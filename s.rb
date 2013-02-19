@@ -45,13 +45,33 @@ class Game
 
   # Accepts actions or moves
   def accept(action_or_move)
-    if headline?
-      # ensure action is a HeadlineCardPlay, etc
-      # add action to stack
-      # if stack contains two headline actions, execute them
-      # according to ordering rules (typically USSR first)
+    # assert that this action satisfies the immediate array of expectations.
+    # execute as needed.
+    if acceptable?(action_or_move)
+      # it was executed already, rename valid? to something better.
+      remove_expectation_if_satified
     else
-      # ...
+      raise UnacceptableActionOrMove.new(self), action_or_move
+    end
+  end
+
+  def acceptable?(action_or_move)
+    expectations.first.any? { |x| x.valid?(action_or_move) }
+  end
+
+  def remove_expectation_if_satified
+    expectations.first.each { |x| expectations.first.delete(x) if x.satisfied? }
+    expectations.shift if expectations.first.empty?
+  end
+
+  class UnacceptableActionOrMove < StandardError
+    def initialize(game)
+      @game = game
+    end
+
+    def to_s
+      "Invalid move or action. Expected one of: #{
+        @game.expectations.first.map { |x| x.explain }}"
     end
   end
 
@@ -98,7 +118,12 @@ module Moves
   end
 
   class Influence < Move
+    attr_accessor :player, :country, :amount
+
     def initialize(player, country, amount)
+      self.player = player
+      self.country = country
+      self.amount = amount
     end
   end
 
@@ -145,25 +170,39 @@ module Validators
   end
 
   class OpeningUssrInfluence
-    def expects
-      [Influence(:ussr, EASTERN_EUROPE, 1)] * 6
+    attr_accessor :moves
+
+    def initialize
+      self.moves = 6
+    end
+
+    def satisfied?
+      moves.zero?
     end
 
     def explain
       "USSR to place 6 influence points within Eastern Europe."
     end
 
-    def valid?(moves)
+    def valid?(move)
       # ensure 6 moves, and each move is:
       # in eastern europe.
+
+      # TODO just check if poland for now
+      if moves > 0 && move.amount > 0 && move.amount <= moves &&
+        move.player == :ussr &&
+        move.country == :poland
+
+        # TODO: actually place influence!
+        self.moves -= move.amount
+
+      else
+        false
+      end
     end
   end
 
   class OpeningUsInfluence
-    def expects
-      [Influence(:us, WESTERN_EUROPE, 1)] * 7
-    end
-
     def explain
       "US to place 7 influence points within Western Europe."
     end
@@ -247,8 +286,8 @@ class Game
     # Require placement of USSR influence.
     # Once complete, require placement of US influence.
     # Once complete, start a regular headline round.
-    add_expectations Validators::OpeningUssrInfluence
-    add_expectations Validators::OpeningUsInfluence
+    add_expectations Validators::OpeningUssrInfluence.new
+    add_expectations Validators::OpeningUsInfluence.new
     add_expectations expect_headline
   end
 
@@ -257,6 +296,7 @@ class Game
   end
 
   def expect_headline
+    "DERP"
   end
 
   def deal_cards

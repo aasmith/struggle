@@ -32,16 +32,16 @@ class Game
   #  [ [e1a, e1b, e1c], [e2a, e2b], [...] ]
   #
   # All of e1* must be completed before any e2* can be accepted, and so on.
-  attr_reader :expectations
+  #
+  # Once all expectations are completed in one array, the next array of
+  # expectations are set by incrementing a pointer @current_index.
+  attr_reader :all_expectations
 
   # Formal definitions
   alias phasing_player       player
   alias action_round         round
   alias china_card_playable? china_card_playable
 
-  # Returns a class of the next expected action(s)
-  def expect
-  end
 
   # Accepts actions or moves
   def accept(action_or_move)
@@ -49,19 +49,26 @@ class Game
     # execute as needed.
     if acceptable?(action_or_move)
       # it was executed already, rename valid? to something better.
-      remove_expectation_if_satified
+      next_expectations_if_satified
     else
       raise UnacceptableActionOrMove.new(self), action_or_move
     end
   end
 
   def acceptable?(action_or_move)
-    expectations.first.any? { |x| x.valid?(action_or_move) }
+    expectations.any? { |x| x.valid?(action_or_move) }
   end
 
-  def remove_expectation_if_satified
-    expectations.first.each { |x| expectations.first.delete(x) if x.satisfied? }
-    expectations.shift if expectations.first.empty?
+  def next_expectations_if_satified
+    next_expectation if expectations.all?(&:satisfied?)
+  end
+
+  def next_expectation
+    @current_index += 1
+  end
+
+  def expectations
+    all_expectations[@current_index]
   end
 
   class UnacceptableActionOrMove < StandardError
@@ -71,7 +78,7 @@ class Game
 
     def to_s
       "Invalid move or action. Expected one of: #{
-        @game.expectations.first.map { |x| x.explain }}"
+        @game.expectations.map { |x| x.explain }}"
     end
   end
 
@@ -277,7 +284,8 @@ class Game
     self.us_ops = 0
     self.ussr_ops = 0
 
-    @expectations = []
+    @all_expectations = []
+    @current_index = 0
 
     # TODO: place static influence for usa, ussr
 
@@ -292,7 +300,7 @@ class Game
   end
 
   def add_expectations(*expectations)
-    @expectations << expectations.flatten
+    @all_expectations << expectations.flatten
   end
 
   def expect_headline

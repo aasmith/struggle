@@ -1,0 +1,8 @@
+.autotest
+History.txt
+Manifest.txt
+README.txt
+Rakefile
+bin/struggle
+lib/struggle.rb
+test/test_struggle.rb

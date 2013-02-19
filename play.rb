@@ -5,14 +5,16 @@ g = Game.new
 # Various placements of influence
 
 puts "Expecting USSR influence placement"
-p g.expectations.first
+p g.expectations.map(&:explain)
 
 g.accept Moves::Influence.new(:ussr, :poland, +6)
 
 puts "Expecting US influence placement"
-p g.expectations.first
+p g.expectations.map(&:explain)
 
-g.accept Moves::Influence.new(:ussr, :canada, +7)
+g.accept Moves::Influence.new(:us, :canada, +7)
+
+# DONE!
 
 # Headline starts
 g.accept HeadlineCardPlay.new(:ussr, Comecon)

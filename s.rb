@@ -209,14 +209,37 @@ module Validators
     end
   end
 
+  # TODO fix and merge similarity with UssrInfluence
   class OpeningUsInfluence
+    attr_accessor :moves
+
+    def initialize
+      self.moves = 7
+    end
+
+    def satisfied?
+      moves.zero?
+    end
+
     def explain
       "US to place 7 influence points within Western Europe."
     end
 
-    def valid?(moves)
+    def valid?(move)
       # ensure 7 moves, and each move is:
       # in western europe.
+
+      # TODO just check if canada for now
+      if moves > 0 && move.amount > 0 && move.amount <= moves &&
+        move.player == :us &&
+        move.country == :canada
+
+        # TODO: actually place influence!
+        self.moves -= move.amount
+
+      else
+        false
+      end
     end
   end
 end

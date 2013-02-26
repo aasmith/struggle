@@ -68,7 +68,7 @@ class Game
   end
 
   def expectations
-    all_expectations[@current_index]
+    all_expectations[@current_index].reject &:satisfied?
   end
 
   class UnacceptableActionOrMove < StandardError
@@ -84,8 +84,16 @@ class Game
 
 end
 
-class Expectation
-  attr_accessor :action_class, :player
+class Expectations
+  attr_accessor :expectations
+
+  # Code to run once all has been satisfied.
+  # Advance turn markers, etc?
+  attr_accessor :terminator
+
+  def satisfied?
+    expectations.all? &:satisfied?
+  end
 end
 
 # The representation of playing a card. The resulting moves the player
@@ -242,6 +250,48 @@ module Validators
       end
     end
   end
+
+  class UssrHeadline
+    attr_accessor :moves
+
+    def initialize
+      self.moves = 1
+    end
+
+    def valid?(move)
+      HeadlineCardPlay === move && move.player == :ussr
+      self.moves -= 1
+    end
+
+    def satisfied?
+      moves.zero?
+    end
+
+    def explain
+      "ussr headline"
+    end
+  end
+
+  class UsHeadline
+    attr_accessor :moves
+
+    def initialize
+      self.moves = 1
+    end
+
+    def valid? move
+      HeadlineCardPlay === move && move.player == :us
+      self.moves -= 1
+    end
+
+    def satisfied?
+      moves.zero?
+    end
+
+    def explain
+      "us headline"
+    end
+  end
 end
 
 class Card
@@ -319,15 +369,15 @@ class Game
     # Once complete, start a regular headline round.
     add_expectations Validators::OpeningUssrInfluence.new
     add_expectations Validators::OpeningUsInfluence.new
-    add_expectations expect_headline
+    add_expectations headline
   end
 
   def add_expectations(*expectations)
     @all_expectations << expectations.flatten
   end
 
-  def expect_headline
-    "DERP"
+  def headline
+    [Validators::UssrHeadline.new, Validators::UsHeadline.new]
   end
 
   def deal_cards

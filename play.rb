@@ -16,14 +16,20 @@ g.accept Moves::Influence.new(:us, :canada, +7)
 
 # DONE!
 
+puts "Expecting any headline"
+p g.expectations.map(&:explain)
+
 # Headline starts
 g.accept HeadlineCardPlay.new(:ussr, Comecon)
 
-g.status # "Awaiting US headline"
+puts "Expecting US headline"
+p g.expectations.map(&:explain)
 
 # Awaits a usa headline play
 g.accept HeadlineCardPlay.new(:usa, TrumanDoctrine)
 
+
+puts "Expect summary of headline cards played"
 g.status # "Headline plays: USSR Comecon, USA Truman Doctrine"
 
 

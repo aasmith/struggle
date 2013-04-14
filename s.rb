@@ -47,6 +47,9 @@ class Game
   def accept(action_or_move)
     # assert that this action satisfies the immediate array of expectations.
     # execute as needed.
+
+    puts "PLAY: #{action_or_move}"
+
     if acceptable?(action_or_move)
       # it was executed already, rename valid? to something better.
       next_expectations_if_satified
@@ -117,6 +120,10 @@ class CardPlay
 
 
   def headline?; false; end
+
+  def to_s
+    "CardPlay TODO"
+  end
 end
 
 class HeadlineCardPlay < CardPlay
@@ -126,10 +133,17 @@ class HeadlineCardPlay < CardPlay
   end
 
   def headline?; true; end
+
+  def to_s
+    "%s headlines %s" % [player, card]
+  end
 end
 
 module Moves
   class Move
+    def to_s
+      "Move TODO"
+    end
   end
 
   class Influence < Move
@@ -139,6 +153,11 @@ module Moves
       self.player = player
       self.country = country
       self.amount = amount
+    end
+
+    def to_s
+      adds_or_subtracts = amount > 0 ? "adds" : "subtracts"
+      "%s %s %s influence points" % [player, adds_or_subtracts, amount.abs]
     end
   end
 
@@ -306,13 +325,33 @@ class Card
     end
   end
 
-  def initialize(*todo)
-    # do stuff, then add to registry
+  FIELDS = [:name, :ops, :side, :phase, :remove_after_event, :validator]
+
+  attr_accessor *FIELDS
+
+  def initialize(args)
+    unless (FIELDS - args.keys).empty?
+      raise ArgumentError, "missing args: #{(FIELDS - args.keys).join(',')}"
+    end
+
+    args.each { |key, value| send("#{key}=", value) }
+    add_to_registry
+  end
+
+  def add_to_registry
+    self.class.add(self)
+  end
+
+  def to_s
+    asterisk = remove_after_event ? "*" : nil
+
+    "%s%s (%s) [%s, %s]" % [name, asterisk, ops, side, phase]
   end
 end
 
 # Sample cards
 Comecon = Card.new(
+  :name => "COMECON",
   :phase => :early,
   :side => :ussr,
   :ops => 3,
@@ -321,6 +360,7 @@ Comecon = Card.new(
 )
 
 TrumanDoctrine = Card.new(
+  :name => "Truman Doctrine",
   :phase => :early,
   :side => :usa,
   :ops => 1,

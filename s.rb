@@ -48,30 +48,30 @@ class Game
     # assert that this action satisfies the immediate array of expectations.
     # execute as needed.
 
-    puts "PLAY: #{action_or_move}"
+    puts "PLAYING: #{action_or_move}"
 
-    if acceptable?(action_or_move)
-      # it was executed already, rename valid? to something better.
+    if expectation = expectations.expecting?(action_or_move)
+      expectation.execute(action_or_move)
       next_expectations_if_satified
     else
       raise UnacceptableActionOrMove.new(self), action_or_move
     end
   end
 
-  def acceptable?(action_or_move)
-    expectations.any? { |x| x.valid?(action_or_move) }
-  end
-
   def next_expectations_if_satified
-    next_expectation if expectations.all?(&:satisfied?)
+    if expectations.satisfied?
+      expectations.execute_terminator
+      next_expectation
+    end
   end
 
   def next_expectation
     @current_index += 1
   end
 
+  # Returns the current Expectations object.
   def expectations
-    all_expectations[@current_index].reject &:satisfied?
+    all_expectations[@current_index]
   end
 
   class UnacceptableActionOrMove < StandardError
@@ -94,8 +94,33 @@ class Expectations
   # Advance turn markers, etc?
   attr_accessor :terminator
 
+  def initialize(expectations, terminator)
+    self.expectations = [*expectations]
+    self.terminator = terminator || DefaultTerminator.new
+  end
+
   def satisfied?
     expectations.all? &:satisfied?
+  end
+
+  # TODO rename - a bool method should not have a required obj return
+  def expecting?(action_or_move)
+    expectations.detect { |x| x.valid?(action_or_move) }
+  end
+
+  def execute_terminator
+    terminator.execute if terminator
+  end
+
+  def explain
+    expectations.map(&:explain)
+  end
+
+
+  class DefaultTerminator
+    def execute
+      puts "DEFAULT TERMINATOR"
+    end
   end
 end
 
@@ -117,7 +142,6 @@ class CardPlay
     self.card = card
     self.type = type
   end
-
 
   def headline?; false; end
 
@@ -144,6 +168,10 @@ module Moves
     def to_s
       "Move TODO"
     end
+
+    def execute
+      raise "Not Implemented!"
+    end
   end
 
   class Influence < Move
@@ -158,6 +186,10 @@ module Moves
     def to_s
       adds_or_subtracts = amount > 0 ? "adds" : "subtracts"
       "%s %s %s influence points" % [player, adds_or_subtracts, amount.abs]
+    end
+
+    def execute
+      # TODO place influence etc.
     end
   end
 
@@ -178,6 +210,16 @@ module Moves
 
   class SpaceRace
     def initialize(player, card)
+    end
+  end
+end
+
+module Terminators
+  class HeadlineRound
+    def execute
+      puts "TODO xxxxx terminator"
+      # Works out how to resolve the headline play that occurred.
+      # Returns the next stack of expectations for appending?
     end
   end
 end
@@ -223,16 +265,14 @@ module Validators
       # in eastern europe.
 
       # TODO just check if poland for now
-      if moves > 0 && move.amount > 0 && move.amount <= moves &&
+      moves > 0 && move.amount > 0 && move.amount <= moves &&
         move.player == :ussr &&
         move.country == :poland
+    end
 
-        # TODO: actually place influence!
-        self.moves -= move.amount
-
-      else
-        false
-      end
+    def execute(move)
+      move.execute
+      self.moves -= move.amount
     end
   end
 
@@ -257,16 +297,14 @@ module Validators
       # in western europe.
 
       # TODO just check if canada for now
-      if moves > 0 && move.amount > 0 && move.amount <= moves &&
+      moves > 0 && move.amount > 0 && move.amount <= moves &&
         move.player == :us &&
         move.country == :canada
+    end
 
-        # TODO: actually place influence!
-        self.moves -= move.amount
-
-      else
-        false
-      end
+    def execute(move)
+      move.execute
+      self.moves -= move.amount
     end
   end
 
@@ -279,6 +317,9 @@ module Validators
 
     def valid?(move)
       HeadlineCardPlay === move && move.player == :ussr
+    end
+
+    def execute(move)
       self.moves -= 1
     end
 
@@ -300,6 +341,9 @@ module Validators
 
     def valid? move
       HeadlineCardPlay === move && move.player == :us
+    end
+
+    def execute(move)
       self.moves -= 1
     end
 
@@ -409,11 +453,11 @@ class Game
     # Once complete, start a regular headline round.
     add_expectations Validators::OpeningUssrInfluence.new
     add_expectations Validators::OpeningUsInfluence.new
-    add_expectations headline
+    add_expectations headline, Terminators::HeadlineRound.new
   end
 
-  def add_expectations(*expectations)
-    @all_expectations << expectations.flatten
+  def add_expectations(expectations, terminator = nil)
+    @all_expectations << Expectations.new(expectations, terminator)
   end
 
   def headline

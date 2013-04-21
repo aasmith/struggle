@@ -26,7 +26,7 @@ puts "Expecting US headline"
 p g.expectations.explain
 
 # Awaits a usa headline play
-g.accept HeadlineCardPlay.new(:usa, TrumanDoctrine)
+g.accept HeadlineCardPlay.new(:us, TrumanDoctrine)
 
 
 puts "Expect summary of headline cards played"
@@ -42,4 +42,4 @@ g.accept Moves::Influence.new(:ussr, :czechoslovakia, +1)
 
 # Now usa
 
-g.accept Moves::Influence.new(:usa, :yugoslavia, -2)
+g.accept Moves::Influence.new(:us, :yugoslavia, -2)

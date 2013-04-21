@@ -54,7 +54,7 @@ class Game
       expectation.execute(action_or_move)
       next_expectations_if_satified
     else
-      raise UnacceptableActionOrMove.new(self), action_or_move
+      raise UnacceptableActionOrMove.new(self, action_or_move)
     end
   end
 
@@ -75,13 +75,18 @@ class Game
   end
 
   class UnacceptableActionOrMove < StandardError
-    def initialize(game)
+    def initialize(game, action_or_move)
       @game = game
+      @action_or_move = action_or_move
     end
 
     def to_s
-      "Invalid move or action. Expected one of: #{
-        @game.expectations.map { |x| x.explain }}"
+      <<-ERR.strip.gsub(/^\s+/,"  ")
+      Invalid move or action.
+      Move: #{@action_or_move.inspect}
+      could not be matched against:
+      #{@game.expectations.inspect}
+      ERR
     end
   end
 

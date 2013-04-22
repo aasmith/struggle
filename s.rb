@@ -23,7 +23,8 @@ class Game
   attr_accessor :us_ops, :ussr_ops
 
   # Expectations. These are arrays of expected (i.e. allowable moves/actions).
-  # Each expectation within an array can be accepted without regards of order.
+  # Each expectation within an array can be accepted without regards of order
+  # (if order_sensitive == false).
   # All expectations in the leading array must be met first before any in
   # the next array can be allowed.
   #
@@ -52,16 +53,20 @@ class Game
 
     if expectation = expectations.expecting?(action_or_move)
       expectation.execute(action_or_move)
-      next_expectations_if_satified
+
+      history << action_or_move
+
+      if expectations.satisfied?
+        more_expectations = expectations.execute_terminator(history)
+
+        add_expectations more_expectations if more_expectations
+
+        next_expectation
+      end
+
+
     else
       raise UnacceptableActionOrMove.new(self, action_or_move)
-    end
-  end
-
-  def next_expectations_if_satified
-    if expectations.satisfied?
-      expectations.execute_terminator
-      next_expectation
     end
   end
 
@@ -71,7 +76,7 @@ class Game
 
   # Returns the current Expectations object.
   def expectations
-    all_expectations[@current_index]
+    all_expectations[@current_index] or fail "Ran out of expectations!"
   end
 
   class UnacceptableActionOrMove < StandardError
@@ -99,9 +104,21 @@ class Expectations
   # Advance turn markers, etc?
   attr_accessor :terminator
 
-  def initialize(expectations, terminator)
+  # Order sensitive - if true, expectations must be
+  # satisfied in the order they are stored. (the default.)
+  attr_accessor :order_sensitive
+
+  DefaultTerminator = Class.new { def execute(*); puts self.class.name; end }
+
+  DEFAULT_ARGS = {
+    :terminator      => DefaultTerminator.new,
+    :order_sensitive => true
+  }
+
+  def initialize(expectations, args = DEFAULT_ARGS)
     self.expectations = [*expectations]
-    self.terminator = terminator || DefaultTerminator.new
+    self.terminator = args[:terminator]
+    self.order_sensitive = args[:order_sensitive]
   end
 
   def satisfied?
@@ -110,23 +127,28 @@ class Expectations
 
   # TODO rename - a bool method should not have a required obj return
   def expecting?(action_or_move)
-    expectations.detect { |x| x.valid?(action_or_move) }
+    if order_sensitive
+      # if order sensitive, find the first unsatisfied expectation.
+      unsatisfied_expectation = expectations.detect { |x| !x.satisfied? }
+
+      if unsatisfied_expectation.valid?(action_or_move)
+        unsatisfied_expectation
+      else
+        nil
+      end
+    else
+      expectations.detect { |x| x.valid?(action_or_move) }
+    end
   end
 
-  def execute_terminator
-    terminator.execute if terminator
+  def execute_terminator(history)
+    terminator.execute(history)
   end
 
   def explain
     expectations.map(&:explain)
   end
 
-
-  class DefaultTerminator
-    def execute
-      puts "DEFAULT TERMINATOR"
-    end
-  end
 end
 
 # The representation of playing a card. The resulting moves the player
@@ -177,6 +199,8 @@ module Moves
     def execute
       raise "Not Implemented!"
     end
+
+    def amount; 1; end
   end
 
   class Influence < Move
@@ -190,7 +214,10 @@ module Moves
 
     def to_s
       adds_or_subtracts = amount > 0 ? "adds" : "subtracts"
-      "%s %s %s influence points" % [player, adds_or_subtracts, amount.abs]
+
+      "%s %s %s influence points to %s" % [
+        player, adds_or_subtracts, amount.abs, country
+      ]
     end
 
     def execute
@@ -221,18 +248,56 @@ end
 
 module Terminators
   class HeadlineRound
-    def execute
-      puts "TODO xxxxx terminator"
-      # Works out how to resolve the headline play that occurred.
-      # Returns the next stack of expectations for appending?
+    # Works out how to resolve the headline play that occurred.
+    # Returns the next stack of expectations for appending?
+    def execute(history)
+      # TODO: this seems rusty - structure history by round or something
+      # instead of one flat array.
+      # get the last two headline plays.
+      headlines = history.grep(HeadlineCardPlay).last(2)
+
+      # Starting with the highest score, build up expectations
+      validators = headlines.
+        sort_by { |h| h.card.score }.
+        map     { |h| h.card.validator.new }.
+        reverse
+
+      Expectations.new(validators)
     end
   end
 end
 
 module Validators
-  class Comecon
-    def valid?(moves)
-      # ensure 4 moves
+  class Validator
+    attr_accessor :moves
+
+    def initialize
+      fail "Someone forgot to create an initializer in #{self.class.name}!"
+    end
+
+    def satisfied?
+      moves.zero?
+    end
+
+    def execute(move)
+      move.execute
+      self.moves -= move.amount
+    end
+
+    def valid?(move)
+      moves > 0 && move.amount > 0 && move.amount <= moves
+    end
+
+  end
+
+  class Comecon < Validator
+    attr_accessor :countries
+
+    def initialize
+      self.moves = 4
+    end
+
+    def valid?(move)
       # ensure each move is:
       # in a unique country
       # in a country in eastern europe
@@ -250,15 +315,9 @@ module Validators
     end
   end
 
-  class OpeningUssrInfluence
-    attr_accessor :moves
-
+  class OpeningUssrInfluence < Validator
     def initialize
       self.moves = 6
-    end
-
-    def satisfied?
-      moves.zero?
     end
 
     def explain
@@ -270,27 +329,15 @@ module Validators
       # in eastern europe.
 
       # TODO just check if poland for now
-      moves > 0 && move.amount > 0 && move.amount <= moves &&
-        move.player == :ussr &&
-        move.country == :poland
-    end
-
-    def execute(move)
-      move.execute
-      self.moves -= move.amount
+      super && move.player == :ussr && move.country == :poland
     end
   end
 
-  # TODO fix and merge similarity with UssrInfluence
-  class OpeningUsInfluence
+  class OpeningUsInfluence < Validator
     attr_accessor :moves
 
     def initialize
       self.moves = 7
-    end
-
-    def satisfied?
-      moves.zero?
     end
 
     def explain
@@ -302,17 +349,13 @@ module Validators
       # in western europe.
 
       # TODO just check if canada for now
-      moves > 0 && move.amount > 0 && move.amount <= moves &&
-        move.player == :us &&
-        move.country == :canada
-    end
-
-    def execute(move)
-      move.execute
-      self.moves -= move.amount
+      super && move.player == :us && move.country == :canada
     end
   end
 
+  # TODO: seems like these validators should be able to inherit from
+  # Validator - but the "move" they validate is a CardPlay, which has
+  # no execute. Smooth this out.
   class UssrHeadline
     attr_accessor :moves
 
@@ -377,6 +420,8 @@ class Card
   FIELDS = [:name, :ops, :side, :phase, :remove_after_event, :validator]
 
   attr_accessor *FIELDS
+
+  alias score ops
 
   def initialize(args)
     unless (FIELDS - args.keys).empty?
@@ -454,15 +499,20 @@ class Game
     deal_cards
 
     # Require placement of USSR influence.
+    add_expectations Expectations.new(Validators::OpeningUssrInfluence.new)
+
     # Once complete, require placement of US influence.
+    add_expectations Expectations.new(Validators::OpeningUsInfluence.new)
+
     # Once complete, start a regular headline round.
-    add_expectations Validators::OpeningUssrInfluence.new
-    add_expectations Validators::OpeningUsInfluence.new
-    add_expectations headline, Terminators::HeadlineRound.new
+    add_expectations Expectations.new(headline,
+      :terminator => Terminators::HeadlineRound.new,
+      :order_sensitive => false
+    )
   end
 
-  def add_expectations(expectations, terminator = nil)
-    @all_expectations << Expectations.new(expectations, terminator)
+  def add_expectations(expectations)
+    @all_expectations << expectations
   end
 
   def headline

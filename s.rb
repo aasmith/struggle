@@ -464,6 +464,22 @@ TrumanDoctrine = Card.new(
   :validator => Validators::TrumanDoctrine
 )
 
+class Superpower
+  def initialize(side)
+    @side = side.to_sym
+  end
+
+  def opponent
+    case side
+    when :us   then :ussr
+    when :ussr then :us
+    end
+  end
+end
+
+US   = Superpower.new(:us)
+USSR = Superpower.new(:ussr)
+
 class Country
   attr_accessor :influence
 

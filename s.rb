@@ -474,10 +474,10 @@ class Country
   def initialize(name)
     @name = name
 
-    self.influence = Hash.new { |h,k| fail "Unknown player #{k.inspect}" }
+    influence = { :us => 0, :ussr => 0 }
+    influence.default_proc = lambda { |h,k| fail "Unknown player #{k.inspect}" }
 
-    self.influence[:us] = 0
-    self.influence[:ussr] = 0
+    self.influence = influence
   end
 
   def in?(region)

@@ -1,3 +1,5 @@
+require "country_data"
+
 class Game
 
   # Things that hold cards
@@ -461,6 +463,80 @@ TrumanDoctrine = Card.new(
   :remove_after_event => true,
   :validator => Validators::TrumanDoctrine
 )
+
+class Country
+  attr_accessor :us_influence, :ussr_influence
+
+  ATTR_NAMES = [:name, :stability, :battleground, :regions, :neighbors]
+
+  Attributes = Struct.new(*ATTR_NAMES)
+
+  def initialize(name)
+    @name = name
+  end
+
+  def in?(region)
+    regions.include? region
+  end
+
+  def neighbor?(country)
+    neighbors.include? country
+  end
+
+  def influence(player)
+    case player
+    when :us   then us_influence
+    when :ussr then ussr_influence
+    else raise "Unknown player #{player.inspect}"
+    end
+  end
+
+  def incr_influence(player)
+    case player
+    when :us then us_influence += 1
+    when :ussr then ussr_influence += 1
+    else raise "Unknown player #{player.inspect}"
+    end
+  end
+
+  def presence?(player)
+    influence(player) > 0
+  end
+
+  def control?(player)
+    influence(player) >= stability + influence(opponent)
+  end
+
+  def add_influence(player, countries)
+    if can_add_influence?(player, countries)
+      incr_influence(player)
+    end
+  end
+
+  def can_add_influence?(player, countries)
+    presence?(player) || player_in_neighboring_country?(player, countries)
+  end
+
+  def player_in_neighboring_country?(player, countries)
+    neighbors.any? do |neighbor|
+      countries.detect { |c| c.name == neighbor && c.presence?(player) }
+    end
+  end
+
+  def fixed_attributes
+    row = COUNTRY_DATA.assoc(@name) or raise "No data for #{@name.inspect}"
+    Attributes.new(*row)
+  end
+
+  # delegate "stability" to fixed_attributes.stability, etc.
+  ATTR_NAMES.each do |attr|
+    define_method(attr) do
+      fixed_attributes.send(attr)
+    end
+  end
+
+  alias battleground? battleground
+end
 
 # Real bits of mostly unimportant code
 class Game

@@ -465,7 +465,7 @@ TrumanDoctrine = Card.new(
 )
 
 class Country
-  attr_accessor :us_influence, :ussr_influence
+  attr_accessor :influence
 
   ATTR_NAMES = [:name, :stability, :battleground, :regions, :neighbors]
 
@@ -473,6 +473,11 @@ class Country
 
   def initialize(name)
     @name = name
+
+    self.influence = Hash.new { |h,k| fail "Unknown player #{k.inspect}" }
+
+    self.influence[:us] = 0
+    self.influence[:ussr] = 0
   end
 
   def in?(region)
@@ -484,19 +489,11 @@ class Country
   end
 
   def influence(player)
-    case player
-    when :us   then us_influence
-    when :ussr then ussr_influence
-    else raise "Unknown player #{player.inspect}"
-    end
+    influence[player]
   end
 
   def incr_influence(player)
-    case player
-    when :us then us_influence += 1
-    when :ussr then ussr_influence += 1
-    else raise "Unknown player #{player.inspect}"
-    end
+    influence[player] += 1
   end
 
   def presence?(player)

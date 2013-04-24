@@ -15,7 +15,8 @@ g.accept Moves::Influence.new(USSR, C[:poland], +6)
 puts "Expecting US influence placement"
 p g.expectations.explain
 
-g.accept Moves::Influence.new(US, C[:canada], +7)
+g.accept Moves::Influence.new(US, C[:canada], +4)
+g.accept Moves::Influence.new(US, C[:west_germany], +3)
 
 # DONE!
 
@@ -45,4 +46,4 @@ g.accept Moves::Influence.new(USSR, C[:czechoslovakia], +1)
 
 # Now usa
 
-g.accept Moves::Influence.new(US, C[:yugoslavia], -2)
+g.accept Moves::Influence.new(US, C[:yugoslavia], -1)

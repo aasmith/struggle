@@ -71,7 +71,7 @@ class Game
 
 
     else
-      raise UnacceptableActionOrMove.new(self, action_or_move)
+      raise UnacceptableActionOrMove.new(expectations, action_or_move)
     end
   end
 
@@ -84,22 +84,22 @@ class Game
     all_expectations[@current_index] or fail "Ran out of expectations!"
   end
 
-  class UnacceptableActionOrMove < StandardError
-    def initialize(game, action_or_move)
-      @game = game
-      @action_or_move = action_or_move
-    end
+end
 
-    def to_s
-      <<-ERR.strip.gsub(/^\s+/,"  ")
-      Invalid move or action.
-      Move: #{@action_or_move.inspect}
-      could not be matched against:
-      #{@game.expectations.inspect}
-      ERR
-    end
+class UnacceptableActionOrMove < StandardError
+  def initialize(expectations, action_or_move)
+    @expectations = expectations
+    @action_or_move = action_or_move
   end
 
+  def to_s
+    <<-ERR.strip.gsub(/^\s+/,"  ")
+    Invalid move or action.
+    Move: #{@action_or_move.inspect}
+    could not be matched against:
+    #{@expectations.inspect}
+    ERR
+  end
 end
 
 class Expectations
@@ -132,17 +132,18 @@ class Expectations
 
   # TODO rename - a bool method should not have a required obj return
   def expecting?(action_or_move)
-    if order_sensitive
+    if order_sensitive?
       # if order sensitive, find the first unsatisfied expectation.
       unsatisfied_expectation = expectations.detect { |x| !x.satisfied? }
 
       if unsatisfied_expectation.valid?(action_or_move)
         unsatisfied_expectation
       else
-        nil
+        raise UnacceptableActionOrMove.new(
+          unsatisfied_expectation, action_or_move)
       end
     else
-      expectations.detect { |x| x.valid?(action_or_move) }
+      expectations.detect { |x| !x.satisfied? && x.valid?(action_or_move) }
     end
   end
 
@@ -153,6 +154,8 @@ class Expectations
   def explain
     expectations.map(&:explain)
   end
+
+  alias order_sensitive? order_sensitive
 
 end
 
@@ -226,7 +229,7 @@ module Moves
     end
 
     def execute
-      # TODO place influence etc.
+      country.add_influence!(player, amount)
     end
   end
 
@@ -274,25 +277,69 @@ end
 
 module Validators
   class Validator
-    attr_accessor :moves
-
-    def initialize
-      fail "Someone forgot to create an initializer in #{self.class.name}!"
-    end
-
     def satisfied?
-      moves.zero?
+      fail "not impl"
     end
 
     def execute(move)
       move.execute
-      self.moves -= move.amount
+      executed(move)
+    end
+
+    def executed(move)
     end
 
     def valid?(move)
-      moves > 0 && move.amount > 0 && move.amount <= moves
+      fail "not impl"
+    end
+  end
+
+  # Validation that is only satisfied when all remaining influence has been
+  # used up. For validating the typical "player places N influence" case.
+  #
+  # Set remaining_influence in your constructor.
+  module InfluenceValidator
+    attr_accessor :remaining_influence
+
+    def initialize
+      fail "Set self.remaining_influence in #{self.class.name}!"
     end
 
+    def valid?(move)
+      move.amount > 0 &&
+        remaining_influence > 0 &&
+        move.amount <= remaining_influence
+    end
+
+    def executed(move)
+      self.remaining_influence -= move.amount
+    end
+
+    def satisfied?
+      remaining_influence.zero?
+    end
+  end
+
+  # A module that sets the Validator to a satisfied state once it has been
+  # executed exactly once.
+  module SingleExecutionValidator
+    attr_accessor :satisfied
+
+    def initialize
+      self.satisfied = false
+    end
+
+    def executed(move)
+      self.satisfied = true
+    end
+
+    def satisfied?
+      satisfied
+    end
+
+    def valid?(move)
+      true
+    end
   end
 
   # Allows four USSR moves, ensuring each move is:
@@ -304,50 +351,55 @@ module Validators
     # Countries that have been used in prior moves.
     attr_accessor :countries
 
+    include InfluenceValidator
+
     def initialize
-      self.moves = 4
+      self.remaining_influence = 4
       self.countries = []
     end
 
     def valid?(move)
-      country = move.country
-
-      valid = super &&
-        !countries.include?(country) &&
-        country.in?(EasternEurope) &&
-        !country.controlled_by?(US)
-
-      if valid
-        countries << country
-        true
-      else
-        false
-      end
+      super &&
+        move.amount == 1 &&
+        move.country.in?(EasternEurope) &&
+        !move.country.controlled_by?(US) &&
+        !countries.include?(move.country)
     end
+
+    def executed(move)
+      super
+      countries << move.country
+    end
+
   end
 
-  # Allows one US move in an uncontrolled country in Europe.
+  # Allows US to remove all USSR influence in an uncontrolled country in
+  # Europe once.
   #
   # Precedents:
   #
   # Must be uncontrolled by *both* players:
   # http://boardgamegeek.com/thread/820285/truman-doctrine-clarification
   class TrumanDoctrine < Validator
-    def initialize
-      self.moves = 1
-    end
 
-    def valid?(moves)
+    include SingleExecutionValidator
+
+    def valid?(move)
       super &&
+        move.player.us? &&
         move.country.in?(Europe) &&
-        move.country.uncontrolled?
+        move.country.uncontrolled? &&
+        move.amount + move.country.influence(USSR) == 0
     end
   end
 
   # Allows six USSR placements of influence within Eastern Europe.
   class OpeningUssrInfluence < Validator
+
+    include InfluenceValidator
+
     def initialize
-      self.moves = 6
+      self.remaining_influence = 6
     end
 
     def explain
@@ -361,10 +413,11 @@ module Validators
 
   # Allows seven US placements of influence within Western Europe.
   class OpeningUsInfluence < Validator
-    attr_accessor :moves
+
+    include InfluenceValidator
 
     def initialize
-      self.moves = 7
+      self.remaining_influence = 7
     end
 
     def explain
@@ -537,7 +590,7 @@ class Country
     @influence[player]
   end
 
-  def incr_influence(player, amount = 1)
+  def add_influence!(player, amount = 1)
     @influence[player] += amount
   end
 
@@ -557,9 +610,11 @@ class Country
     !controlled?
   end
 
-  def add_influence(player, countries)
-    if can_add_influence?(player, countries)
-      incr_influence(player)
+  def add_influence(player, countries, amount = 1)
+    amount.times do
+      if can_add_influence?(player, countries)
+        add_influence!(player)
+      end
     end
   end
 
@@ -682,21 +737,21 @@ class Game
   end
 
   def place_starting_influence
-    Country.find(:syria, countries).incr_influence(USSR, 1)
-    Country.find(:iraq, countries).incr_influence(USSR, 1)
-    Country.find(:north_korea, countries).incr_influence(USSR, 3)
-    Country.find(:east_germany, countries).incr_influence(USSR, 3)
-    Country.find(:finland, countries).incr_influence(USSR, 1)
+    Country.find(:syria, countries).add_influence!(USSR, 1)
+    Country.find(:iraq, countries).add_influence!(USSR, 1)
+    Country.find(:north_korea, countries).add_influence!(USSR, 3)
+    Country.find(:east_germany, countries).add_influence!(USSR, 3)
+    Country.find(:finland, countries).add_influence!(USSR, 1)
 
-    Country.find(:iran, countries).incr_influence(US, 1)
-    Country.find(:israel, countries).incr_influence(US, 1)
-    Country.find(:japan, countries).incr_influence(US, 1)
-    Country.find(:australia, countries).incr_influence(US, 4)
-    Country.find(:philippines, countries).incr_influence(US, 1)
-    Country.find(:south_korea, countries).incr_influence(US, 1)
-    Country.find(:panama, countries).incr_influence(US, 1)
-    Country.find(:south_africa, countries).incr_influence(US, 1)
-    Country.find(:united_kingdom, countries).incr_influence(US, 5)
+    Country.find(:iran, countries).add_influence!(US, 1)
+    Country.find(:israel, countries).add_influence!(US, 1)
+    Country.find(:japan, countries).add_influence!(US, 1)
+    Country.find(:australia, countries).add_influence!(US, 4)
+    Country.find(:philippines, countries).add_influence!(US, 1)
+    Country.find(:south_korea, countries).add_influence!(US, 1)
+    Country.find(:panama, countries).add_influence!(US, 1)
+    Country.find(:south_africa, countries).add_influence!(US, 1)
+    Country.find(:united_kingdom, countries).add_influence!(US, 5)
 
     def self.place_starting_influence
       fail "Called more than once"

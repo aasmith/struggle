@@ -156,7 +156,6 @@ class Expectations
   end
 
   alias order_sensitive? order_sensitive
-
 end
 
 # The representation of playing a card. The resulting moves the player
@@ -264,13 +263,28 @@ module Terminators
       # get the last two headline plays.
       headlines = history.grep(HeadlineCardPlay).last(2)
 
+      # TODO: if a tie on card score, US goes first (Rule 4.5 Subsection C)
       # Starting with the highest score, build up expectations
       validators = headlines.
         sort_by { |h| h.card.score }.
         map     { |h| h.card.validator.new }.
         reverse
 
-      Expectations.new(validators)
+      puts "HEADLINE CARDS PLAYED!"
+
+      Expectations.new(validators, :terminator => HeadlineEnd.new)
+    end
+  end
+
+  class HeadlineEnd
+    def execute(history)
+      puts "HEADLINE PHASE ENDED!"
+    end
+  end
+
+  class TurnEnd
+    def execute(history)
+      puts "TURN ENDED!"
     end
   end
 end
@@ -440,6 +454,7 @@ module Validators
     end
 
     def valid?(move)
+      # TODO: ensure china card cannot be played (Rule 4.5 Subsection C)
       HeadlineCardPlay === move && move.player.ussr?
     end
 
@@ -464,6 +479,7 @@ module Validators
     end
 
     def valid? move
+      # TODO: ensure china card cannot be played (Rule 4.5 Subsection C)
       HeadlineCardPlay === move && move.player.us?
     end
 

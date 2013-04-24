@@ -8,6 +8,16 @@ regions = { # TODO: might not need a hierarchy here
   SA = "South America" => []
 }
 
+EasternEurope = EE
+WesternEurope = WE
+Europe = EU
+Asia = AS
+SoutheastAsia = SE
+Africa = AF
+MiddleEast = ME
+CentralAmerica = CA
+SouthAmerica = SA
+
 
 # country spec
 #   Name, Stability, Battleground, Regions, Neighbors

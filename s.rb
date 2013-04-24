@@ -24,6 +24,9 @@ class Game
   # Military Ops: 0-5
   attr_accessor :us_ops, :ussr_ops
 
+  # Countries and their associated presence
+  attr_accessor :countries
+
   # Expectations. These are arrays of expected (i.e. allowable moves/actions).
   # Each expectation within an array can be accepted without regards of order
   # (if order_sensitive == false).
@@ -317,6 +320,7 @@ module Validators
     end
   end
 
+  # Allows six USSR placements of influence within Eastern Europe.
   class OpeningUssrInfluence < Validator
     def initialize
       self.moves = 6
@@ -327,14 +331,11 @@ module Validators
     end
 
     def valid?(move)
-      # ensure 6 moves, and each move is:
-      # in eastern europe.
-
-      # TODO just check if poland for now
-      super && move.player.ussr? && move.country == :poland
+      super && move.player.ussr? && move.country.in?(EasternEurope)
     end
   end
 
+  # Allows seven US placements of influence within Western Europe.
   class OpeningUsInfluence < Validator
     attr_accessor :moves
 
@@ -347,11 +348,7 @@ module Validators
     end
 
     def valid?(move)
-      # ensure 7 moves, and each move is:
-      # in western europe.
-
-      # TODO just check if canada for now
-      super && move.player.us? && move.country == :canada
+      super && move.player.us? && move.country.in?(WesternEurope)
     end
   end
 
@@ -490,12 +487,14 @@ end
 class Country
   attr_accessor :influence
 
-  ATTR_NAMES = [:name, :stability, :battleground, :regions, :neighbors]
+  attr_reader :name, :stability, :battleground, :regions, :neighbors
 
-  Attributes = Struct.new(*ATTR_NAMES)
-
-  def initialize(name)
+  def initialize(name, stability, battleground, regions, neighbors)
     @name = name
+    @stability = stability
+    @battleground = battleground
+    @regions = regions
+    @neighbors = neighbors
 
     influence = { :us => 0, :ussr => 0 }
     influence.default_proc = lambda { |h,k| fail "Unknown player #{k.inspect}" }
@@ -543,19 +542,33 @@ class Country
     end
   end
 
-  def fixed_attributes
-    row = COUNTRY_DATA.assoc(@name) or raise "No data for #{@name.inspect}"
-    Attributes.new(*row)
-  end
+  alias battleground? battleground
 
-  # delegate "stability" to fixed_attributes.stability, etc.
-  ATTR_NAMES.each do |attr|
-    define_method(attr) do
-      fixed_attributes.send(attr)
+  class << self
+    def all
+      COUNTRY_DATA.map do |row|
+        Country.new(*row)
+      end
+    end
+
+    # Looks through the given array of countries for an unambiguous
+    # match on country name. Name can be a String or Symbol.
+    #
+    # Not finding a country with the given name is considered an error.
+    def find(name, countries)
+      name = name.to_s.gsub(/_/, " ")
+
+      results = countries.select do |country|
+        country.name =~ /^#{name}/i
+      end
+
+      if results.size == 1
+        return results.first
+      else
+        raise "No country found for #{name.inspect}"
+      end
     end
   end
-
-  alias battleground? battleground
 end
 
 # Real bits of mostly unimportant code
@@ -586,6 +599,8 @@ class Game
 
     self.us_ops = 0
     self.ussr_ops = 0
+
+    self.countries = Country.all
 
     @all_expectations = []
     @current_index = 0

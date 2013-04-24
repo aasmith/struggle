@@ -2,17 +2,20 @@ require 's'
 
 g = Game.new
 
+# Helper to find a country for this game.
+C = lambda { |name| Country.find(name, g.countries) }
+
 # Various placements of influence
 
 puts "Expecting USSR influence placement"
 p g.expectations.explain
 
-g.accept Moves::Influence.new(USSR, :poland, +6)
+g.accept Moves::Influence.new(USSR, C[:poland], +6)
 
 puts "Expecting US influence placement"
 p g.expectations.explain
 
-g.accept Moves::Influence.new(US, :canada, +7)
+g.accept Moves::Influence.new(US, C[:canada], +7)
 
 # DONE!
 
@@ -35,11 +38,11 @@ g.status # "Headline plays: USSR Comecon, USA Truman Doctrine"
 
 # Players may now execute moves according to ordering (ussr first)
 
-g.accept Moves::Influence.new(USSR, :poland, +1)
-g.accept Moves::Influence.new(USSR, :east_germany, +1)
-g.accept Moves::Influence.new(USSR, :yugoslavia, +1)
-g.accept Moves::Influence.new(USSR, :czechoslovakia, +1)
+g.accept Moves::Influence.new(USSR, C[:poland], +1)
+g.accept Moves::Influence.new(USSR, C[:east_germany], +1)
+g.accept Moves::Influence.new(USSR, C[:yugoslavia], +1)
+g.accept Moves::Influence.new(USSR, C[:czechoslovakia], +1)
 
 # Now usa
 
-g.accept Moves::Influence.new(US, :yugoslavia, -2)
+g.accept Moves::Influence.new(US, C[:yugoslavia], -2)

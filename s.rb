@@ -576,7 +576,15 @@ class Country
   alias battleground? battleground
 
   def to_s
-    "%s (US:%s, USSR:%s)" % [name, influence(US), influence(USSR)]
+    basic = "%s (US:%s, USSR:%s)" % [name, influence(US), influence(USSR)]
+
+    extra = if controlled_by?(US)
+      "Controlled by US"
+    elsif controlled_by?(USSR)
+      "Controlled by USSR"
+    end
+
+    [basic, extra].join(" ")
   end
 
   class << self

@@ -1,22 +1,14 @@
 
-regions = { # TODO: might not need a hierarchy here
-  EU = "Europe" => [WE = "Western Europe", EE = "Eastern Europe"],
-  AS = "Asia"   => [SE = "Southeast Asia"],
-  AF = "Africa" => [],
-  ME = "Middle East" => [],
-  CA = "Central America" => [],
-  SA = "South America" => []
-}
-
-EasternEurope = EE
-WesternEurope = WE
-Europe = EU
-Asia = AS
-SoutheastAsia = SE
-Africa = AF
-MiddleEast = ME
-CentralAmerica = CA
-SouthAmerica = SA
+# Regions
+EasternEurope = EE = "Eastern Europe"
+WesternEurope = WE = "Western Europe"
+Europe = EU = "Europe"
+Asia = AS = "Asia"
+SoutheastAsia = SE = "Southeast Asia"
+Africa = AF = "Africa"
+MiddleEast = ME = "Middle East"
+CentralAmerica = CA = "Central America"
+SouthAmerica = SA = "South America"
 
 
 # country spec

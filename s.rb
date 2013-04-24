@@ -220,7 +220,7 @@ module Moves
     def to_s
       adds_or_subtracts = amount > 0 ? "adds" : "subtracts"
 
-      "%s %s %s influence points to %s" % [
+      "%s %s %s influence points in %s" % [
         player, adds_or_subtracts, amount.abs, country
       ]
     end

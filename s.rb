@@ -295,28 +295,52 @@ module Validators
 
   end
 
+  # Allows four USSR moves, ensuring each move is:
+  #  in a unique country
+  #  in a country in Eastern Europe
+  #  in a country that is not US-controlled
   class Comecon < Validator
+
+    # Countries that have been used in prior moves.
     attr_accessor :countries
 
     def initialize
       self.moves = 4
+      self.countries = []
     end
 
     def valid?(move)
-      # ensure each move is:
-      # in a unique country
-      # in a country in eastern europe
-      # in a country that is not us-controlled
+      country = move.country
+
+      valid = super &&
+        !countries.include?(country) &&
+        country.in?(EasternEurope) &&
+        !country.controlled_by?(US)
+
+      if valid
+        countries << country
+        true
+      else
+        false
+      end
     end
   end
 
-  class TrumanDoctrine
+  # Allows one US move in an uncontrolled country in Europe.
+  #
+  # Precedents:
+  #
+  # Must be uncontrolled by *both* players:
+  # http://boardgamegeek.com/thread/820285/truman-doctrine-clarification
+  class TrumanDoctrine < Validator
+    def initialize
+      self.moves = 1
+    end
+
     def valid?(moves)
-      # ensure 1 move
-      # the move should:
-      # remove all ussr influence
-      # be in a country in europe
-      # be in an uncontrolled country
+      super &&
+        move.country.in?(Europe) &&
+        move.country.uncontrolled?
     end
   end
 
@@ -485,9 +509,8 @@ class Ussr < Superpower
 end
 
 class Country
-  attr_accessor :influence
-
   attr_reader :name, :stability, :battleground, :regions, :neighbors
+  attr_reader :influence
 
   def initialize(name, stability, battleground, regions, neighbors)
     @name = name
@@ -496,10 +519,10 @@ class Country
     @regions = regions
     @neighbors = neighbors
 
-    influence = { :us => 0, :ussr => 0 }
+    influence = { US => 0, USSR => 0 }
     influence.default_proc = lambda { |h,k| fail "Unknown player #{k.inspect}" }
 
-    self.influence = influence
+    @influence = influence
   end
 
   def in?(region)
@@ -511,19 +534,27 @@ class Country
   end
 
   def influence(player)
-    influence[player]
+    @influence[player]
   end
 
-  def incr_influence(player)
-    influence[player] += 1
+  def incr_influence(player, amount = 1)
+    @influence[player] += amount
   end
 
   def presence?(player)
     influence(player) > 0
   end
 
-  def control?(player)
-    influence(player) >= stability + influence(opponent)
+  def controlled_by?(player)
+    influence(player) >= stability + influence(player.opponent)
+  end
+
+  def controlled?
+    controlled_by?(US) || controlled_by?(USSR)
+  end
+
+  def uncontrolled?
+    !controlled?
   end
 
   def add_influence(player, countries)
@@ -543,6 +574,10 @@ class Country
   end
 
   alias battleground? battleground
+
+  def to_s
+    "%s (US:%s, USSR:%s)" % [name, influence(US), influence(USSR)]
+  end
 
   class << self
     def all
@@ -605,7 +640,7 @@ class Game
     @all_expectations = []
     @current_index = 0
 
-    # TODO: place static influence for usa, ussr
+    place_starting_influence
 
     deal_cards
 
@@ -636,5 +671,27 @@ class Game
 
   def status
     puts "game status..."
+  end
+
+  def place_starting_influence
+    Country.find(:syria, countries).incr_influence(USSR, 1)
+    Country.find(:iraq, countries).incr_influence(USSR, 1)
+    Country.find(:north_korea, countries).incr_influence(USSR, 3)
+    Country.find(:east_germany, countries).incr_influence(USSR, 3)
+    Country.find(:finland, countries).incr_influence(USSR, 1)
+
+    Country.find(:iran, countries).incr_influence(US, 1)
+    Country.find(:israel, countries).incr_influence(US, 1)
+    Country.find(:japan, countries).incr_influence(US, 1)
+    Country.find(:australia, countries).incr_influence(US, 4)
+    Country.find(:philippines, countries).incr_influence(US, 1)
+    Country.find(:south_korea, countries).incr_influence(US, 1)
+    Country.find(:panama, countries).incr_influence(US, 1)
+    Country.find(:south_africa, countries).incr_influence(US, 1)
+    Country.find(:united_kingdom, countries).incr_influence(US, 5)
+
+    def self.place_starting_influence
+      fail "Called more than once"
+    end
   end
 end

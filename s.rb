@@ -331,7 +331,7 @@ module Validators
       # in eastern europe.
 
       # TODO just check if poland for now
-      super && move.player == :ussr && move.country == :poland
+      super && move.player.ussr? && move.country == :poland
     end
   end
 
@@ -351,7 +351,7 @@ module Validators
       # in western europe.
 
       # TODO just check if canada for now
-      super && move.player == :us && move.country == :canada
+      super && move.player.us? && move.country == :canada
     end
   end
 
@@ -366,7 +366,7 @@ module Validators
     end
 
     def valid?(move)
-      HeadlineCardPlay === move && move.player == :ussr
+      HeadlineCardPlay === move && move.player.ussr?
     end
 
     def execute(move)
@@ -390,7 +390,7 @@ module Validators
     end
 
     def valid? move
-      HeadlineCardPlay === move && move.player == :us
+      HeadlineCardPlay === move && move.player.us?
     end
 
     def execute(move)
@@ -465,20 +465,27 @@ TrumanDoctrine = Card.new(
 )
 
 class Superpower
-  def initialize(side)
-    @side = side.to_sym
-  end
-
-  def opponent
-    case side
-    when :us   then :ussr
-    when :ussr then :us
-    end
-  end
+  def opponent; fail NotImplementedError; end
+  def ussr?; false; end
+  def us?; false; end
+  def to_s; self.class.name.upcase; end
 end
 
-US   = Superpower.new(:us)
-USSR = Superpower.new(:ussr)
+class Us < Superpower; end
+class Ussr < Superpower; end
+
+US   = Us.new
+USSR = Ussr.new
+
+class Us < Superpower
+  def opponent; USSR; end
+  def us?; true; end
+end
+
+class Ussr < Superpower
+  def opponent; US; end
+  def ussr?; true; end
+end
 
 class Country
   attr_accessor :influence

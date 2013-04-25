@@ -180,7 +180,7 @@ class CardPlay
   def headline?; false; end
 
   def to_s
-    "CardPlay TODO"
+    "%s plays %s for %s" % [player, card, type]
   end
 end
 
@@ -531,7 +531,7 @@ class Card
   def to_s
     asterisk = remove_after_event ? "*" : nil
 
-    "%s%s (%s) [%s, %s]" % [name, asterisk, ops, side, phase]
+    "%s%s (%s) [%s, %s]" % [name, asterisk, ops, side || "neutral", phase]
   end
 end
 

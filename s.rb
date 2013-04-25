@@ -446,16 +446,17 @@ module Validators
   # TODO: seems like these validators should be able to inherit from
   # Validator - but the "move" they validate is a CardPlay, which has
   # no execute. Smooth this out.
-  class UssrHeadline
-    attr_accessor :moves
+  class Headline
+    attr_accessor :expected_player, :moves
 
-    def initialize
+    def initialize(expected_player)
+      self.expected_player = expected_player
       self.moves = 1
     end
 
     def valid?(move)
       # TODO: ensure china card cannot be played (Rule 4.5 Subsection C)
-      HeadlineCardPlay === move && move.player.ussr?
+      HeadlineCardPlay === move && move.player == expected_player
     end
 
     def execute(move)
@@ -467,34 +468,10 @@ module Validators
     end
 
     def explain
-      "ussr headline"
+      "#{expected_player} headline"
     end
   end
 
-  class UsHeadline
-    attr_accessor :moves
-
-    def initialize
-      self.moves = 1
-    end
-
-    def valid? move
-      # TODO: ensure china card cannot be played (Rule 4.5 Subsection C)
-      HeadlineCardPlay === move && move.player.us?
-    end
-
-    def execute(move)
-      self.moves -= 1
-    end
-
-    def satisfied?
-      moves.zero?
-    end
-
-    def explain
-      "us headline"
-    end
-  end
 end
 
 class Card
@@ -741,7 +718,7 @@ class Game
   end
 
   def headline
-    [Validators::UssrHeadline.new, Validators::UsHeadline.new]
+    [Validators::Headline.new(USSR), Validators::Headline.new(US)]
   end
 
   def deal_cards

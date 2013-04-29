@@ -880,14 +880,18 @@ Blockade = Card.new(
 
 class Country
   attr_reader :name, :stability, :battleground, :regions, :neighbors
-  attr_reader :influence
+  attr_reader :influence, :adjacent_superpower
 
-  def initialize(name, stability, battleground, regions, neighbors)
+
+  def initialize(name, stability, battleground, regions, neighbors,
+                 adjacent_superpower = nil)
+
     @name = name
     @stability = stability
     @battleground = battleground
     @regions = regions
     @neighbors = neighbors
+    @adjacent_superpower = adjacent_superpower
 
     influence = { US => 0, USSR => 0 }
     influence.default_proc = lambda { |h,k| fail "Unknown player #{k.inspect}" }
@@ -900,7 +904,7 @@ class Country
   end
 
   def neighbor?(country)
-    neighbors.include? country
+    neighbors.include? country.name
   end
 
   def influence(player)
@@ -981,10 +985,12 @@ class Country
       if results.size == 1
         return results.first
       else
-        raise "No country found for #{name.inspect}"
+        raise AmbiguousName, "No country found for #{name.inspect}"
       end
     end
   end
+
+  AmbiguousName = Class.new(RuntimeError)
 end
 
 # Real bits of mostly unimportant code

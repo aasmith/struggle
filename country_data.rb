@@ -14,8 +14,8 @@ SouthAmerica = SA = "South America"
 # country spec
 #   Name, Stability, Battleground, Regions, Neighbors
 COUNTRY_DATA = [
-  ["Mexico",              2, true,   CA, ["USA", "Guatemala"]],
-  ["Cuba",                3, true,   CA, ["USA", "Nicaragua", "Haiti"]],
+  ["Mexico",              2, true,   CA, ["Guatemala"], "US"],
+  ["Cuba",                3, true,   CA, ["Nicaragua", "Haiti"], "US"],
   ["Guatemala",           1, false,  CA, ["Mexico", "El Salvador", "Honduras"]],
   ["El Salvador",         1, false,  CA, ["Guatemala", "Honduras"]],
   ["Honduras",            2, false,  CA, ["Guatemala", "El Salvador", "Costa Rica", "Nicaragua"]],
@@ -40,7 +40,7 @@ COUNTRY_DATA = [
   ["Denmark",             3, false,  [EU, WE], ["Sweden", "West Germany"]],
   ["Sweden",              4, false,  [EU, WE], ["Norway", "Denmark", "Finland"]],
   ["United Kingdom",      5, false,  [EU, WE], ["Norway", "France", "Canada", "Benelux"]],
-  ["Canada",              4, false,  [EU, WE], ["USA", "United Kingdom"]],
+  ["Canada",              4, false,  [EU, WE], ["United Kingdom"], "US"],
   ["Benelux",             3, false,  [EU, WE], ["United Kingdom", "West Germany"]],
   ["West Germany",        4, true,   [EU, WE], ["Denmark", "Benelux", "France", "East Germany"]],
   ["France",              3, true,   [EU, WE], ["United Kingdom", "West Germany", "Spain/Portugal", "Algeria", "Italy"]],
@@ -49,14 +49,14 @@ COUNTRY_DATA = [
   ["Turkey",              2, false,  [EU, WE], ["Romania", "Bulgaria", "Greece", "Syria"]],
   ["Greece",              2, false,  [EU, WE], ["Italy", "Yugoslavia", "Bulgaria", "Turkey"]],
 
-  ["Finland",             4, false,  [EU, WE, EE], ["USSR", "Sweden"]],
+  ["Finland",             4, false,  [EU, WE, EE], ["Sweden"], "USSR"],
   ["Austria",             4, false,  [EU, WE, EE], ["West Germany", "East Germany", "Hungary", "Italy"]],
 
   ["East Germany",        3, true,   [EU, EE], ["Poland", "Czechoslovakia", "Austria", "West Germany"]],
-  ["Poland",              3, true,   [EU, EE], ["USSR", "Czechoslovakia", "East Germany"]],
+  ["Poland",              3, true,   [EU, EE], ["Czechoslovakia", "East Germany"], "USSR"],
   ["Czechoslovakia",      3, false,  [EU, EE], ["East Germany", "Poland", "Hungary"]],
   ["Hungary",             3, false,  [EU, EE], ["Austria", "Czechoslovakia", "Romania", "Yugoslavia"]],
-  ["Romania",             3, false,  [EU, EE], ["USSR", "Turkey", "Yugoslavia", "Hungary"]],
+  ["Romania",             3, false,  [EU, EE], ["Turkey", "Yugoslavia", "Hungary"], "USSR"],
   ["Yugoslavia",          3, false,  [EU, EE], ["Hungary", "Romania", "Greece", "Italy"]],
   ["Bulgaria",            3, false,  [EU, EE], ["Turkey", "Greece"]],
 
@@ -90,11 +90,11 @@ COUNTRY_DATA = [
   ["Gulf States",         3, false,  ME, ["Iraq", "Saudi Arabia"]],
   ["Saudi Arabia",        3, true,   ME, ["Gulf States", "Iraq", "Jordan"]],
 
-  ["North Korea",         3, true,   AS, ["USSR", "South Korea"]],
-  ["Afghanistan",         2, false,  AS, ["USSR", "Iran", "Pakistan"]],
+  ["North Korea",         3, true,   AS, ["South Korea"], "USSR"],
+  ["Afghanistan",         2, false,  AS, ["Iran", "Pakistan"], "USSR"],
   ["South Korea",         3, true,   AS, ["North Korea", "Japan", "Taiwan"]],
   ["Pakistan",            2, true,   AS, ["India", "Afghanistan", "Iran"]],
-  ["Japan",               4, true,   AS, ["USA", "Philippines", "Taiwan", "South Korea"]],
+  ["Japan",               4, true,   AS, ["Philippines", "Taiwan", "South Korea"], "US"],
   ["India",               3, true,   AS, ["Burma", "Pakistan"]],
   ["Taiwan",              3, false,  AS, ["South Korea", "Japan"]],
   ["Australia",           4, false,  AS, ["Malaysia"]],

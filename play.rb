@@ -47,3 +47,33 @@ g.accept Moves::Influence.new(USSR, C[:czechoslovakia], +1)
 # Now usa
 
 g.accept Moves::Influence.new(US, C[:yugoslavia], -1)
+
+puts "First round starts..."
+
+g.accept CardPlay.new(USSR, OlympicGames, :event)
+
+# OR ? g.accept Moves::Event.new(USSR, OlympicGames)
+
+g.status # USSR plays ogames as event - us to participate?
+
+g.accept Moves::OlympicSponsorOrBoycott.new(US, :sponsor)
+
+g.status # some olympics outcome....
+
+# TODO playing for points - but playing ops first
+g.accept CardPlay.new(US, Blockade, :event, :ops_before)
+
+# play for ops
+g.accept Moves::Operation.new(US, Blockade, :influence)
+
+# pretending there are 4 ops to demo creep for now
+g.accept Moves::Influence.new(US, C[:france], +1)
+g.accept Moves::Influence.new(US, C[:france], +1)
+g.accept Moves::Influence.new(US, C[:france], +1)
+g.accept Moves::Influence.new(US, C[:france], +1)
+
+# now the event - one of these...
+g.accept Moves::Discard.new(US, some_card)
+g.accept Moves::Influence.new(US, C[:west_germany], -4)
+
+

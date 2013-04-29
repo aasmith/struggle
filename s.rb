@@ -56,10 +56,24 @@ class Game
 
     puts "PLAYING: #{action_or_move}"
 
+    # Guesses what possible bits of context that the object may need in order
+    # to go about its business. This should probably be less guess and more
+    # object stating what it needs, and we provide it here.
+    #
+    # Suggested: add "def self.needs; [:countries]; end" to the object
+    # receiving the injections.
+    if action_or_move.respond_to?(:countries=)
+      action_or_move.countries = countries
+    end
+
     if expectation = expectations.expecting?(action_or_move)
-      expectation.execute(action_or_move)
+      possible_expectations = expectation.execute(action_or_move)
+
+      add_immediate_expectations *possible_expectations
 
       history << action_or_move
+
+      expectations.execute_interval(history) if expectation.satisfied?
 
       if expectations.satisfied?
         more_expectations = expectations.execute_terminator(history)
@@ -84,6 +98,16 @@ class Game
     all_expectations[@current_index] or fail "Ran out of expectations!"
   end
 
+  # Add the provided validators (TODO or should these be a new set of nested
+  # expectations?) into the current set of expectations, right after the
+  # current validation.
+  def add_immediate_expectations(*validators)
+    if validators.all? { |v| Validators::Validator === v }
+      expectations.insert(*validators)
+    else
+      warn "Not all validators were valid! Got #{validators.inspect}"
+    end
+  end
 end
 
 class UnacceptableActionOrMove < StandardError
@@ -109,19 +133,28 @@ class Expectations
   # Advance turn markers, etc?
   attr_accessor :terminator
 
+  # Code to run after each satisfaction, switch phasing player etc?
+  attr_accessor :interval
+
   # Order sensitive - if true, expectations must be
   # satisfied in the order they are stored. (the default.)
   attr_accessor :order_sensitive
 
   DefaultTerminator = Class.new { def execute(*); puts self.class.name; end }
+  DefaultInterval   = Class.new { def execute(*); puts self.class.name; end }
 
   DEFAULT_ARGS = {
     :terminator      => DefaultTerminator.new,
+    :interval        => DefaultInterval.new,
     :order_sensitive => true
   }
 
-  def initialize(expectations, args = DEFAULT_ARGS)
+  def initialize(expectations, args = {})
     self.expectations = [*expectations]
+
+    args = DEFAULT_ARGS.merge(args)
+
+    self.interval = args[:interval]
     self.terminator = args[:terminator]
     self.order_sensitive = args[:order_sensitive]
   end
@@ -147,6 +180,10 @@ class Expectations
     end
   end
 
+  def execute_interval(history)
+    interval.execute(history)
+  end
+
   def execute_terminator(history)
     terminator.execute(history)
   end
@@ -155,9 +192,42 @@ class Expectations
     expectations.map(&:explain)
   end
 
+  # Inserts a validator after the last satisfied validator, or put it on the
+  # end if all are satisfied.
+  def insert(*validators)
+    index = expectations.index { |v| !v.satisfied? } || expectations.size
+
+    expectations.insert(index, *validators)
+  end
+
   alias order_sensitive? order_sensitive
 end
 
+class Superpower
+  def opponent; fail NotImplementedError; end
+  def ussr?; false; end
+  def us?; false; end
+  def to_s; self.class.name.upcase; end
+end
+
+class Us < Superpower; end
+class Ussr < Superpower; end
+
+US   = Us.new
+USSR = Ussr.new
+
+class Us < Superpower
+  def opponent; USSR; end
+  def us?; true; end
+end
+
+class Ussr < Superpower
+  def opponent; US; end
+  def ussr?; true; end
+end
+
+# TODO: explain this better
+# TODO: why is this not a Move?
 # The representation of playing a card. The resulting moves the player
 # may make are not part of a CardPlay.
 class CardPlay
@@ -171,19 +241,60 @@ class CardPlay
   # The card being played.
   attr_accessor :card
 
-  def initialize(player, card, type)
+  # The order of playing ops. This is required when a player has played an
+  # opponent's card, thus meaning the event must be played. The player must
+  # decide when ops points are played in relation to the event. Valid values
+  # in this case are :ops_before or :ops_after.
+  #
+  # This is affected by a case ruling, see Ruling #2.
+  #
+  # Otherwise leave nil.
+  attr_accessor :order_of_play
+
+  def initialize(player, card, type, order_of_play = nil)
     self.player = player
     self.card = card
     self.type = type
+    self.order_of_play = order_of_play
+
+    if player.opponent == card.side
+      if invalid_order_of_play?
+        raise "order of play was invalid: #{order_of_play.inspect}"
+      end
+    end
+
   end
 
   def headline?; false; end
 
+  # puts the card just played onto the expectation stack. Just like how
+  # HeadlineCardRound does it after a couple of HeadlineCardPlays. BUT INSTEAD
+  # IT DOES IT RIGHT NOW
+  #
+  # Returns one or more validators to be placed on the current set of
+  # expectations.
+  def execute
+    if order_of_play == :ops_before
+      [Validators::Operation.new(player, card), card.validator.new]
+    elsif order_of_play == :ops_after
+      [card.validator.new, Validators::Operation.new(player, card)]
+    else
+      card.validator.new
+    end
+  end
+
   def to_s
     "%s plays %s for %s" % [player, card, type]
   end
+
+  def invalid_order_of_play?
+    order_of_play.nil? || ![:ops_before, :ops_after].include?(order_of_play)
+  end
 end
 
+# Deferred kind of CardPlay. They encapsulate the playing of a headline card
+# but will not be revealed or acted upon until the HeadlineEnd terminator
+# displays them.
 class HeadlineCardPlay < CardPlay
 
   def initialize(player, card)
@@ -191,6 +302,8 @@ class HeadlineCardPlay < CardPlay
   end
 
   def headline?; true; end
+
+  def execute; end
 
   def to_s
     "%s headlines %s" % [player, card]
@@ -200,7 +313,7 @@ end
 module Moves
   class Move
     def to_s
-      "Move TODO"
+      "Move TODO in #{self.class.name}"
     end
 
     def execute
@@ -235,6 +348,10 @@ module Moves
   class Event < Move
     def initialize(player, todo)
     end
+
+    def execute
+      # ...
+    end
   end
 
   class Coup
@@ -242,7 +359,7 @@ module Moves
     end
   end
 
-  class Realign
+  class Realignment
     def initialize(player, country)
     end
   end
@@ -251,10 +368,102 @@ module Moves
     def initialize(player, card)
     end
   end
+
+  class Operation < Move
+    attr_accessor :player, :card, :type, :countries
+
+    # The countries arg allows the validator to take a snapshot of the current
+    # state of all countries. This is used to prevent influence creep.
+    def initialize(player, card, type)
+      self.player = player
+      self.card = card
+      self.type = validate_type(type)
+    end
+
+    def countries=(countries)
+      @countries = shallow_copy(countries)
+    end
+
+    def validate_type(type)
+      # Valid types for an Operation -- Section 6.0
+      types = [:influence, :realignment, :coup, :space_race]
+
+      if types.include?(type)
+        return type
+      else
+        raise "Bad type: #{type.inspect}"
+      end
+    end
+
+    # Return the requisite number of expectations for the operation.
+    def execute
+      # TODO: the card points may not be an indicator of how many moves
+      # can be made by the player (Red Scare in effect for example).
+      card.score.times.map do
+        instantiate_validator(type_to_validator(type))
+      end
+    end
+
+    def type_to_validator(type)
+      class_name = type.to_s.split("_").map(&:capitalize).join
+
+      Validators.const_get(class_name, false)
+    end
+
+    def instantiate_validator(validator)
+      # Doing a case on Class classes is not fun.
+      case
+      when validator == Validators::Influence
+        validator.new(player, countries)
+      else
+        raise "Don't know how to instantiate #{validator.inspect}!"
+      end
+    end
+
+    def to_s
+      "%s to play %s for %s" % [player, card, type]
+    end
+  end
+
+  ### Misc, specialized moves
+
+  class OlympicSponsorOrBoycott < Move
+    attr_accessor :player, :sponsor_or_boycott
+
+    def initialize(player, sponsor_or_boycott)
+      unless [:sponsor, :boycott].include?(sponsor_or_boycott)
+        raise "sponsor_or_boycott must be one of :sponsor or :boycott"
+      end
+
+      self.player = player
+      self.sponsor_or_boycott = sponsor_or_boycott
+    end
+
+    def execute
+      # TODO: all of this
+      if boycott?
+        todo "degrade_defcon"
+        todo "play_as_ops"
+      else # sponsors
+        todo "roll_dice"
+        todo "award_vp"
+      end
+    end
+
+    def boycott?
+      sponsor_or_boycott == :boycott
+    end
+
+    def to_s
+      "The %s decides to %s the Olympic Games." % [player, sponsor_or_boycott]
+    end
+  end
 end
 
 module Terminators
-  class HeadlineRound
+  # A class that shows and queues up the headline events that have been placed
+  # by each player.
+  class HeadlineCardRound
     # Works out how to resolve the headline play that occurred.
     # Returns the next stack of expectations for appending?
     def execute(history)
@@ -272,16 +481,39 @@ module Terminators
 
       puts "HEADLINE CARDS PLAYED!"
 
-      Expectations.new(validators, :terminator => HeadlineEnd.new)
+      # TODO: maybe update game status here about cards played
+
+      Expectations.new(validators, :terminator => HeadlineEventsEnd.new)
     end
   end
 
-  class HeadlineEnd
+  # A class for processing the end of events being played in the headline
+  # round.
+  class HeadlineEventsEnd
     def execute(history)
       puts "HEADLINE PHASE ENDED!"
+
+      validators = [
+        Validators::CardPlay.new(USSR),
+        Validators::CardPlay.new(US)
+      ]
+
+      Expectations.new(
+        validators,
+        :terminator => Terminators::ActionRoundEnd.new
+      )
     end
   end
 
+  # Handles the end of each action round. There are multiple action rounds
+  # per turn.
+  class ActionRoundEnd
+    def execute(move)
+      puts "ACTION ROUND ENDED!"
+    end
+  end
+
+  # Handles the end of each turn. There are multiple turns per phase.
   class TurnEnd
     def execute(history)
       puts "TURN ENDED!"
@@ -292,12 +524,13 @@ end
 module Validators
   class Validator
     def satisfied?
-      fail "not impl"
+      fail "#{self.class.name} did not impl"
     end
 
     def execute(move)
-      move.execute
+      retval = move.execute
       executed(move)
+      retval
     end
 
     def executed(move)
@@ -312,7 +545,7 @@ module Validators
   # used up. For validating the typical "player places N influence" case.
   #
   # Set remaining_influence in your constructor.
-  module InfluenceValidator
+  module InfluenceHelper
     attr_accessor :remaining_influence
 
     def initialize
@@ -336,7 +569,7 @@ module Validators
 
   # A module that sets the Validator to a satisfied state once it has been
   # executed exactly once.
-  module SingleExecutionValidator
+  module SingleExecutionHelper
     attr_accessor :satisfied
 
     def initialize
@@ -352,7 +585,7 @@ module Validators
     end
 
     def valid?(move)
-      true
+      fail "not impl in #{self.class.name}"
     end
   end
 
@@ -365,7 +598,7 @@ module Validators
     # Countries that have been used in prior moves.
     attr_accessor :countries
 
-    include InfluenceValidator
+    include InfluenceHelper
 
     def initialize
       self.remaining_influence = 4
@@ -392,25 +625,70 @@ module Validators
   #
   # Precedents:
   #
-  # Must be uncontrolled by *both* players:
-  # http://boardgamegeek.com/thread/820285/truman-doctrine-clarification
+  # Must be uncontrolled by *both* players, see Ruling #1.
   class TrumanDoctrine < Validator
 
-    include SingleExecutionValidator
+    include SingleExecutionHelper
 
     def valid?(move)
-      super &&
-        move.player.us? &&
+      move.player.us? &&
         move.country.in?(Europe) &&
         move.country.uncontrolled? &&
         move.amount + move.country.influence(USSR) == 0
     end
   end
 
+  # Card Text
+  # ---------
+  #
+  # This player sponsors the Olympics. The opponent must either participate
+  # or boycott. If the opponent participates, each player rolls a die and
+  # the sponsor adds 2 to their roll. The player with the highest modified
+  # die roll receives 2 VP (reroll ties). If the opponent boycotts, degrade
+  # the DEFCON level by 1 and the sponsor may conduct Operations as if they
+  # played a 4 Ops card.
+  #
+  #
+  class OlympicGames < Validator
+
+    include SingleExecutionHelper
+
+    def initialize
+      self.satisfied = false
+    end
+
+    def valid?(move)
+      # accept a boycott or sponsor decision from the opponent
+      #
+      # TODO: need to access the opponent
+      Moves::OlympicSponsorOrBoycott === move
+    end
+  end
+
+  # Card Text
+  # ---------
+  #
+  # Unless the US immediately discards a card with an Operations value of 3
+  # or more, remove all US Influence from West Germany.
+  #
+  class Blockade < Validator
+
+    # Move is valid if any of:
+    #  - discards a card >= 3 ops
+    #  - requests to remove *all* influence from west germany
+    def valid?(move)
+      false
+    end
+
+    def satisfied?
+      false
+    end
+  end
+
   # Allows six USSR placements of influence within Eastern Europe.
   class OpeningUssrInfluence < Validator
 
-    include InfluenceValidator
+    include InfluenceHelper
 
     def initialize
       self.remaining_influence = 6
@@ -428,7 +706,7 @@ module Validators
   # Allows seven US placements of influence within Western Europe.
   class OpeningUsInfluence < Validator
 
-    include InfluenceValidator
+    include InfluenceHelper
 
     def initialize
       self.remaining_influence = 7
@@ -443,15 +721,14 @@ module Validators
     end
   end
 
-  # TODO: seems like these validators should be able to inherit from
-  # Validator - but the "move" they validate is a CardPlay, which has
-  # no execute. Smooth this out.
-  class Headline
-    attr_accessor :expected_player, :moves
+  class Headline < Validator
+    attr_accessor :expected_player
+
+    include SingleExecutionHelper
 
     def initialize(expected_player)
+      super()
       self.expected_player = expected_player
-      self.moves = 1
     end
 
     def valid?(move)
@@ -459,19 +736,69 @@ module Validators
       HeadlineCardPlay === move && move.player == expected_player
     end
 
-    def execute(move)
-      self.moves -= 1
-    end
-
-    def satisfied?
-      moves.zero?
-    end
-
     def explain
       "#{expected_player} headline"
     end
   end
 
+  # TODO: Having two classes named CardPlay is bad -- fix
+  class CardPlay < Validator
+    attr_accessor :expected_player
+
+    include SingleExecutionHelper
+
+    def initialize(expected_player)
+      super()
+      self.expected_player = expected_player
+    end
+
+    def valid?(move)
+      ::CardPlay === move && move.player == expected_player
+    end
+  end
+
+  class Operation < Validator
+    attr_accessor :expected_player, :expected_card
+
+    include SingleExecutionHelper
+
+    def initialize(expected_player, expected_card)
+      super()
+
+      self.expected_player = expected_player
+      self.expected_card = expected_card
+    end
+
+    def valid?(move)
+      move.player == expected_player &&
+        move.card == expected_card &&
+        can_play?(move.card, move.type)
+    end
+
+    # TODO: delegate this somewhere useful
+    # determines if a given card can be played for the type of operation
+    # i.e. can the card be space raced etc?
+    def can_play?(card, operation_type)
+      # SRSLY TODO
+      todo "check specific action can be played"
+      true
+    end
+  end
+
+  # An Influence validator that applies the rules of placing influence during
+  # operations. For instance, it will test for neighboring occupation, as well
+  # as ensuring 2:1 cost of entry during opponent control.
+  class Influence < Validator
+
+    # include InfluenceHelper
+
+    def initialize(expected_player, original_countries)
+    end
+
+    def satisfied?
+      false
+    end
+  end
 end
 
 class Card
@@ -516,7 +843,7 @@ end
 Comecon = Card.new(
   :name => "COMECON",
   :phase => :early,
-  :side => :ussr,
+  :side => USSR,
   :ops => 3,
   :remove_after_event => true,
   :validator => Validators::Comecon
@@ -525,34 +852,31 @@ Comecon = Card.new(
 TrumanDoctrine = Card.new(
   :name => "Truman Doctrine",
   :phase => :early,
-  :side => :us,
+  :side => US,
   :ops => 1,
   :remove_after_event => true,
   :validator => Validators::TrumanDoctrine
 )
 
-class Superpower
-  def opponent; fail NotImplementedError; end
-  def ussr?; false; end
-  def us?; false; end
-  def to_s; self.class.name.upcase; end
-end
+OlympicGames = Card.new(
+  :name => "Olympic Games",
+  :phase => :early,
+  :side => nil,
+  :ops => 2,
+  :remove_after_event => true,
+  :validator => Validators::OlympicGames
+)
 
-class Us < Superpower; end
-class Ussr < Superpower; end
+Blockade = Card.new(
+  :name => "Blockade",
+  :phase => :early,
+  :side => USSR,
+  :ops => 4, # TODO: this should be 1, but testing something
+  :remove_after_event => true,
+  :validator => Validators::Blockade
+)
 
-US   = Us.new
-USSR = Ussr.new
 
-class Us < Superpower
-  def opponent; USSR; end
-  def us?; true; end
-end
-
-class Ussr < Superpower
-  def opponent; US; end
-  def ussr?; true; end
-end
 
 class Country
   attr_reader :name, :stability, :battleground, :regions, :neighbors
@@ -603,6 +927,7 @@ class Country
     !controlled?
   end
 
+  # TODO: this method should go away now Validators::Influence exists.
   def add_influence(player, countries, amount = 1)
     amount.times do
       if can_add_influence?(player, countries)
@@ -681,12 +1006,12 @@ class Game
 
     self.turn = 0 # headline
     self.round = 1
-    self.player = :ussr
+    self.player = USSR
 
     self.defcon = 5
 
     self.china_card_playable = true
-    self.china_card_holder = :ussr
+    self.china_card_holder = USSR
 
     self.us_ops = 0
     self.ussr_ops = 0
@@ -708,7 +1033,7 @@ class Game
 
     # Once complete, start a regular headline round.
     add_expectations Expectations.new(headline,
-      :terminator => Terminators::HeadlineRound.new,
+      :terminator => Terminators::HeadlineCardRound.new,
       :order_sensitive => false
     )
   end
@@ -750,4 +1075,13 @@ class Game
       fail "Called more than once"
     end
   end
+end
+
+def todo(thing)
+  puts "TODO: #{thing}"
+  puts caller if ENV["TODO"]
+end
+
+def shallow_copy(array)
+  array.map &:dup
 end

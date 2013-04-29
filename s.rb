@@ -961,7 +961,7 @@ class Country
   end
 
   class << self
-    def all
+    def initialize_all
       COUNTRY_DATA.map do |row|
         Country.new(*row)
       end
@@ -1016,7 +1016,7 @@ class Game
     self.us_ops = 0
     self.ussr_ops = 0
 
-    self.countries = Country.all
+    self.countries = Country.initialize_all
 
     @all_expectations = []
     @current_index = 0

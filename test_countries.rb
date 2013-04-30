@@ -67,5 +67,45 @@ class TestCountry < MiniTest::Unit::TestCase
     uk.add_influence!(US)
     refute uk.controlled_by?(USSR)
   end
+
+  def test_price_of_influence
+    fr = Country.find(:france, @countries)
+
+    fr.add_influence!(USSR, fr.stability)
+
+    assert_equal fr.price_of_influence(USSR), 1
+    assert_equal fr.price_of_influence(US), 2
+
+    fr.add_influence!(US)
+
+    assert_equal fr.price_of_influence(USSR), 1
+    assert_equal fr.price_of_influence(US), 1
+  end
+
+  def test_self_accessible
+    uk = Country.find(:united_kingdom, @countries)
+    fr = Country.find(:france, @countries)
+
+    uk.add_influence!(USSR)
+    fr.add_influence!(USSR, fr.stability)
+
+    assert uk.presence?(USSR)
+    assert fr.controlled_by?(USSR)
+
+    expected = [
+      "Algeria",
+      "Spain/Portugal",
+      "Italy",
+      "West Germany",
+      "Benelux",
+      "Norway",
+      "Canada",
+      "France",
+      "United Kingdom"
+    ]
+
+    assert_equal Country.accessible(USSR, @countries).sort, expected.sort
+    assert_empty Country.accessible(US, @countries)
+  end
 end
 

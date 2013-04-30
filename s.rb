@@ -343,6 +343,14 @@ module Moves
     def execute
       country.add_influence!(player, amount)
     end
+
+    # Ignoring all other factors except occupiers of the country, this method
+    # returns true if the move has enough influence points for the player to
+    # place influence in the target country. This is not always a pertinent
+    # question to ask -- such as placing influence during most events.
+    def affordable?
+      amount >= country.price_of_influence(player)
+    end
   end
 
   class Event < Move
@@ -380,10 +388,6 @@ module Moves
       self.type = validate_type(type)
     end
 
-    def countries=(countries)
-      @countries = shallow_copy(countries)
-    end
-
     def validate_type(type)
       # Valid types for an Operation -- Section 6.0
       types = [:influence, :realignment, :coup, :space_race]
@@ -399,9 +403,7 @@ module Moves
     def execute
       # TODO: the card points may not be an indicator of how many moves
       # can be made by the player (Red Scare in effect for example).
-      card.score.times.map do
-        instantiate_validator(type_to_validator(type))
-      end
+      instantiate_validator(type_to_validator(type), card.score)
     end
 
     def type_to_validator(type)
@@ -410,13 +412,13 @@ module Moves
       Validators.const_get(class_name, false)
     end
 
-    def instantiate_validator(validator)
+    def instantiate_validator(validator_class, number_of_moves)
       # Doing a case on Class classes is not fun.
       case
-      when validator == Validators::Influence
-        validator.new(player, countries)
+      when validator_class == Validators::Influence
+        validator_class.new(player, countries, number_of_moves)
       else
-        raise "Don't know how to instantiate #{validator.inspect}!"
+        raise "Don't know how to instantiate #{validator_class.inspect}!"
       end
     end
 
@@ -537,7 +539,7 @@ module Validators
     end
 
     def valid?(move)
-      fail "not impl"
+      fail "#{self.class.name} did not impl"
     end
   end
 
@@ -789,14 +791,36 @@ module Validators
   # operations. For instance, it will test for neighboring occupation, as well
   # as ensuring 2:1 cost of entry during opponent control.
   class Influence < Validator
+    attr_accessor :expected_player, :countries, :countries_whitelist
 
-    # include InfluenceHelper
+    include InfluenceHelper
 
-    def initialize(expected_player, original_countries)
+    def initialize(expected_player, countries, number_of_moves)
+      self.expected_player = expected_player
+      self.countries = countries
+      self.remaining_influence = number_of_moves
+
+      self.countries_whitelist = Country.accessible(expected_player, countries)
+    end
+
+    def valid?(move)
+      super &&
+        Moves::Influence === move &&
+        expected_player == move.player &&
+        move.affordable?
     end
 
     def satisfied?
       false
+    end
+
+    # XXX: Super-lol hack to hide a huge array from inspect
+    def inspect
+      hide = countries
+      self.countries = ["TRUNCATED"]
+      r = super
+      self.countries = hide
+      r
     end
   end
 end
@@ -950,6 +974,10 @@ class Country
     end
   end
 
+  def price_of_influence(player)
+    controlled_by?(player.opponent) ? 2 : 1
+  end
+
   alias battleground? battleground
 
   def to_s
@@ -988,6 +1016,22 @@ class Country
         raise AmbiguousName, "No country found for #{name.inspect}"
       end
     end
+
+    # Returns a list of country names that the given player can "access" for
+    # the purpose of placing influence, given the current countries and their
+    # state of play.
+    def accessible(player, countries)
+      accessible_countries = []
+
+      countries.each do |country|
+        if country.presence?(player)
+          accessible_countries.push country.name
+          accessible_countries.push *country.neighbors
+        end
+      end
+
+      accessible_countries.uniq
+    end
   end
 
   AmbiguousName = Class.new(RuntimeError)
@@ -1024,6 +1068,7 @@ class Game
 
     self.countries = Country.initialize_all
 
+    @starting_influence_placed = false
     @all_expectations = []
     @current_index = 0
 
@@ -1061,6 +1106,8 @@ class Game
   end
 
   def place_starting_influence
+    fail "Called more than once!" if @starting_influence_placed
+
     Country.find(:syria, countries).add_influence!(USSR, 1)
     Country.find(:iraq, countries).add_influence!(USSR, 1)
     Country.find(:north_korea, countries).add_influence!(USSR, 3)
@@ -1077,17 +1124,11 @@ class Game
     Country.find(:south_africa, countries).add_influence!(US, 1)
     Country.find(:united_kingdom, countries).add_influence!(US, 5)
 
-    def self.place_starting_influence
-      fail "Called more than once"
-    end
+    @starting_influence_placed = true
   end
 end
 
 def todo(thing)
   puts "TODO: #{thing}"
   puts caller if ENV["TODO"]
-end
-
-def shallow_copy(array)
-  array.map &:dup
 end

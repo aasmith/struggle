@@ -144,7 +144,7 @@ class TestCountry < MiniTest::Unit::TestCase
     assert uk.presence?(USSR)
     assert fr.controlled_by?(USSR)
 
-    expected = [
+    expected_neighbors = [
       "Algeria",
       "Spain/Portugal",
       "Italy",
@@ -156,8 +156,23 @@ class TestCountry < MiniTest::Unit::TestCase
       "United Kingdom"
     ]
 
+    # Those included by virture of superpower adjacency.
+    expected_superpower = [
+      "Afghanistan",
+      "Finland",
+      "North Korea",
+      "Norway",
+      "Poland",
+      "Romania"
+    ]
+
+    expected = expected_neighbors | expected_superpower
+
     assert_equal Country.accessible(USSR, @countries).sort, expected.sort
-    assert_empty Country.accessible(US, @countries)
+
+    expected_us = ["Mexico", "Cuba", "Canada", "Japan"]
+
+    assert_equal Country.accessible(US, @countries).sort, expected_us.sort
   end
 end
 

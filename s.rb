@@ -1106,13 +1106,15 @@ class Country
     # Returns a list of country names that the given player can "access" for
     # the purpose of placing influence, given the current countries and their
     # state of play.
-    def accessible(player, countries)
+    def accessible(player, all_countries)
       accessible_countries = []
 
-      countries.each do |country|
+      all_countries.each do |country|
         if country.presence?(player)
           accessible_countries.push country.name
           accessible_countries.push *country.neighbors
+        elsif country.player_adjacent_to_superpower?(player)
+          accessible_countries.push country.name
         end
       end
 

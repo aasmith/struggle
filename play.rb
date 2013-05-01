@@ -10,13 +10,13 @@ C = lambda { |name| Country.find(name, g.countries) }
 puts "Expecting USSR influence placement"
 p g.expectations.explain
 
-g.accept Moves::Influence.new(USSR, C[:poland], +6)
+g.accept Moves::UnrestrictedInfluence.new(USSR, C[:poland], +6)
 
 puts "Expecting US influence placement"
 p g.expectations.explain
 
-g.accept Moves::Influence.new(US, C[:canada], +4)
-g.accept Moves::Influence.new(US, C[:west_germany], +3)
+g.accept Moves::UnrestrictedInfluence.new(US, C[:canada], +4)
+g.accept Moves::UnrestrictedInfluence.new(US, C[:west_germany], +3)
 
 # DONE!
 
@@ -39,10 +39,10 @@ g.status # "Headline plays: USSR Comecon, USA Truman Doctrine"
 
 # Players may now execute moves according to ordering (ussr first)
 
-g.accept Moves::Influence.new(USSR, C[:poland], +1)
-g.accept Moves::Influence.new(USSR, C[:east_germany], +1)
-g.accept Moves::Influence.new(USSR, C[:yugoslavia], +1)
-g.accept Moves::Influence.new(USSR, C[:czechoslovakia], +1)
+g.accept Moves::UnrestrictedInfluence.new(USSR, C[:poland], +1)
+g.accept Moves::UnrestrictedInfluence.new(USSR, C[:east_germany], +1)
+g.accept Moves::UnrestrictedInfluence.new(USSR, C[:yugoslavia], +1)
+g.accept Moves::UnrestrictedInfluence.new(USSR, C[:czechoslovakia], +1)
 
 # Now usa
 
@@ -66,9 +66,8 @@ g.accept CardPlay.new(US, Blockade, :event, :ops_before)
 # play for ops
 g.accept Moves::Operation.new(US, Blockade, :influence)
 
-# pretending there are 4 ops to demo creep for now
-g.accept Moves::Influence.new(US, C[:france], +1)
-g.accept Moves::Influence.new(US, C[:france], +1)
+# Pretending blockade has 4 ops for now.
+g.accept Moves::Influence.new(US, C[:east_germany], +2)
 g.accept Moves::Influence.new(US, C[:france], +1)
 g.accept Moves::Influence.new(US, C[:france], +1)
 

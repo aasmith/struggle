@@ -324,7 +324,7 @@ module Moves
     def amount; 1; end
   end
 
-  class Influence < Move
+  class UnrestrictedInfluence < Move
     attr_accessor :player, :country, :amount
 
     def initialize(player, country, amount)
@@ -344,13 +344,35 @@ module Moves
     def execute
       country.add_influence!(player, amount)
     end
+  end
+
+  class Influence < Move
+    attr_accessor :player, :country, :amount
+
+    def initialize(player, country, amount)
+      self.player = player
+      self.country = country
+      self.amount = amount
+    end
+
+    def to_s
+      adds_or_subtracts = amount > 0 ? "adds" : "subtracts"
+
+      "%s %s %s influence points in %s" % [
+        player, adds_or_subtracts, amount.abs, country
+      ]
+    end
+
+    def execute
+      country.add_influence!(player, 1)
+    end
 
     # Ignoring all other factors except occupiers of the country, this method
     # returns true if the move has enough influence points for the player to
     # place influence in the target country. This is not always a pertinent
     # question to ask -- such as placing influence during most events.
     def affordable?
-      amount >= country.price_of_influence(player)
+      amount == country.price_of_influence(player)
     end
 
     # Can the player place influence using this restricted list of countries?
@@ -553,7 +575,7 @@ module Validators
   # used up. For validating the typical "player places N influence" case.
   #
   # Set remaining_influence in your constructor.
-  module InfluenceHelper
+  module TypeAgnosticInfluenceHelper
     attr_accessor :remaining_influence
 
     def initialize
@@ -572,6 +594,22 @@ module Validators
 
     def satisfied?
       remaining_influence.zero?
+    end
+  end
+
+  module InfluenceHelper
+    include TypeAgnosticInfluenceHelper
+
+    def valid?(move)
+      super && Moves::Influence === move
+    end
+  end
+
+  module UnrestrictedInfluenceHelper
+    include TypeAgnosticInfluenceHelper
+
+    def valid?(move)
+      super && Moves::UnrestrictedInfluence === move
     end
   end
 
@@ -606,7 +644,7 @@ module Validators
     # Countries that have been used in prior moves.
     attr_accessor :countries
 
-    include InfluenceHelper
+    include UnrestrictedInfluenceHelper
 
     def initialize
       self.remaining_influence = 4
@@ -696,7 +734,7 @@ module Validators
   # Allows six USSR placements of influence within Eastern Europe.
   class OpeningUssrInfluence < Validator
 
-    include InfluenceHelper
+    include UnrestrictedInfluenceHelper
 
     def initialize
       self.remaining_influence = 6
@@ -714,7 +752,7 @@ module Validators
   # Allows seven US placements of influence within Western Europe.
   class OpeningUsInfluence < Validator
 
-    include InfluenceHelper
+    include UnrestrictedInfluenceHelper
 
     def initialize
       self.remaining_influence = 7

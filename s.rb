@@ -754,7 +754,9 @@ module Validators
     end
 
     def deinfluences?(move)
-      Moves::UnrestrictedInfluence === move && move.resulting_influence.zero?
+      Moves::UnrestrictedInfluence === move &&
+        move.country.name == "West Germany" &&
+        move.resulting_influence.zero?
     end
   end
 

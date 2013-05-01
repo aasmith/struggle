@@ -208,6 +208,7 @@ class Superpower
   def ussr?; false; end
   def us?; false; end
   def to_s; self.class.name.upcase; end
+  alias name to_s
 end
 
 class Us < Superpower; end
@@ -350,6 +351,11 @@ module Moves
     # question to ask -- such as placing influence during most events.
     def affordable?
       amount >= country.price_of_influence(player)
+    end
+
+    # Can the player place influence using this restricted list of countries?
+    def can_add_influence?(countries_whitelist)
+      country.can_add_influence?(player, countries_whitelist)
     end
   end
 
@@ -800,14 +806,17 @@ module Validators
       self.countries = countries
       self.remaining_influence = number_of_moves
 
-      self.countries_whitelist = Country.accessible(expected_player, countries)
+      self.countries_whitelist =
+        Country.accessible(expected_player, countries).
+        map { |name| Country.find(name, countries) }
     end
 
     def valid?(move)
       super &&
         Moves::Influence === move &&
         expected_player == move.player &&
-        move.affordable?
+        move.affordable? &&
+        move.can_add_influence?(countries_whitelist)
     end
 
     def satisfied?
@@ -956,21 +965,36 @@ class Country
   end
 
   # TODO: this method should go away now Validators::Influence exists.
-  def add_influence(player, countries, amount = 1)
-    amount.times do
-      if can_add_influence?(player, countries)
-        add_influence!(player)
-      end
+  # def add_influence(player, countries, amount = 1)
+  #   amount.times do
+  #     if can_add_influence?(player, countries)
+  #       add_influence!(player)
+  #     end
+  #   end
+  # end
+
+  # Checks if the given player can add influence to this country by checking
+  # for presence in or around the country.
+  #
+  # This country must also be in the list of countries in order to consider
+  # itself a valid target for influence.
+  def can_add_influence?(player, countries)
+    if countries.include?(self)
+      presence?(player) || player_in_neighboring_country?(player, countries)
+    else
+      player_adjacent_to_superpower?(player)
     end
   end
 
-  def can_add_influence?(player, countries)
-    presence?(player) || player_in_neighboring_country?(player, countries)
+  def player_adjacent_to_superpower?(player)
+    adjacent_superpower == player.name
   end
 
   def player_in_neighboring_country?(player, countries)
     neighbors.any? do |neighbor|
-      countries.detect { |c| c.name == neighbor && c.presence?(player) }
+      countries.detect do |c|
+        c.name == neighbor && c.presence?(player)
+      end
     end
   end
 

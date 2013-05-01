@@ -82,6 +82,58 @@ class TestCountry < MiniTest::Unit::TestCase
     assert_equal fr.price_of_influence(US), 1
   end
 
+  def test_can_add_influence?
+    fr = Country.find(:france, @countries)
+    uk = Country.find(:united_kingdom, @countries)
+
+    whitelist = [fr, uk]
+
+    refute fr.can_add_influence?(USSR, whitelist)
+    refute uk.can_add_influence?(USSR, whitelist)
+
+    uk.add_influence!(USSR)
+
+    refute fr.can_add_influence?(USSR, [])
+    assert fr.can_add_influence?(USSR, whitelist)
+
+    it = Country.find(:italy, @countries)
+
+    fr.add_influence!(USSR)
+
+    refute it.can_add_influence?(USSR, [uk, fr]), <<-MSG
+      The target country itself must be in the list of countries in order
+      to be regarded as a valid target for placing influence.
+    MSG
+
+    jp = Country.find(:japan, @countries)
+
+    assert jp.can_add_influence?(US, []), <<-MSG
+      Countries adjacent to a player's superpower must always be allowed
+      to receive influence.
+    MSG
+  end
+
+  def test_player_in_neighboring_country?
+    fr = Country.find(:france, @countries)
+    uk = Country.find(:united_kingdom, @countries)
+
+    uk.add_influence!(USSR)
+
+    assert fr.player_in_neighboring_country?(USSR, @countries)
+    refute uk.player_in_neighboring_country?(USSR, @countries)
+  end
+
+  def test_player_adjacent_to_superpower?
+    jp = Country.find(:japan, @countries)
+    au = Country.find(:australia, @countries)
+
+    assert jp.player_adjacent_to_superpower?(US),
+      "Should return true because Japan is adjacent to the US superpower."
+
+    refute au.player_adjacent_to_superpower?(US),
+      "Should be false because Australia is not adjacent to the US superpower."
+  end
+
   def test_self_accessible
     uk = Country.find(:united_kingdom, @countries)
     fr = Country.find(:france, @countries)

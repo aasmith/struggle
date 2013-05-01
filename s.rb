@@ -857,10 +857,6 @@ module Validators
         move.can_add_influence?(countries_whitelist)
     end
 
-    def satisfied?
-      false
-    end
-
     # XXX: Super-lol hack to hide a huge array from inspect
     def inspect
       hide = countries

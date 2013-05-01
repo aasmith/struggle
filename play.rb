@@ -46,7 +46,7 @@ g.accept Moves::UnrestrictedInfluence.new(USSR, C[:czechoslovakia], +1)
 
 # Now usa
 
-g.accept Moves::Influence.new(US, C[:yugoslavia], -1)
+g.accept Moves::UnrestrictedInfluence.new(US, C[:yugoslavia], -1)
 
 puts "First round starts..."
 

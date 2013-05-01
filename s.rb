@@ -677,7 +677,8 @@ module Validators
     include SingleExecutionHelper
 
     def valid?(move)
-      move.player.us? &&
+      Moves::UnrestrictedInfluence === move &&
+        move.player.us? &&
         move.country.in?(Europe) &&
         move.country.uncontrolled? &&
         move.amount + move.country.influence(USSR) == 0

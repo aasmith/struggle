@@ -72,7 +72,7 @@ g.accept Moves::Influence.new(US, C[:france], +1)
 g.accept Moves::Influence.new(US, C[:france], +1)
 
 # now the event - one of these...
-g.accept Moves::Discard.new(US, some_card)
+g.accept Moves::Discard.new(US, Comecon) # TODO pick a card
 g.accept Moves::Influence.new(US, C[:west_germany], -4)
 
 

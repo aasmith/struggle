@@ -324,6 +324,8 @@ module Moves
     def amount; 1; end
   end
 
+  #TODO: give these two classes a common abstract class.
+
   class UnrestrictedInfluence < Move
     attr_accessor :player, :country, :amount
 
@@ -343,6 +345,10 @@ module Moves
 
     def execute
       country.add_influence!(player, amount)
+    end
+
+    def resulting_influence
+      country.influence(US) + amount
     end
   end
 
@@ -456,6 +462,20 @@ module Moves
   end
 
   ### Misc, specialized moves
+
+  class Discard < Move
+    attr_accessor :player, :card
+
+    def initialize(player, card)
+      self.player = player
+      self.card = card
+    end
+
+    def execute
+      todo "discard the card from the player's hand"
+    end
+
+  end
 
   class OlympicSponsorOrBoycott < Move
     attr_accessor :player, :sponsor_or_boycott
@@ -720,15 +740,21 @@ module Validators
   #
   class Blockade < Validator
 
+    include SingleExecutionHelper
+
     # Move is valid if any of:
     #  - discards a card >= 3 ops
     #  - requests to remove *all* influence from west germany
     def valid?(move)
-      false
+      move.player.us? && (discard?(move) || deinfluences?(move))
     end
 
-    def satisfied?
-      false
+    def discard?(move)
+      Moves::Discard === move && move.card.score >= 3
+    end
+
+    def deinfluences?(move)
+      Moves::UnrestrictedInfluence === move && move.resulting_influence.zero?
     end
   end
 
@@ -852,7 +878,6 @@ module Validators
 
     def valid?(move)
       super &&
-        Moves::Influence === move &&
         expected_player == move.player &&
         move.affordable? &&
         move.can_add_influence?(countries_whitelist)

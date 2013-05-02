@@ -11,13 +11,7 @@ require "hoe"
 # Hoe.plugin :rubyforge
 
 Hoe.spec "struggle" do
-  # HEY! If you fill these out in ~/.hoe_template/Rakefile.erb then
-  # you'll never have to touch them again!
-  # (delete this comment too, of course)
-
-  # developer("FIX", "FIX@example.com")
-
-  # self.rubyforge_name = "strugglex" # if different than "struggle"
+  developer("Andrew A Smith", "andy@tinnedfruit.org")
 
   # license "MIT" # this should match the license in the README
 end

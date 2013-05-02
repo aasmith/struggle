@@ -475,6 +475,10 @@ module Moves
       todo "discard the card from the player's hand"
     end
 
+    def to_s
+      "%s discards %s from their hand" % [player, card]
+    end
+
   end
 
   class OlympicSponsorOrBoycott < Move

@@ -518,6 +518,13 @@ module Terminators
   # A class that shows and queues up the headline events that have been placed
   # by each player.
   class HeadlineCardRound
+
+    attr_accessor :turn
+
+    def initialize(turn = 1)
+      self.turn = turn
+    end
+
     # Works out how to resolve the headline play that occurred.
     # Returns the next stack of expectations for appending?
     def execute(history)
@@ -537,13 +544,20 @@ module Terminators
 
       # TODO: maybe update game status here about cards played
 
-      Expectations.new(validators, :terminator => HeadlineEventsEnd.new)
+      Expectations.new(validators, :terminator => HeadlineEventsEnd.new(turn))
     end
   end
 
   # A class for processing the end of events being played in the headline
   # round.
   class HeadlineEventsEnd
+
+    attr_accessor :turn
+
+    def initialize(turn)
+      self.turn = turn
+    end
+
     def execute(history)
       puts "HEADLINE PHASE ENDED!"
 
@@ -554,7 +568,7 @@ module Terminators
 
       Expectations.new(
         validators,
-        :terminator => Terminators::ActionRoundEnd.new
+        :terminator => Terminators::ActionRoundEnd.new(turn)
       )
     end
   end
@@ -562,15 +576,53 @@ module Terminators
   # Handles the end of each action round. There are multiple action rounds
   # per turn.
   class ActionRoundEnd
+
+    attr_accessor :turn, :counter
+
+    def initialize(turn, counter = 1)
+      self.turn = turn
+      self.counter = counter
+    end
+
     def execute(move)
       puts "ACTION ROUND ENDED!"
+
+      t = if (turn <= 3 && counter == 6) || (turn >= 4 && counter == 7)
+        Terminators::TurnEnd.new(turn)
+      else
+        Terminators::ActionRoundEnd.new(turn, counter + 1)
+      end
+
+      Expectations.new([], :terminator => t)
     end
   end
 
   # Handles the end of each turn. There are multiple turns per phase.
   class TurnEnd
+    attr_accessor :turn
+
+    def initialize(turn)
+      self.turn = turn
+    end
+
     def execute(history)
       puts "TURN ENDED!"
+
+      if turn == 10 then
+        Expectations.new([], :terminator => Terminators::GameEnd.new)
+      else
+        Expectations.new([],
+          :terminator => Terminators::HeadlineCardRound.new(turn + 1))
+      end
+    end
+  end
+
+  class GameEnd
+    def turn
+    end
+
+    def execute(history)
+      puts "GAME ENDED"
     end
   end
 end

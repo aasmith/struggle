@@ -965,7 +965,8 @@ module Validators
   end
 end
 
-class Card
+# A registry for cards.
+class Cards
   class << self
     def all
       @cards || []
@@ -975,7 +976,14 @@ class Card
       @cards ||= []
       @cards << card
     end
+
+    def early_war
+      all.select { |c| c.phase == :early }
+    end
   end
+end
+
+class Card
 
   FIELDS = [:name, :ops, :side, :phase, :remove_after_event, :validator]
 
@@ -993,7 +1001,7 @@ class Card
   end
 
   def add_to_registry
-    self.class.add(self)
+    Cards.add(self)
   end
 
   def to_s
@@ -1004,6 +1012,7 @@ class Card
 end
 
 # Sample cards
+# TODO: namespace... module Cards?
 Comecon = Card.new(
   :name => "COMECON",
   :phase => :early,
@@ -1040,6 +1049,45 @@ Blockade = Card.new(
   :validator => Validators::Blockade
 )
 
+class Deck
+  attr_accessor :cards, :backup
+
+  def initialize(cards = [], backup = nil)
+    self.cards = cards.shuffle
+    self.backup = backup
+  end
+
+  def draw
+    card = cards.shift
+
+    if card
+      card
+    elsif backup
+      backup.draw or fail NoCardsError, "No cards in deck or backup."
+    else
+      fail NoCardsError, "No cards in deck and no backup provided."
+    end
+  end
+
+  NoCardsError = Class.new(StandardError)
+end
+
+class Hand
+  attr_reader :player, :cards
+
+  def initialize(player, cards = [])
+    @player = player
+    @cards = cards
+  end
+
+  def discard(card)
+    @cards.delete(card) or fail "Card #{card.inspect} not found in hand."
+  end
+
+  def add(cards)
+    @cards.push *cards
+  end
+end
 
 
 class Country
@@ -1202,12 +1250,13 @@ class Game
 
   # Start a new game
   def initialize
-    self.deck = []
-    self.discarded = []
-    self.removed = []
+    self.discarded = Deck.new
+    self.removed = Deck.new
 
-    self.us_hand = []
-    self.ussr_hand = []
+    self.deck = Deck.new(Cards.early_war, discarded)
+
+    self.us_hand = Hand.new(US)
+    self.ussr_hand = Hand.new(USSR)
 
     self.history = []
 
@@ -1256,6 +1305,12 @@ class Game
 
   def deal_cards
     puts "dealing cards..."
+
+    # TODO INCREASE TO EIGHT
+    2.times do
+      us_hand.add(deck.draw)
+      ussr_hand.add(deck.draw)
+    end
   end
 
   def status

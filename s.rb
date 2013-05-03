@@ -611,6 +611,13 @@ module Terminators
       if turn == 10 then
         Expectations.new([], :terminator => Terminators::GameEnd.new)
       else
+        # if *end of* turn 3 ... etc
+        if turn == 3 then
+          todo "merge in mid war cards"
+        elsif turn == 6 then
+          todo "merge in late ward cards"
+        end
+
         Expectations.new([],
           :terminator => Terminators::HeadlineCardRound.new(turn + 1))
       end

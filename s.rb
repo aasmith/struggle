@@ -262,6 +262,12 @@ class CardPlay
       if invalid_order_of_play?
         raise "order of play was invalid: #{order_of_play.inspect}"
       end
+    else
+      # The player played their own or neutral card, so specifying an
+      # order of play is invalid.
+      if order_of_play
+        raise "Player cannot specify an order of play for this move"
+      end
     end
 
   end

@@ -922,6 +922,7 @@ module Validators
     # TODO: delegate this somewhere useful
     # determines if a given card can be played for the type of operation
     # i.e. can the card be space raced etc?
+    # TODO: this should probably be vetted in Validators::CardPlay instead
     def can_play?(card, operation_type)
       # SRSLY TODO
       todo "check specific action can be played"

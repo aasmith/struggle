@@ -249,10 +249,6 @@ module Moves
     # The player taking the action.
     attr_accessor :player
 
-    # The type of action being made:
-    #  (influence, event, space race, coup, realignment)
-    attr_accessor :type
-
     # The card being played.
     attr_accessor :card
 
@@ -360,7 +356,7 @@ module Moves
     end
 
     def to_s
-      "%s plays %s for %s" % [player, card, type]
+      "%s plays %s for %s" % [player, card, actions.join(" then ")]
     end
 
     def amount

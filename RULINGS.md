@@ -40,3 +40,12 @@ THUS RESOLVED AS:
 When a player plays an opponent's card - it must be played with operations also
 occurring. The card cannot be played for the purpose of playing the opponent's 
 event only.
+
+
+Ruling #3 - Resolved by Official
+================================
+
+The optional add-on cards have incorrect duplicates -- the following URL has
+the right vresions of the cards to use:
+http://www.gmtgames.com/nnts/3-TScards.pdf
+

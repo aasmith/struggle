@@ -603,7 +603,12 @@ module Terminators
         Terminators::ActionRoundEnd.new(turn, counter + 1)
       end
 
-      Expectations.new([], :terminator => t)
+      validators = [
+        Validators::CardPlay.new(USSR),
+        Validators::CardPlay.new(US)
+      ]
+
+      Expectations.new(validators, :terminator => t)
     end
   end
 

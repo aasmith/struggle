@@ -227,95 +227,6 @@ class Ussr < Superpower
   def ussr?; true; end
 end
 
-# TODO: explain this better
-# TODO: why is this not a Move?
-# The representation of playing a card. The resulting moves the player
-# may make are not part of a CardPlay.
-class CardPlay
-  # The player taking the action.
-  attr_accessor :player
-
-  # The type of action being made:
-  #  (influence, event, space race, coup, realignment)
-  attr_accessor :type
-
-  # The card being played.
-  attr_accessor :card
-
-  # The order of playing ops. This is required when a player has played an
-  # opponent's card, thus meaning the event must be played. The player must
-  # decide when ops points are played in relation to the event. Valid values
-  # in this case are :ops_before or :ops_after.
-  #
-  # This is affected by a case ruling, see Ruling #2.
-  #
-  # Otherwise leave nil.
-  attr_accessor :order_of_play
-
-  def initialize(player, card, type, order_of_play = nil)
-    self.player = player
-    self.card = card
-    self.type = type
-    self.order_of_play = order_of_play
-
-    if player.opponent == card.side
-      if invalid_order_of_play?
-        raise "order of play was invalid: #{order_of_play.inspect}"
-      end
-    else
-      # The player played their own or neutral card, so specifying an
-      # order of play is invalid.
-      if order_of_play
-        raise "Player cannot specify an order of play for this move"
-      end
-    end
-
-  end
-
-  def headline?; false; end
-
-  # puts the card just played onto the expectation stack. Just like how
-  # HeadlineCardRound does it after a couple of HeadlineCardPlays. BUT INSTEAD
-  # IT DOES IT RIGHT NOW
-  #
-  # Returns one or more validators to be placed on the current set of
-  # expectations.
-  def execute
-    if order_of_play == :ops_before
-      [Validators::Operation.new(player, card), card.validator.new]
-    elsif order_of_play == :ops_after
-      [card.validator.new, Validators::Operation.new(player, card)]
-    else
-      card.validator.new
-    end
-  end
-
-  def to_s
-    "%s plays %s for %s" % [player, card, type]
-  end
-
-  def invalid_order_of_play?
-    order_of_play.nil? || ![:ops_before, :ops_after].include?(order_of_play)
-  end
-end
-
-# Deferred kind of CardPlay. They encapsulate the playing of a headline card
-# but will not be revealed or acted upon until the HeadlineEnd terminator
-# displays them.
-class HeadlineCardPlay < CardPlay
-
-  def initialize(player, card)
-    super(player, card, :event)
-  end
-
-  def headline?; true; end
-
-  def execute; end
-
-  def to_s
-    "%s headlines %s" % [player, card]
-  end
-end
 
 module Moves
   class Move
@@ -329,6 +240,149 @@ module Moves
 
     def amount; 1; end
   end
+
+  # TODO: explain this better
+  # TODO: why is this not a Move?
+  # The representation of playing a card. The resulting moves the player
+  # may make are not part of a CardPlay.
+  class CardPlay
+    # The player taking the action.
+    attr_accessor :player
+
+    # The type of action being made:
+    #  (influence, event, space race, coup, realignment)
+    attr_accessor :type
+
+    # The card being played.
+    attr_accessor :card
+
+    # The action(s) the player wants to take as a result of playing the card.
+    # If playing an opponent card, the player must specify :event and some
+    # other action in the order they want to play them.
+    #
+    # This is affected by a case ruling, see Ruling #2.
+    attr_accessor :actions
+
+    # injected as needed.
+    attr_accessor :countries
+
+    def initialize(player, card, actions)
+      self.player = player
+      self.card = card
+      self.actions = validate_actions(player, card, [*actions])
+    end
+
+    def validate_actions(player, card, actions)
+
+      if exclusively_space_race?(actions)
+        can_space_race?(player, card) or raise "Cannot space race."
+
+      elsif playing_opponent_card?(player, card)
+        raise "Must be two actions" unless actions.size == 2
+        raise "Must include event" unless includes_event?(actions)
+        raise "Must include an action" unless includes_action?(actions)
+
+      else
+        raise "Player can only specify one action" unless actions.size == 1
+
+        unless includes_action?(actions) || includes_event?(actions)
+          raise "Must include an action or event"
+        end
+      end
+
+      actions
+    end
+
+    def exclusively_space_race?(actions)
+      actions == [:space_race]
+    end
+
+    def includes_event?(actions)
+      actions.include?(:event)
+    end
+
+    # Any action (defined in Section 6) other than space race.
+    def includes_action?(actions)
+      actions.any? { |e| [:influence, :coup, :realignment].include?(e) }
+    end
+
+    def playing_opponent_card?(player, card)
+      card.side == player.opponent
+    end
+
+    # TODO
+    def can_space_race?(*)
+      true
+    end
+
+    def headline?; false; end
+
+    # puts the card just played onto the expectation stack. Just like how
+    # HeadlineCardRound does it after a couple of HeadlineCardPlays. BUT INSTEAD
+    # IT DOES IT RIGHT NOW
+    #
+    # Returns one or more validators to be placed on the current set of
+    # expectations.
+    def execute
+      convert_actions(actions)
+    end
+
+    def convert_actions(actions)
+      actions.map { |a| convert_action(a, card) }
+    end
+
+    # The rest of this smells a lot like a Factory...
+
+    # Convert an action to a validator.
+    def convert_action(action, card)
+      # TODO: the card points may not be an indicator of how many moves
+      # can be made by the player (Red Scare in effect for example).
+
+      action == :event ?
+        card.validator.new :
+        instantiate_validator(type_to_validator(action), card.score)
+    end
+
+    def type_to_validator(type)
+      class_name = type.to_s.split("_").map(&:capitalize).join
+
+      Validators.const_get(class_name, false)
+    end
+
+    def instantiate_validator(validator_class, number_of_moves)
+      # Doing a case on Class classes is not fun.
+      case
+      when validator_class == Validators::Influence
+        validator_class.new(player, countries, number_of_moves)
+      else
+        raise "Don't know how to instantiate #{validator_class.inspect}!"
+      end
+    end
+
+    def to_s
+      "%s plays %s for %s" % [player, card, type]
+    end
+
+  end
+
+  # Deferred kind of CardPlay. They encapsulate the playing of a headline card
+  # but will not be revealed or acted upon until the HeadlineEnd terminator
+  # displays them.
+  class HeadlineCardPlay < CardPlay
+
+    def initialize(player, card)
+      super(player, card, :event)
+    end
+
+    def headline?; true; end
+
+    def execute; end
+
+    def to_s
+      "%s headlines %s" % [player, card]
+    end
+  end
+
 
   #TODO: give these two classes a common abstract class.
 
@@ -417,56 +471,6 @@ module Moves
     end
   end
 
-  class Operation < Move
-    attr_accessor :player, :card, :type, :countries
-
-    # The countries arg allows the validator to take a snapshot of the current
-    # state of all countries. This is used to prevent influence creep.
-    def initialize(player, card, type)
-      self.player = player
-      self.card = card
-      self.type = validate_type(type)
-    end
-
-    def validate_type(type)
-      # Valid types for an Operation -- Section 6.0
-      types = [:influence, :realignment, :coup, :space_race]
-
-      if types.include?(type)
-        return type
-      else
-        raise "Bad type: #{type.inspect}"
-      end
-    end
-
-    # Return the requisite number of expectations for the operation.
-    def execute
-      # TODO: the card points may not be an indicator of how many moves
-      # can be made by the player (Red Scare in effect for example).
-      instantiate_validator(type_to_validator(type), card.score)
-    end
-
-    def type_to_validator(type)
-      class_name = type.to_s.split("_").map(&:capitalize).join
-
-      Validators.const_get(class_name, false)
-    end
-
-    def instantiate_validator(validator_class, number_of_moves)
-      # Doing a case on Class classes is not fun.
-      case
-      when validator_class == Validators::Influence
-        validator_class.new(player, countries, number_of_moves)
-      else
-        raise "Don't know how to instantiate #{validator_class.inspect}!"
-      end
-    end
-
-    def to_s
-      "%s to play %s for %s" % [player, card, type]
-    end
-  end
-
   ### Misc, specialized moves
 
   class Discard < Move
@@ -537,7 +541,7 @@ module Terminators
       # TODO: this seems rusty - structure history by round or something
       # instead of one flat array.
       # get the last two headline plays.
-      headlines = history.grep(HeadlineCardPlay).last(2)
+      headlines = history.grep(Moves::HeadlineCardPlay).last(2)
 
       # TODO: if a tie on card score, US goes first (Rule 4.5 Subsection C)
       # Starting with the highest score, build up expectations
@@ -877,7 +881,7 @@ module Validators
 
     def valid?(move)
       # TODO: ensure china card cannot be played (Rule 4.5 Subsection C)
-      HeadlineCardPlay === move && move.player == expected_player
+      Moves::HeadlineCardPlay === move && move.player == expected_player
     end
 
     def explain
@@ -897,36 +901,7 @@ module Validators
     end
 
     def valid?(move)
-      ::CardPlay === move && move.player == expected_player
-    end
-  end
-
-  class Operation < Validator
-    attr_accessor :expected_player, :expected_card
-
-    include SingleExecutionHelper
-
-    def initialize(expected_player, expected_card)
-      super()
-
-      self.expected_player = expected_player
-      self.expected_card = expected_card
-    end
-
-    def valid?(move)
-      move.player == expected_player &&
-        move.card == expected_card &&
-        can_play?(move.card, move.type)
-    end
-
-    # TODO: delegate this somewhere useful
-    # determines if a given card can be played for the type of operation
-    # i.e. can the card be space raced etc?
-    # TODO: this should probably be vetted in Validators::CardPlay instead
-    def can_play?(card, operation_type)
-      # SRSLY TODO
-      todo "check specific action can be played"
-      true
+      Moves::CardPlay === move && move.player == expected_player
     end
   end
 

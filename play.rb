@@ -24,13 +24,13 @@ puts "Expecting any headline"
 p g.expectations.explain
 
 # Headline starts
-g.accept HeadlineCardPlay.new(USSR, Comecon)
+g.accept Moves::HeadlineCardPlay.new(USSR, Comecon)
 
 puts "Expecting US headline"
 p g.expectations.explain
 
 # Awaits a usa headline play
-g.accept HeadlineCardPlay.new(US, TrumanDoctrine)
+g.accept Moves::HeadlineCardPlay.new(US, TrumanDoctrine)
 
 
 puts "Expect summary of headline cards played"
@@ -50,7 +50,7 @@ g.accept Moves::UnrestrictedInfluence.new(US, C[:yugoslavia], -1)
 
 puts "First round starts..."
 
-g.accept CardPlay.new(USSR, OlympicGames, :event)
+g.accept Moves::CardPlay.new(USSR, OlympicGames, :event)
 
 # OR ? g.accept Moves::Event.new(USSR, OlympicGames)
 
@@ -60,11 +60,8 @@ g.accept Moves::OlympicSponsorOrBoycott.new(US, :sponsor)
 
 g.status # some olympics outcome....
 
-# TODO playing for points - but playing ops first
-g.accept CardPlay.new(US, Blockade, :event, :ops_before)
-
-# play for ops
-g.accept Moves::Operation.new(US, Blockade, :influence)
+# Play opponent card -- use the ops first then ussr gets event.
+g.accept Moves::CardPlay.new(US, Blockade, [:influence, :event])
 
 # Pretending blockade has 4 ops for now.
 g.accept Moves::Influence.new(US, C[:east_germany], +2)

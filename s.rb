@@ -245,7 +245,7 @@ module Moves
   # TODO: why is this not a Move?
   # The representation of playing a card. The resulting moves the player
   # may make are not part of a CardPlay.
-  class CardPlay
+  class CardPlay < Move
     # The player taking the action.
     attr_accessor :player
 
@@ -361,6 +361,10 @@ module Moves
 
     def to_s
       "%s plays %s for %s" % [player, card, type]
+    end
+
+    def amount
+      raise "An amount is not required for a #{self.class.name}."
     end
 
   end

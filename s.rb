@@ -937,10 +937,11 @@ module Validators
 
     # XXX: Super-lol hack to hide a huge array from inspect
     def inspect
-      hide = countries
+      hide = [countries, countries_whitelist]
       self.countries = ["TRUNCATED"]
+      self.countries_whitelist = ["TRUNCATED"]
       r = super
-      self.countries = hide
+      self.countries, self.countries_whitelist = hide
       r
     end
   end

@@ -1,0 +1,51 @@
+order sensitive should default to true.
+
+too much stuff called expectation. dont forget expectations WRAP validators.
+
+should cardplay be a move with an empty execute method?
+
+player needs to be an object.. so player.opponent can be a thing
+
+status method should be grabbing some kind of log. always prints last entry
+
+not sure if Intervals are useful in their current form
+
+rename country.can_add_influence? to country.can_receive_influence? or
+  country.influenceable?
+
+
+influence creep is only applicable during influence being played during
+operations, right? in this case Validators::Influence can be the single
+point of enforcement for this... is this the only time that the 2:1 "cost of
+entry" also applies?
+
+game state should only be mutated within a Move class?
+
+need some kind of "modifiers" object that notes the current modifications in
+place -- essentially a hash encapsulated by suitable methods for getting the
+right info about what cards are in effect and what the current ops points are
+after modification.
+
+ensure all raises and fails use a custom & representative exception class
+
+ X placing influence by event decree
+ X placing influence by ops points
+ X placing influence without spread/creep - needs snapshot of countries
+     possibly add some kind of transaction api for adding influence
+ X playing opponent card (+ deciding if event should occur pre/post-ops)
+ - coups
+ - space race
+ - realignment
+ - scoring card
+
+ ~ hand/deck management (including discarding of event cards etc)
+ - china card management - this is not in the "hand", also has flipped state
+ ~ turn/round/player tracking: possibly some kind of executor inserted
+   between ordered expectations? - player tracking remaining
+
+ - explain why rejections occur - make Validators print in a readable way
+     what they are expecting.
+
+ - OMG TESTS (unit and integration)
+ - look in manual for italicised examples of play for good integration tests
+     i.e. Section 5.2 - examples 1-4

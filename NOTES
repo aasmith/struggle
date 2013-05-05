@@ -26,7 +26,26 @@ place -- essentially a hash encapsulated by suitable methods for getting the
 right info about what cards are in effect and what the current ops points are
 after modification.
 
-ensure all raises and fails use a custom & representative exception class
+ensure all raises and fails use a custom or representative exception class
+
+make influence helpers less magic -- dont rely on initialize, instead call them
+explicitly. makes the task of mixing in multiple helpers less scary
+
+consider execute blocks returning objects to describe each change - makes
+hooking and checking for instant-win conditions after each change easier, as
+well as clearer change-logging
+
+  def modify(changers)
+   changers.each do |c|
+    c.change(game)
+    check_defcon
+    etc
+   end
+  end
+
+all puts etc should go to a per-play action log that gets set up each play -
+this then gets rolled into master log for posterity but allows player to see
+what happened on the last turn
 
  X placing influence by event decree
  X placing influence by ops points

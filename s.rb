@@ -227,6 +227,27 @@ class Ussr < Superpower
   def ussr?; true; end
 end
 
+class VictoryTrack
+
+  # +20 = USSR victory, -20 = US victory
+  attr_reader :points
+
+  def initialize
+    @points = 0
+  end
+
+  def add(player, amount)
+    raise ArgumentError, "Must be positive" if amount < 0
+
+    @points += (player.us? ? -amount : amount)
+  end
+
+  def subtract(player, amount)
+    raise ArgumentError, "Must be positive" if amount < 0
+
+    @points += (player.us? ? amount : -amount)
+  end
+end
 
 module Moves
   class Move

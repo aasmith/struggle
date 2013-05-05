@@ -19,7 +19,7 @@ class TestTerminators < MiniTest::Unit::TestCase
 
       break if Terminators::GameEnd === t
 
-      fail "Test ran too many iterations." if (i += 1) > 2000
+      fail "Test ran too many iterations." if (i += 1) > 100
     end
 
     test = lambda { |n, turn, terminators|

@@ -114,6 +114,10 @@ class Game
       warn "Not all validators were valid! Got #{validators.inspect}"
     end
   end
+
+  def current_card
+    history.last.card
+  end
 end
 
 class UnacceptableActionOrMove < StandardError

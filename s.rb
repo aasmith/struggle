@@ -68,9 +68,13 @@ class Game
     #
     # Suggested: add "def self.needs; [:countries]; end" to the object
     # receiving the injections.
-    if action_or_move.respond_to?(:countries=)
-      action_or_move.countries = countries
+
+    %w(countries defcon current_card die).each do |name|
+      if action_or_move.respond_to?(:"#{name}=")
+        action_or_move.send(:"#{name}=", send(name.to_sym))
+      end
     end
+
 
     if expectation = expectations.expecting?(action_or_move)
       possible_expectations = expectation.execute(action_or_move)
@@ -284,8 +288,6 @@ module Moves
     def amount; 1; end
   end
 
-  # TODO: explain this better
-  # TODO: why is this not a Move?
   # The representation of playing a card. The resulting moves the player
   # may make are not part of a CardPlay.
   class CardPlay < Move
@@ -303,7 +305,7 @@ module Moves
     attr_accessor :actions
 
     # injected as needed.
-    attr_accessor :countries
+    attr_accessor :countries, :defcon
 
     def initialize(player, card, actions)
       self.player = player
@@ -393,6 +395,8 @@ module Moves
       case
       when validator_class == Validators::Influence
         validator_class.new(player, countries, number_of_moves)
+      when validator_class == Validators::Coup
+        validator_class.new(player, defcon, number_of_moves)
       else
         raise "Don't know how to instantiate #{validator_class.inspect}!"
       end
@@ -499,8 +503,62 @@ module Moves
     end
   end
 
-  class Coup
+  class Coup < Move
+    attr_accessor :player, :country
+
+    # inject
+    attr_accessor :current_card, :die
+
     def initialize(player, country)
+      self.player = player
+      self.country = country
+    end
+
+    def can_coup?(defcon)
+      country.presence?(player.opponent) &&
+        country.defcon_permits_coup?(defcon)
+    end
+
+    def execute
+      todo "reduce defcon (if battleground)"
+      todo "increase military ops by score"
+
+      stability = country.stability * 2
+
+      n = die.roll
+
+      # TODO adjust score if red scare etc
+      score = current_card.score
+
+      modified_roll = n + score
+
+      puts "%s rolls %s + %s = %s against a required %s modified stability" % [
+        player, n, score, modified_roll, stability
+      ]
+
+      difference = modified_roll - stability
+
+      if difference > 0
+        puts "%s coups with %s point-win in %s" % [player, difference, country]
+
+        country.successful_coup(player, difference)
+      end
+    end
+
+    def to_s
+      "%s attempts a coup in %s" % [player, country]
+    end
+  end
+
+  # An alternate version of a Coup used in "free coup" moves that doesn't
+  # test for geographic/defcon qualifiers (Section 6.3.5)
+  class FreeCoup < Coup
+    def can_coup?(defcon)
+      country.presence?(player.opponent)
+    end
+
+    def to_s
+      "%s attempts a FREE coup in %s" % [player, country]
     end
   end
 
@@ -988,6 +1046,22 @@ module Validators
       r
     end
   end
+
+  class Coup < Validator
+    attr_accessor :expected_player, :defcon, :points
+
+    include SingleExecutionHelper
+
+    def initialize(expected_player, defcon, points)
+      self.expected_player = expected_player
+      self.points = points
+      self.defcon = defcon
+    end
+
+    def valid?(move)
+      move.player == expected_player && move.can_coup?(defcon)
+    end
+  end
 end
 
 # A registry for cards.
@@ -1116,6 +1190,14 @@ end
 
 
 class Country
+
+  NO_COUPS = {
+    5 => [],
+    4 => [Europe],
+    3 => [Europe, Asia],
+    2 => [Europe, Asia, MiddleEast]
+  }
+
   attr_reader :name, :stability, :battleground, :regions, :neighbors
   attr_reader :influence, :adjacent_superpower
 
@@ -1205,6 +1287,36 @@ class Country
   def price_of_influence(player)
     controlled_by?(player.opponent) ? 2 : 1
   end
+
+  # Coup methods
+
+  def defcon_prevents_coup?(defcon)
+    return true if defcon == 1 # should you even be asking at this juncture?
+
+    regions = NO_COUPS[defcon]
+
+    # Is this country in any of the DEFCON-affected regions?
+    regions.any? { |region| in?(region) }
+  end
+
+  def defcon_permits_coup?(defcon)
+    !defcon_prevents_coup?(defcon)
+  end
+
+  # Effect the change of a successful coup by the given player with given
+  # margin of victory.
+  def successful_coup(player, amount)
+    raise ArgumentError, "must be positive" if amount < 0
+
+    amount.times do
+      if presence?(player.opponent)
+        add_influence! player.opponent, -1
+      else
+        add_influence! player, 1
+      end
+    end
+  end
+
 
   alias battleground? battleground
 

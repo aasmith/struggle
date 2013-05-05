@@ -174,5 +174,48 @@ class TestCountry < MiniTest::Unit::TestCase
 
     assert_equal Country.accessible(US, @countries).sort, expected_us.sort
   end
+
+  def test_defcon_prevents_coup?
+    uk = Country.find(:united_kingdom, @countries)
+    refute uk.defcon_prevents_coup?(5)
+    assert uk.defcon_prevents_coup?(4)
+
+    jp = Country.find(:japan, @countries)
+    refute jp.defcon_prevents_coup?(4)
+    assert jp.defcon_prevents_coup?(3)
+
+    iq = Country.find(:iraq, @countries)
+    refute iq.defcon_prevents_coup?(3)
+    assert iq.defcon_prevents_coup?(2)
+
+    za = Country.find(:south_africa, @countries)
+    refute za.defcon_prevents_coup?(2)
+    assert za.defcon_prevents_coup?(1)
+  end
+
+  def test_successful_coup_positive
+    jp = Country.find(:japan, @countries)
+
+    jp.add_influence!(US, 2)
+
+    assert_raises(ArgumentError) do
+      jp.successful_coup(USSR, -1)
+    end
+  end
+
+  def test_successful_coup
+    jp = Country.find(:japan, @countries)
+    jp.add_influence!(US, 3)
+
+    jp.successful_coup(USSR, 1)
+
+    assert_equal jp.influence(US), 2, "US influence should reduce by 1"
+    assert_equal jp.influence(USSR), 0, "USSR influence should not change"
+
+    jp.successful_coup(USSR, 3)
+
+    assert_equal jp.influence(US), 0, "US influence should be removed"
+    assert_equal jp.influence(USSR), 1, "USSR influence should increase by 1"
+  end
 end
 

@@ -27,6 +27,9 @@ class Game
   # Countries and their associated presence
   attr_accessor :countries
 
+  # A victory track for victory points.
+  attr_accessor :victory_track
+
   # Expectations. These are arrays of expected (i.e. allowable moves/actions).
   # Each expectation within an array can be accepted without regards of order
   # (if order_sensitive == false).
@@ -1276,6 +1279,8 @@ class Game
     self.ussr_ops = 0
 
     self.countries = Country.initialize_all
+
+    self.victory_track = VictoryTrack.new
 
     @starting_influence_placed = false
     @all_expectations = []

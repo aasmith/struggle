@@ -30,6 +30,9 @@ class Game
   # A victory track for victory points.
   attr_accessor :victory_track
 
+  # The die to be used for generating numbers.
+  attr_accessor :die
+
   # Expectations. These are arrays of expected (i.e. allowable moves/actions).
   # Each expectation within an array can be accepted without regards of order
   # (if order_sensitive == false).
@@ -249,6 +252,18 @@ class VictoryTrack
     raise ArgumentError, "Must be positive" if amount < 0
 
     @points += (player.us? ? amount : -amount)
+  end
+end
+
+class Die
+  attr_accessor :prng
+
+  def initialize
+    self.prng = Random.new
+  end
+
+  def roll
+    [1,2,3,4,5,6].sample(random: prng)
   end
 end
 
@@ -1281,6 +1296,8 @@ class Game
     self.countries = Country.initialize_all
 
     self.victory_track = VictoryTrack.new
+
+    self.die = Die.new
 
     @starting_influence_placed = false
     @all_expectations = []

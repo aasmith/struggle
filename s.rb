@@ -33,6 +33,10 @@ class Game
   # The die to be used for generating numbers.
   attr_accessor :die
 
+  # Modifiers that change certain underlying aspects of the gameplay for a
+  # limited amount of time.
+  attr_accessor :modifiers
+
   # Expectations. These are arrays of expected (i.e. allowable moves/actions).
   # Each expectation within an array can be accepted without regards of order
   # (if order_sensitive == false).
@@ -62,40 +66,58 @@ class Game
 
     puts "PLAYING: #{action_or_move}"
 
-    # Guesses what possible bits of context that the object may need in order
-    # to go about its business. This should probably be less guess and more
-    # object stating what it needs, and we provide it here.
-    #
-    # Suggested: add "def self.needs; [:countries]; end" to the object
-    # receiving the injections.
+    inject_variables action_or_move
 
-    %w(countries defcon current_card die).each do |name|
-      if action_or_move.respond_to?(:"#{name}=")
-        action_or_move.send(:"#{name}=", send(name.to_sym))
-      end
-    end
-
-
-    if expectation = expectations.expecting?(action_or_move)
-      possible_expectations = expectation.execute(action_or_move)
-
-      add_immediate_expectations *possible_expectations
-
-      history << action_or_move
-
-      expectations.execute_interval(history) if expectation.satisfied?
-
-      if expectations.satisfied?
-        more_expectations = expectations.execute_terminator(history)
-
-        add_expectations more_expectations if more_expectations
-
-        next_expectation
-      end
-
-
-    else
+    expectation = expectations.expecting?(action_or_move) or
       raise UnacceptableActionOrMove.new(expectations, action_or_move)
+
+    # TODO possible_expectations is a bad name.
+    possible_expectations = *expectation.execute(action_or_move)
+
+    modifiers.executed(action_or_move)
+
+    new_validators = possible_expectations.grep(Validators::Validator)
+    new_modifiers  = possible_expectations.grep(Modifiers::Modifier)
+
+    add_immediate_expectations new_validators
+    add_modifiers new_modifiers
+
+    history << action_or_move
+
+    # TODO possibly remove intervals
+    # expectations.execute_interval(history) if expectation.satisfied?
+
+    if expectations.satisfied?
+      terminator = expectations.terminator
+
+      inject_variables terminator
+
+      more_expectations = terminator.execute
+
+      modifiers.executed(terminator)
+
+      add_expectations more_expectations if more_expectations
+
+      history << terminator
+
+      next_expectation
+    end
+  end
+
+  # Guesses what possible bits of context that the object may need in order
+  # to go about its business. This should probably be less guess and more
+  # object stating what it needs, and we provide it here.
+  #
+  # Suggested: add "def self.needs; [:countries]; end" to the object
+  # receiving the injections.
+  def inject_variables(target)
+    injections = %w(countries defcon current_card current_card die
+                    score_resolver history)
+
+    injections.each do |name|
+      if target.respond_to?(:"#{name}=")
+        target.send(:"#{name}=", send(name.to_sym))
+      end
     end
   end
 
@@ -111,16 +133,22 @@ class Game
   # Add the provided validators (TODO or should these be a new set of nested
   # expectations?) into the current set of expectations, right after the
   # current validation.
-  def add_immediate_expectations(*validators)
-    if validators.all? { |v| Validators::Validator === v }
-      expectations.insert(*validators)
-    else
-      warn "Not all validators were valid! Got #{validators.inspect}"
-    end
+  def add_immediate_expectations(validators)
+    expectations.insert(*validators)
+  end
+
+  def add_modifiers(modifiers)
+    self.modifiers.insert *modifiers
   end
 
   def current_card
-    history.last.card
+    x = history.reverse.detect { |entry| entry.respond_to?(:card) }
+    x.card
+  end
+
+  def current_turn
+    x = history.reverse.detect { |entry| entry.respond_to?(:turn) }
+    x.turn
   end
 end
 
@@ -192,14 +220,6 @@ class Expectations
     else
       expectations.detect { |x| !x.satisfied? && x.valid?(action_or_move) }
     end
-  end
-
-  def execute_interval(history)
-    interval.execute(history)
-  end
-
-  def execute_terminator(history)
-    terminator.execute(history)
   end
 
   def explain
@@ -305,7 +325,7 @@ module Moves
     attr_accessor :actions
 
     # injected as needed.
-    attr_accessor :countries, :defcon
+    attr_accessor :countries, :defcon, :current_turn, :score_resolver
 
     def initialize(player, card, actions)
       self.player = player
@@ -364,12 +384,16 @@ module Moves
     #
     # Returns one or more validators to be placed on the current set of
     # expectations.
+    #
+    # Execute can return a combination of validators and modifiers.
     def execute
       convert_actions(actions)
     end
 
     def convert_actions(actions)
-      actions.map { |a| convert_action(a, card) }
+      actions.
+        map { |a| convert_action(a, card) }.
+        flatten
     end
 
     # The rest of this smells a lot like a Factory...
@@ -379,9 +403,15 @@ module Moves
       # TODO: the card points may not be an indicator of how many moves
       # can be made by the player (Red Scare in effect for example).
 
-      action == :event ?
-        card.validator.new :
-        instantiate_validator(type_to_validator(action), card.score)
+      validator = action == :event ?
+        card.validator && card.validator.new :
+        instantiate_validator(
+          type_to_validator(action),
+          score_resolver.score(player, card))
+
+      modifier = card.modifier && card.modifier.new(player)
+
+      [validator, modifier].compact
     end
 
     def type_to_validator(type)
@@ -507,7 +537,7 @@ module Moves
     attr_accessor :player, :country
 
     # inject
-    attr_accessor :current_card, :die
+    attr_accessor :current_card, :die, :score_resolver
 
     def initialize(player, country)
       self.player = player
@@ -527,8 +557,7 @@ module Moves
 
       n = die.roll
 
-      # TODO adjust score if red scare etc
-      score = current_card.score
+      score = score_resolver.score(player, current_card)
 
       modified_roll = n + score
 
@@ -632,13 +661,16 @@ module Terminators
 
     attr_accessor :turn
 
+    # injected
+    attr_accessor :history
+
     def initialize(turn = 1)
       self.turn = turn
     end
 
     # Works out how to resolve the headline play that occurred.
     # Returns the next stack of expectations for appending?
-    def execute(history)
+    def execute
       # TODO: this seems rusty - structure history by round or something
       # instead of one flat array.
       # get the last two headline plays.
@@ -647,7 +679,7 @@ module Terminators
       # TODO: if a tie on card score, US goes first (Rule 4.5 Subsection C)
       # Starting with the highest score, build up expectations
       validators = headlines.
-        sort_by { |h| h.card.score }.
+        sort_by { |h| h.card.score! }.
         map     { |h| h.card.validator.new }.
         reverse
 
@@ -669,7 +701,7 @@ module Terminators
       self.turn = turn
     end
 
-    def execute(history)
+    def execute
       puts "HEADLINE PHASE ENDED!"
 
       validators = [
@@ -695,7 +727,7 @@ module Terminators
       self.counter = counter
     end
 
-    def execute(move)
+    def execute
       puts "ACTION ROUND ENDED!"
 
       t = if (turn <= 3 && counter == 6) || (turn >= 4 && counter == 7)
@@ -721,7 +753,7 @@ module Terminators
       self.turn = turn
     end
 
-    def execute(history)
+    def execute
       puts "TURN ENDED!"
 
       if turn == 10 then
@@ -744,7 +776,7 @@ module Terminators
     def turn
     end
 
-    def execute(history)
+    def execute
       puts "GAME ENDED"
     end
   end
@@ -1064,6 +1096,103 @@ module Validators
   end
 end
 
+class Modifiers
+  attr_accessor :modifiers
+
+  include Enumerable
+
+  def initialize
+    self.modifiers = []
+  end
+
+  def each(&block)
+    modifiers.select(&:active?).each(&block)
+  end
+
+  def insert(*modifiers)
+    self.modifiers.push(*modifiers)
+  end
+
+  def executed(something)
+    modifiers.each { |m| m.executed(something) }
+  end
+end
+
+class Modifiers
+  # A Modifier is a persistent object that will stay around modifying certain
+  # aspects of gameplay until it renders itself to be no longer active.
+  #
+  # Modifiers receive notifications of all actions, move and terminators that
+  # are executed in order to manage their internal state over multiple plays.
+  class Modifier
+    def executed(something)
+    end
+  end
+
+  module ScoreModifier
+    def score(current_player, card)
+      raise "impl"
+    end
+  end
+
+  # Card Text
+  # ---------
+  #
+  # All Operations cards played by the opponent, for the remainder of this
+  # turn, receive -1 to their Operations value (to a minimum value of 1
+  # Operations point).
+  #
+  class RedScarePurge < Modifier
+
+    include ScoreModifier
+
+    # The player that activated this modifier.
+    attr_accessor :activating_player
+
+    def initialize(activating_player)
+      self.activating_player = activating_player
+
+      @active = true
+    end
+
+    def score(current_player, card)
+      current_player == activating_player.opponent ? -1 : 0
+    end
+
+    def executed(something)
+      @active = false if Terminators::TurnEnd === something
+    end
+
+    def active?
+      @active
+    end
+
+    def expired?
+      !active?
+    end
+  end
+end
+
+class ScoreResolver
+
+  attr_accessor :modifiers
+
+  def initialize(modifiers)
+    self.modifiers = modifiers
+  end
+
+  def score(player, card)
+    score = card.score!
+
+    modifiers.
+      grep(Modifiers::ScoreModifier).
+      each { |m| score += m.score(player, card) }
+
+    score
+  end
+end
+
+
 # A registry for cards.
 class Cards
   class << self
@@ -1084,13 +1213,16 @@ end
 
 class Card
 
-  FIELDS = [:name, :ops, :side, :phase, :remove_after_event, :validator]
+  FIELDS = [
+    :name, :ops, :side, :phase, :remove_after_event, :validator, :modifier
+  ]
 
   attr_accessor *FIELDS
 
-  alias score ops
-
   def initialize(args)
+    # Don't require modifier
+    args[:modifier] ||= nil
+
     unless (FIELDS - args.keys).empty?
       raise ArgumentError, "missing args: #{(FIELDS - args.keys).join(',')}"
     end
@@ -1103,10 +1235,22 @@ class Card
     Cards.add(self)
   end
 
+  def ops
+    raise "Don't get the score here. Use a ScoreResolver."
+  end
+
+  alias score ops
+
+  def ops!
+    @ops
+  end
+
+  alias score! ops!
+
   def to_s
     asterisk = remove_after_event ? "*" : nil
 
-    "%s%s (%s) [%s, %s]" % [name, asterisk, ops, side || "neutral", phase]
+    "%s%s (%s) [%s, %s]" % [name, asterisk, ops!, side || "neutral", phase]
   end
 end
 
@@ -1146,6 +1290,16 @@ Blockade = Card.new(
   :ops => 4, # TODO: this should be 1, but testing something
   :remove_after_event => true,
   :validator => Validators::Blockade
+)
+
+RedScarePurge = Card.new(
+  :name => "Red Scare/Purge",
+  :phase => :early,
+  :side => nil,
+  :ops => 4,
+  :remove_after_event => false,
+  :validator => nil, # nothing in the event to be validated
+  :modifier => Modifiers::RedScarePurge
 )
 
 class Deck
@@ -1415,6 +1569,8 @@ class Game
 
     self.die = Die.new
 
+    self.modifiers = Modifiers.new
+
     @starting_influence_placed = false
     @all_expectations = []
     @current_index = 0
@@ -1456,6 +1612,10 @@ class Game
 
   def status
     puts "game status..."
+  end
+
+  def score_resolver
+    ScoreResolver.new(modifiers)
   end
 
   def place_starting_influence

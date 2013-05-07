@@ -13,7 +13,8 @@ class TestTerminators < MiniTest::Unit::TestCase
 
     loop do
       t = ex ? ex.terminator : Terminators::HeadlineCardRound.new
-      ex = t.execute([])
+      t.history = [] if t.respond_to?(:history)
+      ex = t.execute
 
       turns[t.turn] << t
 

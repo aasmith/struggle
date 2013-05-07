@@ -72,7 +72,14 @@ g.accept Moves::Influence.new(US, C[:france], +1)
 g.accept Moves::UnrestrictedInfluence.new(US, C[:west_germany], -3)
 #g.accept Moves::Discard.new(US, Comecon) # TODO pick a card
 
+# USSR to coup
+g.accept Moves::CardPlay.new(USSR, Blockade, :coup)
+g.accept Moves::Coup.new(USSR, C[:canada])
+
+# US red scares!
+g.accept Moves::CardPlay.new(US, RedScarePurge, :event)
 
 g.accept Moves::CardPlay.new(USSR, Blockade, :coup)
-
 g.accept Moves::Coup.new(USSR, C[:canada])
+
+p g.modifiers

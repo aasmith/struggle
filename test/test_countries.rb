@@ -51,6 +51,26 @@ class TestCountry < MiniTest::Unit::TestCase
     assert fr.presence?(USSR)
   end
 
+  def test_add_influence_raises_with_too_much_negative_influence
+    fr = Country.find(:france, @countries)
+
+    fr.add_influence!(USSR, 2)
+
+    assert_raises(StandardError) do
+      fr.add_influence!(USSR, -3)
+    end
+  end
+
+  def test_add_influence_negative
+    fr = Country.find(:france, @countries)
+
+    fr.add_influence!(USSR, 2)
+    fr.add_influence!(USSR, -2)
+
+    assert_equal fr.influence(USSR), 0
+  end
+
+
   def test_controlled_by?
     uk = Country.find(:united_kingdom, @countries)
 

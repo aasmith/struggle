@@ -1424,8 +1424,6 @@ class Country
   def can_add_influence?(player, countries)
     if countries.include?(self)
       presence?(player) || player_in_neighboring_country?(player, countries)
-    else
-      player_adjacent_to_superpower?(player)
     end
   end
 

@@ -127,9 +127,9 @@ class TestCountry < MiniTest::Unit::TestCase
 
     jp = Country.find(:japan, @countries)
 
-    assert jp.can_add_influence?(US, []), <<-MSG
-      Countries adjacent to a player's superpower must always be allowed
-      to receive influence.
+    refute jp.can_add_influence?(US, []), <<-MSG
+      Countries adjacent to a player's superpower must be ignored if it
+      is not in the list of provided countries
     MSG
   end
 

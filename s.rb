@@ -424,12 +424,20 @@ module Moves
       # Doing a case on Class classes is not fun.
       case
       when validator_class == Validators::Influence
-        validator_class.new(player, countries, number_of_moves)
+        validator_class.new(player,
+                            accessible_countries(player, countries),
+                            number_of_moves)
+
       when validator_class == Validators::Coup
         validator_class.new(player, defcon, number_of_moves)
       else
         raise "Don't know how to instantiate #{validator_class.inspect}!"
       end
+    end
+
+    def accessible_countries(player, countries)
+      Country.accessible(player, countries).
+        map { |name| Country.find(name, countries) }
     end
 
     def to_s
@@ -1047,7 +1055,7 @@ module Validators
   # operations. For instance, it will test for neighboring occupation, as well
   # as ensuring 2:1 cost of entry during opponent control.
   class Influence < Validator
-    attr_accessor :expected_player, :countries, :countries_whitelist
+    attr_accessor :expected_player, :countries
 
     include InfluenceHelper
 
@@ -1055,26 +1063,21 @@ module Validators
       self.expected_player = expected_player
       self.countries = countries
       self.remaining_influence = number_of_moves
-
-      self.countries_whitelist =
-        Country.accessible(expected_player, countries).
-        map { |name| Country.find(name, countries) }
     end
 
     def valid?(move)
       super &&
         expected_player == move.player &&
         move.affordable? &&
-        move.can_add_influence?(countries_whitelist)
+        move.can_add_influence?(countries)
     end
 
     # XXX: Super-lol hack to hide a huge array from inspect
     def inspect
-      hide = [countries, countries_whitelist]
+      hide = countries
       self.countries = ["TRUNCATED"]
-      self.countries_whitelist = ["TRUNCATED"]
       r = super
-      self.countries, self.countries_whitelist = hide
+      self.countries = hide
       r
     end
   end

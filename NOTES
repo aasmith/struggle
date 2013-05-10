@@ -36,6 +36,18 @@ all puts etc should go to a per-play action log that gets set up each play -
 this then gets rolled into master log for posterity but allows player to see
 what happened on the last turn
 
+break out history into a class - lots of internalisation to do regarding
+searching history for the most recent Thing
+
+do not keep all of the modifiers inside the Modifiers class namespace. (screws
+up inspect())
+
+does the CardPlay validator need to do more work? The CardPlay move is looking
+a bit fat
+
+fix the terrible API around Country.accessible returning a list of country
+NAMES. WAT. This stems from country.neighbors returning only a list of names.
+
  X placing influence by event decree
  X placing influence by ops points
  X placing influence without spread/creep - needs snapshot of countries

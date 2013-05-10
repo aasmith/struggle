@@ -1367,10 +1367,7 @@ class Country
     @neighbors = neighbors
     @adjacent_superpower = adjacent_superpower
 
-    influence = { US => 0, USSR => 0 }
-    influence.default_proc = lambda { |h,k| fail "Unknown player #{k.inspect}" }
-
-    @influence = influence
+    @influence = { US => 0, USSR => 0 }
   end
 
   def in?(region)
@@ -1382,11 +1379,11 @@ class Country
   end
 
   def influence(player)
-    @influence[player]
+    @influence.fetch(player)
   end
 
   def add_influence!(player, amount = 1)
-    @influence[player] += amount
+    @influence.key?(player) && @influence[player] += amount
   end
 
   def presence?(player)

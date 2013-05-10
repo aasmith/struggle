@@ -82,7 +82,22 @@ g.accept Moves::Coup.new(USSR, C[:canada])
 # US red scares!
 g.accept Moves::CardPlay.new(US, RedScarePurge, :event)
 
-g.accept Moves::CardPlay.new(USSR, Blockade, :coup)
-g.accept Moves::Coup.new(USSR, C[:canada])
+# USSR plays Vietnam revolts
+g.accept Moves::CardPlay.new(USSR, VietnamRevolts, :event)
+g.accept Moves::UnrestrictedInfluence.new(USSR, C[:vietnam], +2)
 
-p g.modifiers
+# something US
+g.accept Moves::CardPlay.new(US, TrumanDoctrine, :influence)
+g.accept Moves::Influence.new(US, C[:france], +1)
+
+# USSR using vietnam revolts modifier for this play
+m = g.modifiers.detect { |m| Modifiers::VietnamRevolts === m }
+g.accept Moves::CardPlay.new(USSR, Blockade, { :influence => [m] })
+
+g.accept Moves::Influence.new(USSR, C[:laos], +1)
+g.accept Moves::Influence.new(USSR, C[:thailand], +1)
+g.accept Moves::Influence.new(USSR, C[:thailand], +1)
+g.accept Moves::Influence.new(USSR, C[:vietnam], +1)
+
+Marshal.dump(g)
+

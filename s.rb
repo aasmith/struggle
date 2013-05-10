@@ -72,9 +72,12 @@ class Game
       raise UnacceptableActionOrMove.new(expectations, action_or_move)
 
     # TODO possible_expectations is a bad name.
-    possible_expectations = *expectation.execute(action_or_move)
+    possible_expectations = []
+    possible_expectations.push *expectation.execute(action_or_move)
 
-    modifiers.executed(action_or_move)
+    modifiers.each { |m| inject_variables m }
+
+    possible_expectations.push *modifiers.executed(action_or_move)
 
     new_validators = possible_expectations.grep(Validators::Validator)
     new_modifiers  = possible_expectations.grep(Modifiers::Modifier)
@@ -322,19 +325,52 @@ module Moves
     # other action in the order they want to play them.
     #
     # This is affected by a case ruling, see Ruling #2.
-    attr_accessor :actions
+    attr_accessor :actions_and_modifiers
 
     # injected as needed.
     attr_accessor :countries, :defcon, :current_turn, :score_resolver
 
-    def initialize(player, card, actions)
+    # actions_and_modifiers may be one of:
+    #   - a single symbol representing a single action,
+    #   - an array of symbols representing an order of actions.
+    #   - a hash keyed on action with each value being one or more
+    #     modifiers to be applied with that action
+    #
+    # Examples:
+    #
+    #   :influence
+    #   [:influence, :event]
+    #   { :influence => [modifier1, modifier2], :event => nil }
+    #
+    def initialize(player, card, actions_and_modifiers)
       self.player = player
-      self.card = card
-      self.actions = validate_actions(player, card, [*actions])
+      self.card = card # TODO: check this can be played (i.e. is in hand)
+
+      self.actions_and_modifiers = convert_to_hash(actions_and_modifiers)
+
+      validate_actions(player, card, actions)
+
+      validate_modifiers(self.actions_and_modifiers)
+      apply_modifiers(self.actions_and_modifiers)
+    end
+
+    # Convert input as described in constructor.
+    def convert_to_hash(actions_and_modifiers)
+      hash = case actions_and_modifiers
+      when Hash   then actions_and_modifiers
+      when Symbol then { actions_and_modifiers => nil }
+      when Array  then Hash[actions_and_modifiers.zip([nil])]
+      else raise "Unknown format: #{actions_and_modifiers}"
+      end
+
+      Hash[hash.map { |k,v| [k,[*v].compact] }]
+    end
+
+    def actions
+      actions_and_modifiers.keys
     end
 
     def validate_actions(player, card, actions)
-
       if exclusively_space_race?(actions)
         raise "Cannot space race." unless can_space_race?(player, card)
 
@@ -350,8 +386,32 @@ module Moves
           raise "Must include an action or event"
         end
       end
+    end
 
-      actions
+    def validate_modifiers(actions_and_modifiers)
+      # TODO can these be used by the player?
+      # i.e. is in game.modifiers and the current player owns them
+      # and are active
+
+      actions_and_modifiers.each do |action, modifiers|
+        modifiers.each do |m|
+          raise "Cannot use an expired modifier: #{m.inspect}" if m.expired?
+
+          if m.unplayable?(action)
+            raise "This modifier would cause an unplayable state"
+          end
+        end
+      end
+    end
+
+    def apply_modifiers(actions_and_modifiers)
+      modifiers = actions_and_modifiers.values.flatten
+
+      card_play_modifiers = modifiers.select { |m| m.modifies?(self.class) }
+
+      card_play_modifiers.each do |m|
+        singleton_class.send :include, m.modifier_for(self.class)
+      end
     end
 
     def exclusively_space_race?(actions)
@@ -398,7 +458,7 @@ module Moves
 
     # The rest of this smells a lot like a Factory...
 
-    # Convert an action to a validator.
+    # Convert an action to a validator and/or modifier.
     def convert_action(action, card)
 
       validator = action == :event ?
@@ -522,11 +582,6 @@ module Moves
     # question to ask -- such as placing influence during most events.
     def affordable?
       amount == country.price_of_influence(player)
-    end
-
-    # Can the player place influence using this restricted list of countries?
-    def can_add_influence?(countries_whitelist)
-      country.can_add_influence?(player, countries_whitelist)
     end
   end
 
@@ -977,6 +1032,19 @@ module Validators
     end
   end
 
+  class VietnamRevolts < Validator
+
+    include UnrestrictedInfluenceHelper
+
+    def initialize
+      self.remaining_influence = 2
+    end
+
+    def valid?(move)
+      super && move.player.ussr? && move.country.name == "Vietnam"
+    end
+  end
+
   # Allows six USSR placements of influence within Eastern Europe.
   class OpeningUssrInfluence < Validator
 
@@ -1050,7 +1118,7 @@ module Validators
   end
 
   # An Influence validator that applies the rules of placing influence during
-  # operations. For instance, it will test for neighboring occupation, as well
+  # operations. It will test for the target country being whitelisted, as well
   # as ensuring 2:1 cost of entry during opponent control.
   class Influence < Validator
     attr_accessor :expected_player, :countries
@@ -1066,17 +1134,8 @@ module Validators
     def valid?(move)
       super &&
         expected_player == move.player &&
-        move.affordable? &&
-        move.can_add_influence?(countries)
-    end
-
-    # XXX: Super-lol hack to hide a huge array from inspect
-    def inspect
-      hide = countries
-      self.countries = ["TRUNCATED"]
-      r = super
-      self.countries = hide
-      r
+        countries.include?(move.country) &&
+        move.affordable?
     end
   end
 
@@ -1115,7 +1174,7 @@ class Modifiers
   end
 
   def executed(something)
-    modifiers.each { |m| m.executed(something) }
+    map { |m| m.executed(something) }
   end
 end
 
@@ -1128,6 +1187,22 @@ class Modifiers
   class Modifier
     def executed(something)
     end
+
+    def modifies?(klass)
+      modifier_for(klass)
+    end
+
+    def modifier_for(klass)
+    end
+
+    def active?
+      raise "impl"
+    end
+
+    def expired?
+      !active?
+    end
+
   end
 
   module ScoreModifier
@@ -1168,8 +1243,75 @@ class Modifiers
       @active
     end
 
-    def expired?
-      !active?
+    def to_s
+      "%s reduces score by 1 point for %s" % [
+        self.class.name, activating_player.opponent]
+    end
+  end
+
+  class VietnamRevolts < Modifier
+
+    attr_accessor :activating_player
+
+    # injected
+    attr_accessor :score_resolver, :countries
+
+    def initialize(activating_player)
+      self.activating_player = activating_player
+
+      @active = true
+    end
+
+    def executed(something)
+      @active = false if Terminators::TurnEnd === something
+    end
+
+    def active?
+      @active
+    end
+
+    # In order to be playable as influence, the activating player
+    # must have presence in at least one country in SE Asia.
+    #
+    # In order to be playable with a coup or realignment, then the
+    # same rule must be true for the opponent.
+    def playable?(action)
+      player = case action
+      when :influence          then activating_player
+      when :realignment, :coup then activating_player.opponent
+      else false
+      end
+
+      Country.accessible(player, countries).
+        map  { |c| Country.find(c, countries) }.
+        any? { |c| c.in?(SoutheastAsia) }
+    end
+
+    def unplayable?(action)
+      !playable?(action)
+    end
+
+    # Methods that overlay CardPlay
+    module CardPlayModifier
+      def instantiate_validator(validator_class, number_of_moves)
+        super(validator_class, number_of_moves + 1)
+      end
+
+      def accessible_countries(player, countries)
+        accessible_countries = super
+
+        accessible_countries.select { |c| c.in?(SoutheastAsia) }
+      end
+    end
+
+    def modifier_for(klass)
+      return CardPlayModifier if klass == Moves::CardPlay
+    end
+
+    def to_s
+      "%s increases ops by 1 point for %s card play entirely within SE Asia" % [
+        self.class.name, activating_player
+      ]
     end
   end
 end
@@ -1303,6 +1445,16 @@ RedScarePurge = Card.new(
   :modifier => Modifiers::RedScarePurge
 )
 
+VietnamRevolts = Card.new(
+  :name => "Vietnam Revolts",
+  :phase => :early,
+  :side => USSR,
+  :ops => 2,
+  :remove_after_event => true,
+  :validator => Validators::VietnamRevolts,
+  :modifier => Modifiers::VietnamRevolts
+)
+
 class Deck
   attr_accessor :cards, :backup
 
@@ -1416,6 +1568,9 @@ class Country
   #
   # This country must also be in the list of countries in order to consider
   # itself a valid target for influence.
+  #
+  # TODO this may not be needed - use Country.accessible to build a whitelist
+  # of countries that can receive influence
   def can_add_influence?(player, countries)
     if countries.include?(self)
       presence?(player) || player_in_neighboring_country?(player, countries)

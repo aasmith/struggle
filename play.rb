@@ -48,7 +48,7 @@ g.accept Moves::UnrestrictedInfluence.new(USSR, C[:czechoslovakia], +1)
 
 # BUG TODO: fix this - currently sets US to -1 instead of wiping out USSR.
 # Instead of player having to provide the number that would cause a wipe-out,
-# create a new move RemoveInfluence
+# create a new move RemoveAllOpponentInfluence
 g.accept Moves::UnrestrictedInfluence.new(US, C[:yugoslavia], -1)
 
 puts "First round starts..."

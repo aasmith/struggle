@@ -336,7 +336,7 @@ module Moves
     def validate_actions(player, card, actions)
 
       if exclusively_space_race?(actions)
-        can_space_race?(player, card) or raise "Cannot space race."
+        raise "Cannot space race." unless can_space_race?(player, card)
 
       elsif playing_opponent_card?(player, card)
         raise "Must be two actions" unless actions.size == 2

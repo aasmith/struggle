@@ -400,8 +400,6 @@ module Moves
 
     # Convert an action to a validator.
     def convert_action(action, card)
-      # TODO: the card points may not be an indicator of how many moves
-      # can be made by the player (Red Scare in effect for example).
 
       validator = action == :event ?
         card.validator && card.validator.new :

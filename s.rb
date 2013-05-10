@@ -1383,7 +1383,7 @@ class Country
   end
 
   def add_influence!(player, amount = 1)
-    @influence.key?(player) && @influence[player] += amount
+    @influence.fetch(player) && @influence[player] += amount
   end
 
   def presence?(player)

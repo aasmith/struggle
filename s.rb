@@ -1249,6 +1249,32 @@ class Modifiers
     end
   end
 
+  class Containment < Modifier
+
+    include ScoreModifier
+
+    def initialize(*)
+      @active = true
+    end
+
+    def score(current_player, card)
+      current_player.us? && card.score! < 4 ? 1 : 0
+    end
+
+    def executed(something)
+      @active = false if Terminators::TurnEnd === something
+    end
+
+    def active?
+      @active
+    end
+
+    def to_s
+      "%s increases card ops by 1 point for US" % self.class.name
+    end
+
+  end
+
   class VietnamRevolts < Modifier
 
     attr_accessor :activating_player
@@ -1443,6 +1469,16 @@ RedScarePurge = Card.new(
   :remove_after_event => false,
   :validator => nil, # nothing in the event to be validated
   :modifier => Modifiers::RedScarePurge
+)
+
+Containment = Card.new(
+  :name => "Containment",
+  :phase => :early,
+  :side => :us,
+  :ops => 3,
+  :remove_after_event => true,
+  :validator => nil,
+  :modifier => Modifiers::Containment
 )
 
 VietnamRevolts = Card.new(

@@ -87,8 +87,7 @@ g.accept Moves::CardPlay.new(USSR, VietnamRevolts, :event)
 g.accept Moves::UnrestrictedInfluence.new(USSR, C[:vietnam], +2)
 
 # something US
-g.accept Moves::CardPlay.new(US, TrumanDoctrine, :influence)
-g.accept Moves::Influence.new(US, C[:france], +1)
+g.accept Moves::CardPlay.new(US, Containment, :event)
 
 # USSR using vietnam revolts modifier for this play
 m = g.modifiers.detect { |m| Modifiers::VietnamRevolts === m }

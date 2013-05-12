@@ -824,7 +824,7 @@ module Terminators
         if turn == 3 then
           todo "merge in mid war cards"
         elsif turn == 6 then
-          todo "merge in late ward cards"
+          todo "merge in late war cards"
         end
 
         Expectations.new([],
@@ -1244,7 +1244,7 @@ class Modifiers
     end
 
     def to_s
-      "%s reduces score by 1 point for %s" % [
+      "%s reduces card ops by 1 point for %s" % [
         self.class.name, activating_player.opponent]
     end
   end
@@ -1505,6 +1505,8 @@ class Deck
     if card
       card
     elsif backup
+      # TODO not good enough simply draw from back up deck - understanding
+      # is this should become the new primary deck (and shuffle it!)
       backup.draw or fail NoCardsError, "No cards in deck or backup."
     else
       fail NoCardsError, "No cards in deck and no backup provided."

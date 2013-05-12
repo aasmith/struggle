@@ -1448,7 +1448,7 @@ OlympicGames = Card.new(
   :phase => :early,
   :side => nil,
   :ops => 2,
-  :remove_after_event => true,
+  :remove_after_event => false,
   :validator => Validators::OlympicGames
 )
 

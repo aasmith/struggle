@@ -1232,7 +1232,7 @@ class Modifiers
     end
 
     def score(current_player, card)
-      current_player == activating_player.opponent ? -1 : 0
+      current_player == activating_player.opponent && card.score! > 1 ? -1 : 0
     end
 
     def executed(something)

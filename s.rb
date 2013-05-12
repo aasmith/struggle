@@ -1687,10 +1687,10 @@ class Country
     #
     # Not finding a country with the given name is considered an error.
     def find(name, countries)
-      name = name.to_s.gsub(/_/, " ")
+      name = Regexp.new(name.to_s.gsub(/_/, " "), :i)
 
       results = countries.select do |country|
-        country.name =~ /^#{name}/i
+        country.name =~ name
       end
 
       if results.size == 1

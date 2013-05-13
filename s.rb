@@ -1383,7 +1383,7 @@ end
 class Card
 
   FIELDS = [
-    :name, :ops, :side, :phase, :remove_after_event, :validator, :modifier
+    :id, :name, :ops, :side, :phase, :remove_after_event, :validator, :modifier
   ]
 
   attr_accessor *FIELDS
@@ -1425,71 +1425,7 @@ end
 
 # Sample cards
 # TODO: namespace... module Cards?
-Comecon = Card.new(
-  :name => "COMECON",
-  :phase => :early,
-  :side => USSR,
-  :ops => 3,
-  :remove_after_event => true,
-  :validator => Validators::Comecon
-)
-
-TrumanDoctrine = Card.new(
-  :name => "Truman Doctrine",
-  :phase => :early,
-  :side => US,
-  :ops => 1,
-  :remove_after_event => true,
-  :validator => Validators::TrumanDoctrine
-)
-
-OlympicGames = Card.new(
-  :name => "Olympic Games",
-  :phase => :early,
-  :side => nil,
-  :ops => 2,
-  :remove_after_event => false,
-  :validator => Validators::OlympicGames
-)
-
-Blockade = Card.new(
-  :name => "Blockade",
-  :phase => :early,
-  :side => USSR,
-  :ops => 4, # TODO: this should be 1, but testing something
-  :remove_after_event => true,
-  :validator => Validators::Blockade
-)
-
-RedScarePurge = Card.new(
-  :name => "Red Scare/Purge",
-  :phase => :early,
-  :side => nil,
-  :ops => 4,
-  :remove_after_event => false,
-  :validator => nil, # nothing in the event to be validated
-  :modifier => Modifiers::RedScarePurge
-)
-
-Containment = Card.new(
-  :name => "Containment",
-  :phase => :early,
-  :side => :us,
-  :ops => 3,
-  :remove_after_event => true,
-  :validator => nil,
-  :modifier => Modifiers::Containment
-)
-
-VietnamRevolts = Card.new(
-  :name => "Vietnam Revolts",
-  :phase => :early,
-  :side => USSR,
-  :ops => 2,
-  :remove_after_event => true,
-  :validator => Validators::VietnamRevolts,
-  :modifier => Modifiers::VietnamRevolts
-)
+require "allcards"
 
 class Deck
   attr_accessor :cards, :backup

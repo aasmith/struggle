@@ -938,7 +938,7 @@ module Validators
     include TypeAgnosticInfluenceHelper
 
     def valid?(move)
-      super && Moves::Influence === move
+      Moves::Influence === move && super
     end
   end
 
@@ -946,7 +946,7 @@ module Validators
     include TypeAgnosticInfluenceHelper
 
     def valid?(move)
-      super && Moves::UnrestrictedInfluence === move
+      Moves::UnrestrictedInfluence === move && super
     end
   end
 

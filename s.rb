@@ -71,16 +71,14 @@ class Game
     expectation = expectations.expecting?(action_or_move) or
       raise UnacceptableActionOrMove.new(expectations, action_or_move)
 
-    # TODO possible_expectations is a bad name.
-    possible_expectations = []
-    possible_expectations.push *expectation.execute(action_or_move)
+    results = [*expectation.execute(action_or_move)]
 
     modifiers.each { |m| inject_variables m }
 
-    possible_expectations.push *modifiers.executed(action_or_move)
+    results.push *modifiers.executed(action_or_move)
 
-    new_validators = possible_expectations.grep(Validators::Validator)
-    new_modifiers  = possible_expectations.grep(Modifiers::Modifier)
+    new_validators = results.grep(Validators::Validator)
+    new_modifiers  = results.grep(Modifiers::Modifier)
 
     add_immediate_expectations new_validators
     add_modifiers new_modifiers

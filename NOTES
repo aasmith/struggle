@@ -48,6 +48,10 @@ a bit fat
 fix the terrible API around Country.accessible returning a list of country
 NAMES. WAT. This stems from country.neighbors returning only a list of names.
 
+need a variant on modifiers: a "forced modifier" that possibly executes before
+every play -- useful for persistent and conditional punishments such as
+quagmire
+
  X placing influence by event decree
  X placing influence by ops points
  X placing influence without spread/creep - needs snapshot of countries

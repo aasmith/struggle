@@ -891,7 +891,7 @@ end
 module Validators
   class Validator
     def satisfied?
-      fail "#{self.class.name} did not impl"
+      fail NotImplementedError, "#{self.class.name} did not impl"
     end
 
     def execute(move)
@@ -904,7 +904,7 @@ module Validators
     end
 
     def valid?(move)
-      fail "#{self.class.name} did not impl"
+      fail NotImplementedError, "#{self.class.name} did not impl"
     end
   end
 
@@ -968,7 +968,7 @@ module Validators
     end
 
     def valid?(move)
-      fail "not impl in #{self.class.name}"
+      fail NotImplementedError, "not impl in #{self.class.name}"
     end
   end
 
@@ -1241,7 +1241,7 @@ class Modifiers
     end
 
     def active?
-      raise "impl"
+      raise NotImplementedError
     end
 
     def expired?
@@ -1252,7 +1252,7 @@ class Modifiers
 
   module ScoreModifier
     def score(current_player, card)
-      raise "impl"
+      raise NotImplementedError
     end
   end
 

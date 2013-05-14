@@ -545,7 +545,11 @@ module Moves
     end
 
     def to_s
-      "%s plays %s for %s" % [player, card, actions.join(" then ")]
+      x = actions_and_modifiers.map do |action, modifiers|
+        [action, *modifiers].join(" with ")
+      end
+
+      "%s plays %s for %s" % [player, card, x.join(" then ")]
     end
 
     def amount

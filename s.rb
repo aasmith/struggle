@@ -379,7 +379,7 @@ module Moves
 
       self.actions_and_modifiers = convert_to_hash(actions_and_modifiers)
 
-      validate_actions(player, card, actions)
+      validate_actions(player, card)
 
       validate_modifiers(self.actions_and_modifiers)
       apply_modifiers(self.actions_and_modifiers)
@@ -401,19 +401,19 @@ module Moves
       actions_and_modifiers.keys
     end
 
-    def validate_actions(player, card, actions)
-      if exclusively_space_race?(actions)
+    def validate_actions(player, card)
+      if exclusively_space_race?
         raise "Cannot space race." unless can_space_race?(player, card)
 
       elsif playing_opponent_card?(player, card)
         raise "Must be two actions" unless actions.size == 2
-        raise "Must include event" unless includes_event?(actions)
-        raise "Must include an action" unless includes_action?(actions)
+        raise "Must include event" unless event?
+        raise "Must include an action" unless action?
 
       else
         raise "Player can only specify one action" unless actions.size == 1
 
-        unless includes_action?(actions) || includes_event?(actions)
+        unless action? || event?
           raise "Must include an action or event"
         end
       end
@@ -445,16 +445,16 @@ module Moves
       end
     end
 
-    def exclusively_space_race?(actions)
+    def exclusively_space_race?
       actions == [:space_race]
     end
 
-    def includes_event?(actions)
+    def event?
       actions.include?(:event)
     end
 
     # Any action (defined in Section 6) other than space race.
-    def includes_action?(actions)
+    def action?
       actions.any? { |e| [:influence, :coup, :realignment].include?(e) }
     end
 

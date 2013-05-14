@@ -1761,9 +1761,6 @@ end
 
 # Real bits of mostly unimportant code
 class Game
-  def headline?
-    turn.zero?
-  end
 
   # Start a new game
   def initialize

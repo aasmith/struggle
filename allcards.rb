@@ -214,17 +214,17 @@ OlympicGames = Card.new(
   :validator => Validators::OlympicGames
 )
 
-#Nato = Card.new(
-#  :id => 21,
-#  :name => "NATO",
-#  :phase => :early,
-#  :ops => 4,
-#  :side => US,
-#  :remove_after_event => true,
-#  :validator => Validators::Nato,
-#  :modifier => Modifiers::Nato
-#)
-#
+Nato = NatoCard.new(
+  :id => 21,
+  :name => "NATO",
+  :phase => :early,
+  :ops => 4,
+  :side => US,
+  :remove_after_event => true,
+  :validator => nil,
+  :modifier => Modifiers::Nato
+)
+
 #IndependentReds = Card.new(
 #  :id => 22,
 #  :name => "Independent Reds",

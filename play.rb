@@ -90,13 +90,16 @@ g.accept Moves::UnrestrictedInfluence.new(USSR, C[:vietnam], +2)
 g.accept Moves::CardPlay.new(US, Containment, :event)
 
 # USSR using vietnam revolts modifier for this play
-m = g.modifiers.detect { |m| Modifiers::VietnamRevolts === m }
-g.accept Moves::CardPlay.new(USSR, Blockade, { :influence => [m] })
+mod = g.modifiers.detect { |m| Modifiers::VietnamRevolts === m }
+g.accept Moves::CardPlay.new(USSR, Nato, { :event => nil, :influence => mod })
 
 g.accept Moves::Influence.new(USSR, C[:laos], +1)
 g.accept Moves::Influence.new(USSR, C[:thailand], +1)
 g.accept Moves::Influence.new(USSR, C[:thailand], +1)
 g.accept Moves::Influence.new(USSR, C[:vietnam], +1)
 
-Marshal.dump(g)
+g.accept Moves::CardPlay.new(US, Nato, :event)
 
+p g.modifiers
+
+Marshal.dump(g)

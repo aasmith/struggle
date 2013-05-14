@@ -359,7 +359,7 @@ module Moves
     attr_accessor :actions_and_modifiers
 
     # injected as needed.
-    attr_accessor :countries, :defcon, :current_turn, :score_resolver
+    attr_accessor :countries, :defcon, :current_turn, :score_resolver, :history
 
     # actions_and_modifiers may be one of:
     #   - a single symbol representing a single action,
@@ -492,15 +492,30 @@ module Moves
     # Convert an action to a validator and/or modifier.
     def convert_action(action, card)
 
-      validator = action == :event ?
-        card.validator && card.validator.new :
-        instantiate_validator(
-          type_to_validator(action),
-          score_resolver.score(player, card))
+      actions_and_modifiers = []
 
-      modifier = card.modifier && card.modifier.new(player)
+      # If the event is playable, then fetch the validator and/or
+      # modifier
+      if action == :event
+        if card.event_playable?(history)
+          actions_and_modifiers.push card.validator.new if card.validator
+          actions_and_modifiers.push card.modifier.new(player) if card.modifier
 
-      [validator, modifier].compact
+          # TODO
+          todo "remove card" if card.remove_after_event?
+        else
+          puts "Event for #{card} does not execute!"
+        end
+      else
+        validator_class = type_to_validator(action)
+        number_of_moves = score_resolver.score(player, card)
+
+        validator = instantiate_validator(validator_class, number_of_moves)
+
+        actions_and_modifiers.push validator
+      end
+
+      actions_and_modifiers
     end
 
     def type_to_validator(type)
@@ -1366,6 +1381,24 @@ class Modifiers
       ]
     end
   end
+
+  class Nato < Modifier
+
+    def initialize(*)
+      @active = true
+    end
+
+    def active?
+      @active
+    end
+
+    # TODO: Implement NATO patches
+    #
+    # Remove european us-controlled countries from accessible_countries
+    # for coups, realignment and brush war.
+    #
+    # patch Moves::Coup, Moves::Realignment and Moves::CardPlay (for BrushWar)
+  end
 end
 
 class ScoreResolver
@@ -1414,6 +1447,8 @@ class Card
 
   attr_accessor *FIELDS
 
+  alias remove_after_event? remove_after_event
+
   def initialize(args)
     # Don't require modifier
     args[:modifier] ||= nil
@@ -1428,6 +1463,12 @@ class Card
 
   def add_to_registry
     Cards.add(self)
+  end
+
+  # If the card is played for the event, is the event executable given the
+  # current history?
+  def event_playable?(history)
+    true
   end
 
   def ops
@@ -1447,6 +1488,28 @@ class Card
 
     "%s%s (%s) [%s, %s]" % [name, asterisk, ops!, side || "neutral", phase]
   end
+end
+
+# Nato is special, it:
+#
+#  can be played for an event, but the event may not execute, depending on
+#  previous card plays
+#
+#  must be discarded after the event has run (card can be played for event,
+#  but if the event doesnt execute due to above conditions, discard should
+#  not occur)
+#
+#
+class NatoCard < Card
+
+  # TODO: remove these ghost classes once cards are defined
+  class WarsawPact; end
+  class MarshallPlan; end
+
+  def event_playable?(history)
+    history.played?(WarsawPact) || history.played?(MarshallPlan)
+  end
+
 end
 
 # Sample cards

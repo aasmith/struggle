@@ -85,7 +85,7 @@ class Game
     add_immediate_expectations new_validators
     add_modifiers new_modifiers
 
-    history << action_or_move
+    history.add action_or_move
 
     # TODO possibly remove intervals
     # expectations.execute_interval(history) if expectation.satisfied?
@@ -101,7 +101,7 @@ class Game
 
       add_expectations more_expectations if more_expectations
 
-      history << terminator
+      history.add terminator
 
       next_expectation
     end
@@ -145,14 +145,13 @@ class Game
   end
 
   def current_card
-    x = history.reverse.detect { |entry| entry.respond_to?(:card) }
-    x.card
+    history.current_card
   end
 
   def current_turn
-    x = history.reverse.detect { |entry| entry.respond_to?(:turn) }
-    x.turn
+    history.current_turn
   end
+
 end
 
 class UnacceptableActionOrMove < StandardError
@@ -296,6 +295,40 @@ class Die
   def roll
     [1,2,3,4,5,6].sample(random: prng)
   end
+end
+
+class History
+  attr_accessor :entries
+
+  def initialize
+    self.entries = []
+  end
+
+  def add(entry)
+    self.entries << entry
+  end
+
+  # Has the card been played as an event?
+  # (This does not mean the event is necessarily in effect...)
+  def played?(card)
+    entries.any? { |e| Moves::CardPlay === e && e.card == card && e.event? }
+  end
+
+  def current_card
+    x = entries.reverse.detect { |entry| entry.respond_to?(:card) }
+    x.card
+  end
+
+  def current_turn
+    x = entries.reverse.detect { |entry| entry.respond_to?(:turn) }
+    x.turn
+  end
+
+  # Returns the most recent headline plays.
+  def headlines
+    entries.grep(Moves::HeadlineCardPlay).last(2)
+  end
+
 end
 
 module Moves
@@ -732,14 +765,9 @@ module Terminators
     # Works out how to resolve the headline play that occurred.
     # Returns the next stack of expectations for appending?
     def execute
-      # TODO: this seems rusty - structure history by round or something
-      # instead of one flat array.
-      # get the last two headline plays.
-      headlines = history.grep(Moves::HeadlineCardPlay).last(2)
-
       # TODO: if a tie on card score, US goes first (Rule 4.5 Subsection C)
       # Starting with the highest score, build up expectations
-      validators = headlines.
+      validators = history.headlines.
         sort_by { |h| h.card.score! }.
         map     { |h| h.card.validator.new }.
         reverse
@@ -1674,7 +1702,7 @@ class Game
     self.us_hand = Hand.new(US)
     self.ussr_hand = Hand.new(USSR)
 
-    self.history = []
+    self.history = History.new
 
     self.turn = 0 # headline
     self.round = 1

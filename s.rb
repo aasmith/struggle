@@ -1416,9 +1416,17 @@ class ScoreResolver
   def score(player, card)
     score = card.score!
 
-    modifiers.
-      grep(Modifiers::ScoreModifier).
-      each { |m| score += m.score(player, card) }
+    score_modifiers = modifiers.grep(Modifiers::ScoreModifier)
+
+    score_modifiers.each do |m|
+      adjustment = m.score(player, card)
+
+      puts "%s adjusts ops points by %s for %s" % [
+        m.class.name, adjustment, player
+      ]
+
+      score += adjustment
+    end
 
     score
   end

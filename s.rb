@@ -772,7 +772,7 @@ module Moves
     alias opponent player
 
     def to_s
-      "The %s decides to %s the Olympic Games." % [opponent, sponsor_or_boycott]
+      "The %s %ss the Olympic Games." % [opponent, sponsor_or_boycott]
     end
   end
 

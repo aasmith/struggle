@@ -792,7 +792,7 @@ module Moves
       # TODO discard card
 
       # execute it as player if us event
-      card.execute(player) if card.side == US
+      return card.execute(player) if card.side == US
     end
   end
 end

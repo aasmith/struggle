@@ -739,20 +739,20 @@ module Moves
   class OlympicSponsorOrBoycott < Move
     attr_accessor :player, :sponsor_or_boycott
 
-    def initialize(player, sponsor_or_boycott)
+    def initialize(opponent, sponsor_or_boycott)
       unless [:sponsor, :boycott].include?(sponsor_or_boycott)
         raise "sponsor_or_boycott must be one of :sponsor or :boycott"
       end
 
-      self.player = player
+      self.player = opponent
       self.sponsor_or_boycott = sponsor_or_boycott
     end
 
     def execute
       # TODO: all of this
       if boycott?
-        todo "degrade_defcon"
-        todo "play_as_ops"
+        todo "degrade_defcon as __sponsor__"
+        todo "play_as_4_op_card"
       else # sponsors
         todo "roll_dice"
         todo "award_vp"
@@ -763,8 +763,16 @@ module Moves
       sponsor_or_boycott == :boycott
     end
 
+    # The player who instigated the Olympic Games.
+    def sponsor
+      player.opponent
+    end
+
+    # The opponent is the player making the decision to sponsor or boycott.
+    alias opponent player
+
     def to_s
-      "The %s decides to %s the Olympic Games." % [player, sponsor_or_boycott]
+      "The %s decides to %s the Olympic Games." % [opponent, sponsor_or_boycott]
     end
   end
 
@@ -1058,18 +1066,18 @@ module Validators
   #
   #
   class OlympicGames < Validator
+    attr_accessor :player
 
     include SingleExecutionHelper
 
-    def initialize(*)
+    def initialize(player)
+      self.player = player
       self.satisfied = false
     end
 
     def valid?(move)
       # accept a boycott or sponsor decision from the opponent
-      #
-      # TODO: need to access the opponent
-      Moves::OlympicSponsorOrBoycott === move
+      Moves::OlympicSponsorOrBoycott === move && move.player == player.opponent
     end
   end
 

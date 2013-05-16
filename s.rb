@@ -244,6 +244,8 @@ class Superpower
     def us?; false; end
     def to_s; name.upcase; end
   end
+
+  def initialize; fail "Cannot instantiate a Superpower!"; end
 end
 
 class Us < Superpower; end

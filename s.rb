@@ -242,7 +242,8 @@ class Superpower
     def opponent; fail NotImplementedError; end
     def ussr?; false; end
     def us?; false; end
-    def to_s; name.upcase; end
+    def to_s; name; end
+    def name; super.upcase; end
   end
 
   def initialize; fail "Cannot instantiate a Superpower!"; end

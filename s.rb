@@ -238,27 +238,32 @@ class Expectations
 end
 
 class Superpower
-  def opponent; fail NotImplementedError; end
-  def ussr?; false; end
-  def us?; false; end
-  def to_s; self.class.name.upcase; end
-  alias name to_s
+  class << self
+    def opponent; fail NotImplementedError; end
+    def ussr?; false; end
+    def us?; false; end
+    def to_s; name.upcase; end
+  end
 end
 
 class Us < Superpower; end
 class Ussr < Superpower; end
 
-US   = Us.new
-USSR = Ussr.new
+US   = Us
+USSR = Ussr
 
 class Us < Superpower
-  def opponent; USSR; end
-  def us?; true; end
+  class << self
+    def opponent; USSR; end
+    def us?; true; end
+  end
 end
 
 class Ussr < Superpower
-  def opponent; US; end
-  def ussr?; true; end
+  class << self
+    def opponent; US; end
+    def ussr?; true; end
+  end
 end
 
 class VictoryTrack

@@ -102,4 +102,4 @@ g.accept Moves::CardPlay.new(US, Nato, :event)
 
 p g.modifiers
 
-Marshal.dump(g)
+File.write "game.out", Marshal.dump(g)

@@ -497,14 +497,13 @@ module Moves
     # Convert an action to a validator and/or modifier.
     def convert_action(action, card)
 
-      actions_and_modifiers = []
+      results = []
 
       # If the event is playable, then fetch the validator and/or
       # modifier
       if action == :event
         if card.event_playable?(history)
-          actions_and_modifiers.push card.validator.new if card.validator
-          actions_and_modifiers.push card.modifier.new(player) if card.modifier
+          results.push *card.execute(player)
 
           # TODO
           todo "remove card" if card.remove_after_event?
@@ -517,10 +516,10 @@ module Moves
 
         validator = instantiate_validator(validator_class, number_of_moves)
 
-        actions_and_modifiers.push validator
+        results.push validator
       end
 
-      actions_and_modifiers
+      results
     end
 
     def type_to_validator(type)
@@ -768,6 +767,26 @@ module Moves
       "The %s decides to %s the Olympic Games." % [player, sponsor_or_boycott]
     end
   end
+
+  class FiveYearPlan < Move
+    attr_accessor :player
+
+    def initialize(player)
+      self.player = player
+    end
+
+    def execute
+      # TODO pick a random card from ussr hand
+      # TODO ensure this card cant be picked (i.e. hand management should
+      # have already removed FiveYearPlan from hand before executing...)
+      card = TrumanDoctrine
+
+      # TODO discard card
+
+      # execute it as player if us event
+      card.execute(player) if card.side == US
+    end
+  end
 end
 
 module Terminators
@@ -920,7 +939,7 @@ module Validators
   module TypeAgnosticInfluenceHelper
     attr_accessor :remaining_influence
 
-    def initialize
+    def initialize(*)
       fail "Set self.remaining_influence in #{self.class.name}!"
     end
 
@@ -960,7 +979,7 @@ module Validators
   module SingleExecutionHelper
     attr_accessor :satisfied
 
-    def initialize
+    def initialize(*)
       self.satisfied = false
     end
 
@@ -988,7 +1007,7 @@ module Validators
 
     include UnrestrictedInfluenceHelper
 
-    def initialize
+    def initialize(*)
       self.remaining_influence = 4
       self.countries = []
     end
@@ -1042,7 +1061,7 @@ module Validators
 
     include SingleExecutionHelper
 
-    def initialize
+    def initialize(*)
       self.satisfied = false
     end
 
@@ -1086,7 +1105,7 @@ module Validators
 
     include UnrestrictedInfluenceHelper
 
-    def initialize
+    def initialize(*)
       self.remaining_influence = 2
     end
 
@@ -1095,12 +1114,28 @@ module Validators
     end
   end
 
+  class FiveYearPlan < Validator
+
+    attr_accessor :expected_player
+
+    include SingleExecutionHelper
+
+    def initialize(expected_player)
+      self.expected_player = expected_player
+      self.satisfied = false
+    end
+
+    def valid?(move)
+      Moves::FiveYearPlan === move && move.player == expected_player
+    end
+  end
+
   # Allows six USSR placements of influence within Eastern Europe.
   class OpeningUssrInfluence < Validator
 
     include UnrestrictedInfluenceHelper
 
-    def initialize
+    def initialize(*)
       self.remaining_influence = 6
     end
 
@@ -1118,7 +1153,7 @@ module Validators
 
     include UnrestrictedInfluenceHelper
 
-    def initialize
+    def initialize(*)
       self.remaining_influence = 7
     end
 
@@ -1137,7 +1172,7 @@ module Validators
     include SingleExecutionHelper
 
     def initialize(expected_player)
-      super()
+      super
       self.expected_player = expected_player
     end
 
@@ -1158,7 +1193,7 @@ module Validators
     include SingleExecutionHelper
 
     def initialize(expected_player)
-      super()
+      super
       self.expected_player = expected_player
     end
 
@@ -1499,6 +1534,13 @@ class Card
   end
 
   alias score! ops!
+
+  def execute(player)
+    v = validator && validator.new(player)
+    m = modifier && modifier.new(player)
+
+    [v, m].compact
+  end
 
   def to_s
     asterisk = remove_after_event ? "*" : nil

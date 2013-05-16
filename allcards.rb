@@ -41,18 +41,18 @@
 #  :validator => Validators::DuckAndCover,
 #  :modifier => Modifiers::DuckAndCover
 #)
-#
-#FiveYearPlan = Card.new(
-#  :id => 5,
-#  :name => "Five Year Plan",
-#  :phase => :early,
-#  :ops => 3,
-#  :side => US,
-#  :remove_after_event => false,
-#  :validator => Validators::FiveYearPlan,
-#  :modifier => Modifiers::FiveYearPlan
-#)
-#
+
+FiveYearPlan = Card.new(
+  :id => 5,
+  :name => "Five Year Plan",
+  :phase => :early,
+  :ops => 3,
+  :side => US,
+  :remove_after_event => false,
+  :validator => Validators::FiveYearPlan,
+  :modifier => nil
+)
+
 #TheChinaCard = Card.new(
 #  :id => 6,
 #  :name => "The China Card",

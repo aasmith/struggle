@@ -98,8 +98,13 @@ g.accept Moves::Influence.new(USSR, C[:thailand], +1)
 g.accept Moves::Influence.new(USSR, C[:thailand], +1)
 g.accept Moves::Influence.new(USSR, C[:vietnam], +1)
 
+# Stupid move, this is a no-op...
 g.accept Moves::CardPlay.new(US, Nato, :event)
 
-p g.modifiers
+g.accept Moves::CardPlay.new(USSR, FiveYearPlan, [:event, :influence])
+# Picks random card from USSR hand, executes if US card.
+# Discards the picked card.
+# Ensures event occurs as the player in the argument (for defcon etc).
+g.accept Moves::FiveYearPlan.new(USSR)
 
 File.write "game.out", Marshal.dump(g)

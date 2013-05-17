@@ -15,7 +15,8 @@ g.accept Moves::UnrestrictedInfluence.new(USSR, C[:poland], +6)
 puts "Expecting US influence placement"
 p g.expectations.explain
 
-g.accept Moves::UnrestrictedInfluence.new(US, C[:canada], +4)
+g.accept Moves::UnrestrictedInfluence.new(US, C[:italy], +2)
+g.accept Moves::UnrestrictedInfluence.new(US, C[:canada], +2)
 g.accept Moves::UnrestrictedInfluence.new(US, C[:west_germany], +3)
 
 # DONE!
@@ -77,7 +78,7 @@ g.accept Moves::UnrestrictedInfluence.new(US, C[:west_germany], -3)
 
 # USSR to coup
 g.accept Moves::CardPlay.new(USSR, Blockade, :coup)
-g.accept Moves::Coup.new(USSR, C[:canada])
+g.accept Moves::Coup.new(USSR, C[:italy])
 
 # US red scares!
 g.accept Moves::CardPlay.new(US, RedScarePurge, :event)

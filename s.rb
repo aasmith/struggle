@@ -714,7 +714,7 @@ module Moves
     attr_accessor :player, :country
 
     # inject
-    attr_accessor :current_card, :die, :score_resolver
+    attr_accessor :current_card, :die, :score_resolver, :defcon
 
     def initialize(player, country)
       self.player = player
@@ -727,7 +727,8 @@ module Moves
     end
 
     def execute
-      todo "reduce defcon (if battleground)"
+      defcon.decrease(player, 1) if country.battleground?
+
       todo "increase military ops by score"
 
       stability = country.stability * 2
@@ -813,7 +814,7 @@ module Moves
     def execute
       # TODO: all of this
       if boycott?
-        todo "degrade_defcon as __sponsor__"
+        defcon.decrease(sponsor, 1)
         todo "play_as_4_op_card"
       else # sponsors
         todo "roll_dice"

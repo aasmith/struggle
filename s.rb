@@ -80,6 +80,8 @@ class Game
     new_validators = results.grep(Validators::Validator)
     new_modifiers  = results.grep(Modifiers::Modifier)
 
+    new_validators.each { |v| inject_variables v }
+
     add_immediate_expectations new_validators
     add_modifiers new_modifiers
 
@@ -449,7 +451,7 @@ module Moves
       validate_actions(player, card)
 
       validate_modifiers(self.actions_and_modifiers)
-      apply_modifiers(self.actions_and_modifiers)
+      apply_modifiers_for(self.actions_and_modifiers.values.flatten, self)
     end
 
     # Convert input as described in constructor.
@@ -502,13 +504,11 @@ module Moves
       end
     end
 
-    def apply_modifiers(actions_and_modifiers)
-      modifiers = actions_and_modifiers.values.flatten
+    def apply_modifiers_for(modifiers, obj)
+      suitable_modifiers = modifiers.select { |m| m.modifies?(obj.class) }
 
-      card_play_modifiers = modifiers.select { |m| m.modifies?(self.class) }
-
-      card_play_modifiers.each do |m|
-        singleton_class.send :include, m.modifier_for(self.class)
+      suitable_modifiers.each do |m|
+        obj.singleton_class.send :include, m.modifier_for(obj.class)
       end
     end
 
@@ -581,6 +581,10 @@ module Moves
         results.push validator
       end
 
+      results.each do |r|
+        apply_modifiers_for(actions_and_modifiers.values.flatten, r)
+      end
+
       results
     end
 
@@ -594,20 +598,13 @@ module Moves
       # Doing a case on Class classes is not fun.
       case
       when validator_class == Validators::Influence
-        validator_class.new(player,
-                            accessible_countries(player, countries),
-                            number_of_moves)
+        validator_class.new(player, number_of_moves)
 
       when validator_class == Validators::Coup
         validator_class.new(player, defcon, number_of_moves)
       else
         raise "Don't know how to instantiate #{validator_class.inspect}!"
       end
-    end
-
-    def accessible_countries(player, countries)
-      Country.accessible(player, countries).
-        map { |name| Country.find(name, countries) }
     end
 
     def to_s
@@ -1313,20 +1310,27 @@ module Validators
   # operations. It will test for the target country being whitelisted, as well
   # as ensuring 2:1 cost of entry during opponent control.
   class Influence < Validator
-    attr_accessor :expected_player, :countries
+    attr_accessor :expected_player
+
+    # injected
+    attr_accessor :countries
 
     include InfluenceHelper
 
-    def initialize(expected_player, countries, number_of_moves)
+    def initialize(expected_player, number_of_moves)
       self.expected_player = expected_player
-      self.countries = countries
       self.remaining_influence = number_of_moves
+    end
+
+    def accessible_countries
+      Country.accessible(expected_player, countries).
+        map { |name| Country.find(name, countries) }
     end
 
     def valid?(move)
       super &&
         expected_player == move.player &&
-        countries.include?(move.country) &&
+        accessible_countries.include?(move.country) &&
         move.affordable?
     end
   end
@@ -1514,16 +1518,17 @@ class Modifiers
       def instantiate_validator(validator_class, number_of_moves)
         super(validator_class, number_of_moves + 1)
       end
+    end
 
-      def accessible_countries(player, countries)
-        accessible_countries = super
-
-        accessible_countries.select { |c| c.in?(SoutheastAsia) }
+    module InfluenceValidatorModifier
+      def accessible_countries
+        super.select { |c| c.in?(SoutheastAsia) }
       end
     end
 
     def modifier_for(klass)
       return CardPlayModifier if klass == Moves::CardPlay
+      return InfluenceValidatorModifier if klass == Validators::Influence
     end
 
     def to_s
@@ -1863,7 +1868,7 @@ class Country
       "Controlled by USSR"
     end
 
-    [basic, extra].join(" ")
+    [basic, extra].compact.join(" ")
   end
 
   class << self

@@ -196,21 +196,23 @@ class TestCountry < MiniTest::Unit::TestCase
   end
 
   def test_defcon_prevents_coup?
+    defcon = Defcon.new
+
     uk = Country.find(:united_kingdom, @countries)
-    refute uk.defcon_prevents_coup?(5)
-    assert uk.defcon_prevents_coup?(4)
+    refute uk.defcon_prevents_coup?(defcon.set(USSR, 5))
+    assert uk.defcon_prevents_coup?(defcon.set(USSR, 4))
 
     jp = Country.find(:japan, @countries)
-    refute jp.defcon_prevents_coup?(4)
-    assert jp.defcon_prevents_coup?(3)
+    refute jp.defcon_prevents_coup?(defcon.set(USSR, 4))
+    assert jp.defcon_prevents_coup?(defcon.set(USSR, 3))
 
     iq = Country.find(:iraq, @countries)
-    refute iq.defcon_prevents_coup?(3)
-    assert iq.defcon_prevents_coup?(2)
+    refute iq.defcon_prevents_coup?(defcon.set(USSR, 3))
+    assert iq.defcon_prevents_coup?(defcon.set(USSR, 2))
 
     za = Country.find(:south_africa, @countries)
-    refute za.defcon_prevents_coup?(2)
-    assert za.defcon_prevents_coup?(1)
+    refute za.defcon_prevents_coup?(defcon.set(USSR, 2))
+    assert za.defcon_prevents_coup?(defcon.set(USSR, 1))
   end
 
   def test_successful_coup_positive

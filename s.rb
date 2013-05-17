@@ -291,6 +291,65 @@ class VictoryTrack
   end
 end
 
+class Defcon
+  attr_reader :value, :destroyed_by
+
+  def initialize
+    @value = 5
+    @destroyed_by = nil
+  end
+
+  def change(player, amount)
+    puts "%s to %s DEFCON by %s" % [
+      player, amount < 0 ? "reduce" : "increase", amount.abs
+    ]
+
+    set(player, value + amount)
+  end
+
+  def increase(player, amount)
+    raise ArgumentError, "Must be positive" if amount < 0
+
+    change(player, amount)
+  end
+
+  alias improve increase
+
+  def decrease(player, amount)
+    raise ArgumentError, "Must be positive" if amount < 0
+
+    change(player, -amount)
+  end
+
+  alias degrade decrease
+
+  def set(player, requested_value)
+    raise ArgumentError, "Need a player" unless [US, USSR].include?(player)
+    raise ImmutableDefcon, "DEFCON can no longer be changed." if nuclear_war?
+
+    # limit the value to 1..5.
+    bounded_value = [[requested_value, 5].min,1].max
+
+    puts "%s sets DEFCON to %s" % [player, bounded_value]
+
+    @value = bounded_value
+
+    declare_nuclear_war(player) if value <= 1
+
+    self
+  end
+
+  def declare_nuclear_war(player)
+    @destroyed_by = player
+  end
+
+  def nuclear_war?
+    destroyed_by
+  end
+
+  ImmutableDefcon = Class.new(StandardError)
+end
+
 class Die
   attr_accessor :prng
 
@@ -1729,9 +1788,9 @@ class Country
   # Coup methods
 
   def defcon_prevents_coup?(defcon)
-    return true if defcon == 1 # should you even be asking at this juncture?
+    return true if defcon.nuclear_war? # should you even be asking?
 
-    regions = NO_COUPS[defcon]
+    regions = NO_COUPS[defcon.value]
 
     # Is this country in any of the DEFCON-affected regions?
     regions.any? { |region| in?(region) }
@@ -1836,7 +1895,7 @@ class Game
     self.round = 1
     self.player = USSR
 
-    self.defcon = 5
+    self.defcon = Defcon.new
 
     self.china_card_playable = true
     self.china_card_holder = USSR

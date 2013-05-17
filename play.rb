@@ -103,9 +103,15 @@ g.accept Moves::Influence.new(USSR, C[:vietnam], +1)
 g.accept Moves::CardPlay.new(US, Nato, :event)
 
 g.accept Moves::CardPlay.new(USSR, FiveYearPlan, [:event, :influence])
+
 # Picks random card from USSR hand, executes if US card.
 # Discards the picked card.
 # Ensures event occurs as the player in the argument (for defcon etc).
 g.accept Moves::FiveYearPlan.new(USSR)
+
+# Discarded card is Duck and Cover
+g.accept Moves::DuckAndCover.new(USSR)
+
+g.accept Moves::Influence.new(USSR, C[:thailand], +1)
 
 File.write "game.out", Marshal.dump(g)

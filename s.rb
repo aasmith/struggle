@@ -113,7 +113,7 @@ class Game
   # receiving the injections.
   def inject_variables(target)
     injections = %w(countries defcon current_card current_card die
-                    score_resolver history)
+                    score_resolver history victory_track)
 
     injections.each do |name|
       if target.respond_to?(:"#{name}=")
@@ -850,12 +850,35 @@ module Moves
       # TODO pick a random card from ussr hand
       # TODO ensure this card cant be picked (i.e. hand management should
       # have already removed FiveYearPlan from hand before executing...)
-      card = TrumanDoctrine
+      card = ::DuckAndCover
+
+      puts "Chosen card is #{card}"
 
       # TODO discard card
 
       # execute it as player if us event
       return card.execute(player) if card.side == US
+    end
+  end
+
+  class DuckAndCover < Move
+    attr_accessor :player
+
+    # inject
+    attr_accessor :defcon
+
+    def initialize(player)
+      self.player = player
+    end
+
+    # lower defcon
+    # award us vps equal to 5 - defcon
+    def execute
+      defcon.decrease(player, 1)
+
+      award = 5 - defcon.value
+
+      todo "AWARD US #{award} VPs"
     end
   end
 end
@@ -1162,6 +1185,7 @@ module Validators
     end
 
     def discard?(move)
+      # TODO test the card score using score_resolver
       Moves::Discard === move && move.card.score >= 3
     end
 
@@ -1185,7 +1209,7 @@ module Validators
     end
   end
 
-  class FiveYearPlan < Validator
+  class BasicMoveValidator < Validator
 
     attr_accessor :expected_player
 
@@ -1197,8 +1221,20 @@ module Validators
     end
 
     def valid?(move)
-      Moves::FiveYearPlan === move && move.player == expected_player
+      move_class === move && move.player == expected_player
     end
+
+    def move_class
+      fail NotImplementedError
+    end
+  end
+
+  class FiveYearPlan < BasicMoveValidator
+    def move_class; Moves::FiveYearPlan; end
+  end
+
+  class DuckAndCover < BasicMoveValidator
+    def move_class; Moves::DuckAndCover; end
   end
 
   # Allows six USSR placements of influence within Eastern Europe.

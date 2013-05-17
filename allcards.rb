@@ -30,17 +30,17 @@
 #  :validator => Validators::MiddleEastScoring,
 #  :modifier => Modifiers::MiddleEastScoring
 #)
-#
-#DuckAndCover = Card.new(
-#  :id => 4,
-#  :name => "Duck and Cover",
-#  :phase => :early,
-#  :ops => 3,
-#  :side => US,
-#  :remove_after_event => false,
-#  :validator => Validators::DuckAndCover,
-#  :modifier => Modifiers::DuckAndCover
-#)
+
+DuckAndCover = Card.new(
+  :id => 4,
+  :name => "Duck and Cover",
+  :phase => :early,
+  :ops => 3,
+  :side => US,
+  :remove_after_event => false,
+  :validator => Validators::DuckAndCover,
+  :modifier => nil
+)
 
 FiveYearPlan = Card.new(
   :id => 5,

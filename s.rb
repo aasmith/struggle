@@ -88,7 +88,8 @@ class Game
     history.add action_or_move
 
     # TODO possibly remove intervals
-    # expectations.execute_interval(history) if expectation.satisfied?
+    #interval = expectations.interval
+    #interval.execute(history) #if expectation.satisfied?
 
     if expectations.satisfied?
       terminator = expectations.terminator
@@ -185,7 +186,7 @@ class Expectations
   attr_accessor :order_sensitive
 
   DefaultTerminator = Class.new { def execute(*); puts self.class.name; end }
-  DefaultInterval   = Class.new { def execute(*); puts self.class.name; end }
+  DefaultInterval   = Class.new { def execute(*); puts "="*80; end }
 
   DEFAULT_ARGS = {
     :terminator      => DefaultTerminator.new,

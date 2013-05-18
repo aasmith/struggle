@@ -1095,13 +1095,13 @@ module Validators
   class Comecon < Validator
 
     # Countries that have been used in prior moves.
-    attr_accessor :countries
+    attr_reader :countries
 
     include UnrestrictedInfluenceHelper
 
     def initialize(*)
       self.remaining_influence = 4
-      self.countries = []
+      @countries = []
     end
 
     def valid?(move)
@@ -1114,7 +1114,7 @@ module Validators
 
     def executed(move)
       super
-      countries << move.country
+      @countries << move.country
     end
 
   end

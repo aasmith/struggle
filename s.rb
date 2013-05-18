@@ -882,6 +882,38 @@ module Moves
   end
 end
 
+class Turn
+  attr_reader :number
+
+  def initialize(number)
+    @number = number
+  end
+
+  def name
+    case number
+    when 1..3  then :early
+    when 4..7  then :mid
+    when 8..10 then :late
+    end
+  end
+
+  def early?
+    name == :early
+  end
+
+  def mid?
+    name == :mid
+  end
+
+  def late?
+    name == :late
+  end
+
+  def next
+    Turn.new(number + 1)
+  end
+end
+
 module Terminators
   # A class that shows and queues up the headline events that have been placed
   # by each player.
@@ -892,7 +924,7 @@ module Terminators
     # injected
     attr_accessor :history
 
-    def initialize(turn = 1)
+    def initialize(turn = Turn.new(1))
       self.turn = turn
     end
 
@@ -910,7 +942,8 @@ module Terminators
 
       # TODO: maybe update game status here about cards played
 
-      Expectations.new(validators, :terminator => HeadlineEventsEnd.new(turn))
+      Expectations.new(validators,
+                       :terminator => HeadlineEventsEnd.new(turn))
     end
   end
 
@@ -953,7 +986,7 @@ module Terminators
     def execute
       puts "ACTION ROUND ENDED!"
 
-      t = if (turn <= 3 && counter == 6) || (turn >= 4 && counter == 7)
+      t = if (turn.early? && counter == 6) || (!turn.early? && counter == 7)
         Terminators::TurnEnd.new(turn)
       else
         Terminators::ActionRoundEnd.new(turn, counter + 1)
@@ -979,24 +1012,25 @@ module Terminators
     def execute
       puts "TURN ENDED!"
 
-      if turn == 10 then
+      if turn.number == 10 then
         Expectations.new([], :terminator => Terminators::GameEnd.new)
       else
         # if *end of* turn 3 ... etc
-        if turn == 3 then
+        if turn.number == 3 then
           todo "merge in mid war cards"
-        elsif turn == 7 then
+        elsif turn.number == 7 then
           todo "merge in late war cards"
         end
 
         Expectations.new([],
-          :terminator => Terminators::HeadlineCardRound.new(turn + 1))
+          :terminator => Terminators::HeadlineCardRound.new(turn.next))
       end
     end
   end
 
   class GameEnd
     def turn
+      Turn.new(nil)
     end
 
     def execute

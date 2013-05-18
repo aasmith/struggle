@@ -16,7 +16,7 @@ class TestTerminators < MiniTest::Unit::TestCase
       t.history = History.new if t.respond_to?(:history)
       ex = t.execute
 
-      turns[t.turn] << t
+      turns[t.turn.number] << t
 
       break if Terminators::GameEnd === t
 
@@ -29,19 +29,19 @@ class TestTerminators < MiniTest::Unit::TestCase
       MSG
 
       assert_kind_of Terminators::HeadlineCardRound, t = terminators.shift
-      assert_equal turn, t.turn
+      assert_equal turn, t.turn.number
 
       assert_kind_of Terminators::HeadlineEventsEnd, t = terminators.shift
-      assert_equal turn, t.turn
+      assert_equal turn, t.turn.number
 
       n.times do |i|
         assert_kind_of Terminators::ActionRoundEnd, t = terminators.shift
         assert_equal i + 1, t.counter
-        assert_equal turn, t.turn
+        assert_equal turn, t.turn.number
       end
 
       assert_kind_of Terminators::TurnEnd, t = terminators.shift
-      assert_equal turn, t.turn
+      assert_equal turn, t.turn.number
     }
 
     test_end = lambda { |terminators|

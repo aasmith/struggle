@@ -985,7 +985,7 @@ module Terminators
         # if *end of* turn 3 ... etc
         if turn == 3 then
           todo "merge in mid war cards"
-        elsif turn == 6 then
+        elsif turn == 7 then
           todo "merge in late war cards"
         end
 

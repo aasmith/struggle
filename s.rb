@@ -91,6 +91,7 @@ class Game
     #interval = expectations.interval
     #interval.execute(history) #if expectation.satisfied?
 
+    # TODO: no results are collected from executions here, is this intentional?
     if expectations.satisfied?
       terminator = expectations.terminator
 

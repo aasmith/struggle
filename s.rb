@@ -910,6 +910,10 @@ class Turn
     name == :late
   end
 
+  alias early_war? early?
+  alias mid_war?   mid?
+  alias late_war?  late?
+
   def next
     Turn.new(number + 1)
   end

@@ -431,7 +431,7 @@ module Moves
     attr_accessor :actions_and_modifiers
 
     # injected as needed.
-    attr_accessor :countries, :defcon, :current_turn, :score_resolver, :history
+    attr_accessor :countries, :defcon, :score_resolver, :history
 
     # actions_and_modifiers may be one of:
     #   - a single symbol representing a single action,

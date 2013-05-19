@@ -116,7 +116,7 @@ class Game
   # Suggested: add "def self.needs; [:countries]; end" to the object
   # receiving the injections.
   def inject_variables(target)
-    injections = %w(countries defcon current_card current_card die
+    injections = %w(countries defcon current_card current_turn die
                     score_resolver history victory_track)
 
     injections.each do |name|

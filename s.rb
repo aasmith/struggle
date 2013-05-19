@@ -389,8 +389,9 @@ class History
   end
 
   def current_turn
-    x = entries.reverse.detect { |entry| entry.respond_to?(:turn) }
-    x.turn
+    entry = entries.reverse.detect { |entry| entry.respond_to?(:turn) }
+
+    entry ? entry.turn : Turn.new(1)
   end
 
   # Returns the most recent headline plays.

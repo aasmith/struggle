@@ -113,5 +113,12 @@ g.accept Moves::FiveYearPlan.new(USSR)
 g.accept Moves::DuckAndCover.new(USSR)
 
 g.accept Moves::Influence.new(USSR, C[:thailand], +1)
+g.accept Moves::Influence.new(USSR, C[:thailand], +1)
+
+g.accept Moves::CardPlay.new(US, EastEuropeanUnrest, :event)
+
+g.accept Moves::Influence.new(US, C[:poland], -1)
+g.accept Moves::Influence.new(US, C[:czech], -1)
+g.accept Moves::Influence.new(US, C[:finland], -1)
 
 File.write "game.out", Marshal.dump(g)

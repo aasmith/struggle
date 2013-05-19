@@ -1159,6 +1159,43 @@ module Validators
 
   end
 
+  # Allows removal of 1 USSR influence from 3 Eastern European countries.
+  # Becomes 2 per country in late war.
+  class EastEuropeanUnrest < Validator
+
+    # Countries that have been used in prior moves.
+    attr_reader :used_countries
+
+    # inject
+    attr_accessor :current_turn, :countries
+
+    def initialize(*)
+      @used_countries = Hash.new(0)
+    end
+
+    def valid?(move)
+      move.amount == -1 &&
+        move.country.presence?(USSR) &&
+        move.country.in?(EasternEurope) &&
+        @used_countries.size < 3 &&
+        @used_countries[move.country] < limit
+    end
+
+    def limit
+      current_turn.late_war? ? 2 : 1
+    end
+
+    def executed(move)
+      @used_countries[move.country] += 1
+    end
+
+    def satisfied?
+      @used_countries.size == 3 || countries.
+        select { |c| c.in?(EasternEurope) && c.presence?(USSR) }.
+        empty?
+    end
+  end
+
   # Allows US to remove all USSR influence in an uncontrolled country in
   # Europe once.
   #

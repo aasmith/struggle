@@ -301,18 +301,18 @@ Containment = Card.new(
 #  :validator => Validators::SuezCrisis,
 #  :modifier => Modifiers::SuezCrisis
 #)
-#
-#EastEuropeanUnrest = Card.new(
-#  :id => 29,
-#  :name => "East European Unrest",
-#  :phase => :early,
-#  :ops => 3,
-#  :side => US,
-#  :remove_after_event => false,
-#  :validator => Validators::EastEuropeanUnrest,
-#  :modifier => Modifiers::EastEuropeanUnrest
-#)
-#
+
+EastEuropeanUnrest = Card.new(
+  :id => 29,
+  :name => "East European Unrest",
+  :phase => :early,
+  :ops => 3,
+  :side => US,
+  :remove_after_event => false,
+  :validator => Validators::EastEuropeanUnrest,
+  :modifier => nil
+)
+
 #Decolonization = Card.new(
 #  :id => 30,
 #  :name => "Decolonization",

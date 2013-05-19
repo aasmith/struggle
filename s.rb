@@ -1190,7 +1190,11 @@ module Validators
     end
 
     def satisfied?
-      @used_countries.size == 3 || countries.
+      @used_countries.size == 3 || no_more_suitable_countries?
+    end
+
+    def no_more_suitable_countries?
+      countries.
         select { |c| c.in?(EasternEurope) && c.presence?(USSR) }.
         empty?
     end

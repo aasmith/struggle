@@ -489,7 +489,7 @@ module Moves
 
       elsif card.score!.zero? # A scoring card...
         raise "Player can only specify one action" unless actions.size == 1
-	raise "Scoring card can only be played for event" unless event?
+        raise "Scoring card can only be played for event" unless event?
 
       else
         raise "Player can only specify one action" unless actions.size == 1
@@ -804,28 +804,28 @@ module Moves
       region = Region.new(countries.select{ |c| c.in?(target_region) })
 
       us_vp, ussr_vp = [US, USSR].map do |superpower|
-	presence   = region.presence?(superpower)
-	domination = region.domination?(superpower)
-	control    = region.control?(superpower)
+        presence   = region.presence?(superpower)
+        domination = region.domination?(superpower)
+        control    = region.control?(superpower)
 
-	level = case
-		when control    then :control
-		when domination then :domination
-		when presence   then :presence
-		end
+        level = case
+                when control    then :control
+                when domination then :domination
+                when presence   then :presence
+                end
 
-	puts "#{superpower} has #{level || 'nothing'} in scoring"
+        puts "#{superpower} has #{level || 'nothing'} in scoring"
 
 
-	points = [
-	  points(level),
-	  region.controlled_adjacent_to_superpower(superpower).size,
-	  region.controlled_battlegrounds(superpower).size
-	]
+        points = [
+          points(level),
+          region.controlled_adjacent_to_superpower(superpower).size,
+          region.controlled_battlegrounds(superpower).size
+        ]
 
-	puts "Scoring synopsis: #{points.inspect}"
+        puts "Scoring synopsis: #{points.inspect}"
 
-	points.reduce(:+)
+        points.reduce(:+)
       end
 
       todo "US SCORES #{us_vp} VP"
@@ -1947,16 +1947,16 @@ class Region
 
     countries.each do |country|
       if country.controlled_by?(player)
-	if country.battleground?
-	  num_bg_countries += 1
-	  controls_bg = true
-	else
-	  num_countries += 1
-	  controls_non_bg = true
-	end
+        if country.battleground?
+          num_bg_countries += 1
+          controls_bg = true
+        else
+          num_countries += 1
+          controls_non_bg = true
+        end
       elsif country.controlled_by?(player.opponent)
-	num_opp_countries += 1
-	num_opp_bg_countries += 1 if country.battleground?
+        num_opp_countries += 1
+        num_opp_bg_countries += 1 if country.battleground?
       end
     end
 
@@ -2023,9 +2023,9 @@ class Country
     @regions = regions
     @neighbors = neighbors
     @adjacent_superpower = case adjacent_superpower
-			   when "US"   then US
-			   when "USSR" then USSR
-			   end
+                           when "US"   then US
+                           when "USSR" then USSR
+                           end
 
     @influence = { US => 0, USSR => 0 }
   end

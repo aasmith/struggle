@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require "country_data"
 
 class Game

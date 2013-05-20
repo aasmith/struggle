@@ -1836,7 +1836,10 @@ class Country
     @battleground = battleground
     @regions = regions
     @neighbors = neighbors
-    @adjacent_superpower = adjacent_superpower
+    @adjacent_superpower = case adjacent_superpower
+			   when "US"   then US
+			   when "USSR" then USSR
+			   end
 
     @influence = { US => 0, USSR => 0 }
   end
@@ -1897,7 +1900,7 @@ class Country
   end
 
   def player_adjacent_to_superpower?(player)
-    adjacent_superpower == player.name
+    adjacent_superpower == player
   end
 
   def player_in_neighboring_country?(player, countries)

@@ -485,6 +485,10 @@ module Moves
         raise "Must include event" unless event?
         raise "Must include an action" unless action?
 
+      elsif card.score!.zero? # A scoring card...
+        raise "Player can only specify one action" unless actions.size == 1
+	raise "Scoring card can only be played for event" unless event?
+
       else
         raise "Player can only specify one action" unless actions.size == 1
 
@@ -779,6 +783,93 @@ module Moves
 
   class SpaceRace
     def initialize(player, card)
+    end
+  end
+
+  class Scoring
+    attr_accessor :player
+
+    # inject
+    attr_accessor :countries
+
+    def initialize(player)
+      self.player = player
+    end
+
+    def execute
+      # TODO check for auto victory
+
+      region = Region.new(countries.select{ |c| c.in?(target_region) })
+
+      us_vp, ussr_vp = [US, USSR].map do |superpower|
+	presence   = region.presence?(superpower)
+	domination = region.domination?(superpower)
+	control    = region.control?(superpower)
+
+	level = case
+		when control    then :control
+		when domination then :domination
+		when presence   then :presence
+		end
+
+	puts "#{superpower} has #{level || 'nothing'} in scoring"
+
+
+	points = [
+	  points(level),
+	  region.controlled_adjacent_to_superpower(superpower).size,
+	  region.controlled_battlegrounds(superpower).size
+	]
+
+	puts "Scoring synopsis: #{points.inspect}"
+
+	points.reduce(:+)
+      end
+
+      todo "US SCORES #{us_vp} VP"
+      todo "USSR SCORES #{ussr_vp} VP"
+    end
+
+    def target_region
+      raise NotImplementedError
+    end
+
+    def points(level)
+      level ? send(level) : 0
+    end
+
+    def presence;   raise NotImplementedError; end
+    def domination; raise NotImplementedError; end
+    def control;    raise NotImplementedError; end
+  end
+
+  class AsiaScoring < Scoring
+    def presence;   3; end
+    def domination; 7; end
+    def control;    9; end
+
+    def target_region
+      Asia
+    end
+  end
+
+  class EuropeScoring < Scoring
+    def presence;   3; end
+    def domination; 7; end
+    def control;    raise NotImplementedError; end # TODO
+
+    def target_region
+      Europe
+    end
+  end
+
+  class MiddleEastScoring < Scoring
+    def presence;   3; end
+    def domination; 5; end
+    def control;    7; end
+
+    def target_region
+      MiddleEast
     end
   end
 
@@ -1311,12 +1402,22 @@ module Validators
     end
   end
 
-  class FiveYearPlan < BasicMoveValidator
-    def move_class; Moves::FiveYearPlan; end
+  # A basic validator that finds the move of the same name.
+  class ResolvingBasicMoveValidator < BasicMoveValidator
+    def move_class
+      Moves.const_get(naked_class_name, false)
+    end
+
+    def naked_class_name
+      self.class.name.split("::").last
+    end
   end
 
-  class DuckAndCover < BasicMoveValidator
-    def move_class; Moves::DuckAndCover; end
+  basic_validators = %w(
+    FiveYearPlan DuckAndCover AsiaScoring EuropeScoring MiddleEastScoring)
+
+  basic_validators.each do |const|
+    const_set(const, Class.new(ResolvingBasicMoveValidator))
   end
 
   # Allows six USSR placements of influence within Eastern Europe.
@@ -1814,6 +1915,89 @@ class Hand
   end
 end
 
+# A Region is an arbitrary collection of countries that can be queried for
+# region-scoring purposes.
+class Region
+  attr_accessor :countries
+
+  def initialize(countries)
+    self.countries = countries
+  end
+
+  def presence?(player)
+    countries.any? { |c| c.controlled_by?(player) }
+  end
+
+  # Domination: A superpower achieves Domination of a Region if it Controls
+  # more countries in that Region than its opponent, and it Controls more
+  # Battleground countries in that Region than its opponent.
+  #
+  # A superpower must Control at least one non-Battleground and one
+  # Battleground country in a Region in order to achieve Domination of that
+  # Region.
+  def domination?(player)
+    num_countries = 0
+    num_bg_countries = 0
+    num_opp_countries = 0
+    num_opp_bg_countries = 0
+
+    controls_non_bg, controls_bg = false
+
+    countries.each do |country|
+      if country.controlled_by?(player)
+	if country.battleground?
+	  num_bg_countries += 1
+	  controls_bg = true
+	else
+	  num_countries += 1
+	  controls_non_bg = true
+	end
+      elsif country.controlled_by?(player.opponent)
+	num_opp_countries += 1
+	num_opp_bg_countries += 1 if country.battleground?
+      end
+    end
+
+    num_countries > num_opp_countries &&
+      num_bg_countries > num_opp_bg_countries &&
+      controls_non_bg && controls_bg
+  end
+
+  # Control: A superpower has Control of a Region if it Controls more
+  # countries in that Region than its opponent, and Controls all of the
+  # Battleground countries in that Region.
+  def control?(player)
+    num_countries = 0
+    num_opp_countries = 0
+
+    countries.each do |country|
+      num_countries +=1 if country.controlled_by?(player)
+      num_opp_countries +=1 if country.controlled_by?(player.opponent)
+    end
+
+    num_countries > num_opp_countries && controls_all_battlegrounds?(player)
+  end
+
+  def controls_all_battlegrounds?(player)
+    countries.
+      select(&:battleground?).
+      all? { |c| c.controlled_by?(player) }
+  end
+
+  def controlled_adjacent_to_superpower(player)
+    countries.select do |c|
+      c.controlled_by?(player) && c.adjacent_superpower == player.opponent
+    end
+  end
+
+  def controlled_battlegrounds(player)
+    battlegrounds.select { |c| c.controlled_by?(player) }
+  end
+
+  def battlegrounds
+    countries.select(&:battleground?)
+  end
+end
 
 class Country
 

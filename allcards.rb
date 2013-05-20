@@ -1,35 +1,35 @@
-#AsiaScoring = Card.new(
-#  :id => 1,
-#  :name => "Asia Scoring",
-#  :phase => :early,
-#  :ops => 0,
-#  :side => nil,
-#  :remove_after_event => false,
-#  :validator => Validators::AsiaScoring,
-#  :modifier => Modifiers::AsiaScoring
-#)
-#
-#EuropeScoring = Card.new(
-#  :id => 2,
-#  :name => "Europe Scoring",
-#  :phase => :early,
-#  :ops => 0,
-#  :side => nil,
-#  :remove_after_event => false,
-#  :validator => Validators::EuropeScoring,
-#  :modifier => Modifiers::EuropeScoring
-#)
-#
-#MiddleEastScoring = Card.new(
-#  :id => 3,
-#  :name => "Middle East Scoring",
-#  :phase => :early,
-#  :ops => 0,
-#  :side => nil,
-#  :remove_after_event => false,
-#  :validator => Validators::MiddleEastScoring,
-#  :modifier => Modifiers::MiddleEastScoring
-#)
+AsiaScoring = Card.new(
+  :id => 1,
+  :name => "Asia Scoring",
+  :phase => :early,
+  :ops => 0,
+  :side => nil,
+  :remove_after_event => false,
+  :validator => Validators::AsiaScoring,
+  :modifier => nil
+)
+
+EuropeScoring = Card.new(
+  :id => 2,
+  :name => "Europe Scoring",
+  :phase => :early,
+  :ops => 0,
+  :side => nil,
+  :remove_after_event => false,
+  :validator => Validators::EuropeScoring,
+  :modifier => nil
+)
+
+MiddleEastScoring = Card.new(
+  :id => 3,
+  :name => "Middle East Scoring",
+  :phase => :early,
+  :ops => 0,
+  :side => nil,
+  :remove_after_event => false,
+  :validator => Validators::MiddleEastScoring,
+  :modifier => nil
+)
 
 DuckAndCover = Card.new(
   :id => 4,

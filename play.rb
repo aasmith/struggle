@@ -121,4 +121,7 @@ g.accept Moves::Influence.new(US, C[:poland], -1)
 g.accept Moves::Influence.new(US, C[:czech], -1)
 g.accept Moves::Influence.new(US, C[:finland], -1)
 
+g.accept Moves::CardPlay.new(USSR, EuropeScoring, :event)
+g.accept Moves::EuropeScoring.new(USSR)
+
 File.write "game.out", Marshal.dump(g)

@@ -248,6 +248,7 @@ class Superpower
     def us?; false; end
     def to_s; name; end
     def name; super.upcase; end
+    def symbol; end
   end
 
   def initialize; fail "Cannot instantiate a Superpower!"; end
@@ -263,6 +264,7 @@ class Us < Superpower
   class << self
     def opponent; USSR; end
     def us?; true; end
+    def symbol; "☆"; end
   end
 end
 
@@ -270,6 +272,7 @@ class Ussr < Superpower
   class << self
     def opponent; US; end
     def ussr?; true; end
+    def symbol; "☭"; end
   end
 end
 
@@ -1942,7 +1945,12 @@ class Country
   alias battleground? battleground
 
   def to_s
-    basic = "%s (US:%s, USSR:%s)" % [name, influence(US), influence(USSR)]
+    swords = battleground? ? "⚔" : ""
+    adjacent = adjacent_superpower && "#{adjacent_superpower.symbol}"
+
+    basic = "%s %s%s (US:%s, USSR:%s)" % [
+      name, swords, adjacent, influence(US), influence(USSR)
+    ]
 
     extra = if controlled_by?(US)
       "Controlled by US"

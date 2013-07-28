@@ -88,3 +88,33 @@ operations, right? in this case Validators::Influence can be the single
 point of enforcement for this... is this the only time that the 2:1 "cost of
 entry" also applies?
 
+
+CARDS OF NOTE
+=============
+
+Outstanding cards that need to be implemented that may affect the game
+engine implementation:
+
+Early War:
+
+   6. China Card
+  26. CIA Created
+  32. UN Intervention
+  35. Formosan Resolution
+ 103. Defectors
+      War Cards
+
+Mid War:
+
+  49. Missile Envy
+  50. "We Will Bury You"
+  44. Bear Trap
+  42. Quagmire
+  69. Latin American Death Squads
+  59. Flower Power
+  40. Cuban Missile Cris
+  67. Grain Sales to Soviets
+  73. Shuttle Diplomacy
+  41. Nuclear Subs
+  60. U2 Incident
+

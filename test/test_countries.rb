@@ -56,7 +56,7 @@ class TestCountry < MiniTest::Unit::TestCase
 
     fr.add_influence!(USSR, 2)
 
-    assert_raises(StandardError) do
+    assert_raises(ArgumentError) do
       fr.add_influence!(USSR, -3)
     end
   end

@@ -2043,7 +2043,13 @@ class Country
   end
 
   def add_influence!(player, amount = 1)
-    @influence.fetch(player) && @influence[player] += amount
+    influence = @influence.fetch(player)
+
+    if influence + amount < 0
+      raise ArgumentError, "Influence cannot be set to a negative value"
+    end
+
+    @influence[player] += amount
   end
 
   def presence?(player)

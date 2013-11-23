@@ -652,7 +652,7 @@ module Moves
   end
 
 
-  #TODO: give these two classes a common abstract class.
+  #TODO: give influence classes a common abstract class.
 
   class UnrestrictedInfluence < Move
     attr_accessor :player, :country, :amount
@@ -677,6 +677,12 @@ module Moves
 
     def resulting_influence
       country.influence(US) + amount
+    end
+  end
+
+  class OpponentInfluence < UnrestrictedInfluence
+    def execute
+      country.add_influence!(player.opponent, amount)
     end
   end
 
@@ -1307,7 +1313,7 @@ module Validators
     include SingleExecutionHelper
 
     def valid?(move)
-      Moves::UnrestrictedInfluence === move &&
+      Moves::OpponentInfluence === move &&
         move.player.us? &&
         move.country.in?(Europe) &&
         move.country.uncontrolled? &&

@@ -228,8 +228,15 @@ class Expectations
     end
   end
 
+  ##
+  # Expectations that are yet to be satisifed.
+  #
+  def outstanding
+    expectations.reject(&:satisfied?)
+  end
+
   def explain
-    expectations.map(&:explain)
+    outstanding.map(&:explain)
   end
 
   # Inserts a validator after the last satisfied validator, or put it on the
@@ -1419,6 +1426,10 @@ module Validators
     def naked_class_name
       self.class.name.split("::").last
     end
+
+    def explain
+      "%s to play %s" % [expected_player, naked_class_name]
+    end
   end
 
   basic_validators = %w(
@@ -1497,6 +1508,10 @@ module Validators
 
     def valid?(move)
       Moves::CardPlay === move && move.player == expected_player
+    end
+
+    def explain
+      "%s to play a card." % expected_player
     end
   end
 

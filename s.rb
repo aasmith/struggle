@@ -847,7 +847,7 @@ module Moves
     end
   end
 
-  class Scoring
+  class Scoring < Move
     attr_accessor :player
 
     # inject

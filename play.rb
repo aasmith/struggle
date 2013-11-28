@@ -8,7 +8,7 @@ C = lambda { |name| Country.find(name, g.countries) }
 
 # Tamper with the hands for this fixed play, the same card will appear in
 # both hands for 'testing'
-g.hand(USSR).add(
+g.hands[USSR] = Hand.new([
   Comecon,
   OlympicGames,
   Blockade,
@@ -16,16 +16,16 @@ g.hand(USSR).add(
   Nato,
   FiveYearPlan,
   EuropeScoring
-)
+])
 
-g.hand(US).add(
+g.hands[US] = Hand.new([
   TrumanDoctrine,
   Blockade,
   RedScarePurge,
   Containment,
   Nato,
   EastEuropeanUnrest
-)
+])
 
 # Various placements of influence
 

@@ -1,9 +1,31 @@
 require 's'
+require 'pp'
 
 g = Game.new
 
 # Helper to find a country for this game.
 C = lambda { |name| Country.find(name, g.countries) }
+
+# Tamper with the hands for this fixed play, the same card will appear in
+# both hands for 'testing'
+g.hand(USSR).add(
+  Comecon,
+  OlympicGames,
+  Blockade,
+  VietnamRevolts,
+  Nato,
+  FiveYearPlan,
+  EuropeScoring
+)
+
+g.hand(US).add(
+  TrumanDoctrine,
+  Blockade,
+  RedScarePurge,
+  Containment,
+  Nato,
+  EastEuropeanUnrest
+)
 
 # Various placements of influence
 

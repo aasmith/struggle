@@ -8,7 +8,7 @@ class Game
   attr_accessor :deck, :discarded, :removed
 
   # Current cards in possession
-  attr_accessor :us_hand, :ussr_hand
+  attr_accessor :hands
 
   # A collection of all moves made to date
   attr_accessor :history
@@ -70,6 +70,8 @@ class Game
 
     inject_variables action_or_move
 
+    action_or_move.before
+
     expectation = expectations.expecting?(action_or_move) or
       raise UnacceptableActionOrMove.new(expectations, action_or_move)
 
@@ -86,6 +88,8 @@ class Game
 
     add_immediate_expectations new_validators
     add_modifiers new_modifiers
+
+    action_or_move.after
 
     history.add action_or_move
 
@@ -119,7 +123,8 @@ class Game
   # receiving the injections.
   def inject_variables(target)
     injections = %w(countries defcon current_card current_turn die
-                    score_resolver history victory_track)
+                    score_resolver history victory_track
+                    hands discarded removed)
 
     injections.each do |name|
       if target.respond_to?(:"#{name}=")
@@ -423,7 +428,17 @@ module Moves
       raise "Not Implemented!"
     end
 
-    def amount; 1; end
+    def amount
+      raise NotImplementedError
+    end
+
+    # Called before execution and after initialization and injection.
+    def before
+    end
+
+    # Called after execution.
+    def after
+    end
   end
 
   # The representation of playing a card. The resulting moves the player
@@ -442,8 +457,12 @@ module Moves
     # This is affected by a case ruling, see Ruling #2.
     attr_accessor :actions_and_modifiers
 
+    # Tracks whether the event on this card was executed on this play.
+    attr_accessor :event_executed
+
     # injected as needed.
-    attr_accessor :countries, :defcon, :score_resolver, :history
+    attr_accessor :countries, :defcon, :score_resolver, :history,
+      :hands, :discarded, :removed
 
     # actions_and_modifiers may be one of:
     #   - a single symbol representing a single action,
@@ -459,7 +478,7 @@ module Moves
     #
     def initialize(player, card, actions_and_modifiers)
       self.player = player
-      self.card = card # TODO: check this can be played (i.e. is in hand)
+      self.card = card
 
       self.actions_and_modifiers = convert_to_hash(actions_and_modifiers)
 
@@ -555,6 +574,12 @@ module Moves
 
     def headline?; false; end
 
+    def mark_event_executed
+      self.event_executed = true
+    end
+
+    alias event_executed? event_executed
+
     # puts the card just played onto the expectation stack. Just like how
     # HeadlineCardRound does it after a couple of HeadlineCardPlays. BUT INSTEAD
     # IT DOES IT RIGHT NOW
@@ -585,9 +610,7 @@ module Moves
       if action == :event
         if card.event_playable?(history)
           results.push *card.execute(player)
-
-          # TODO
-          todo "remove card" if card.remove_after_event?
+          mark_event_executed
         else
           puts "Event for #{card} does not execute!"
         end
@@ -623,6 +646,29 @@ module Moves
         validator_class.new(player, defcon, number_of_moves)
       else
         raise "Don't know how to instantiate #{validator_class.inspect}!"
+      end
+    end
+
+    def before
+      take_card_from_hand
+    end
+
+    def take_card_from_hand
+      hands.fetch(player).take(card)
+    end
+
+    def after
+      remove_or_discard_card
+    end
+
+    # Cards are either sent to the discard pile or permenently removed. If
+    # the card should have any lasting effect after play, then this is
+    # captured in a Modifier.
+    def remove_or_discard_card
+      if card.remove_after_event? && event_executed?
+        removed.add(card)
+      else
+        discarded.add(card)
       end
     end
 
@@ -1900,12 +1946,12 @@ class Deck
   attr_accessor :cards, :backup
 
   def initialize(cards = [], backup = nil)
-    self.cards = cards.shuffle
+    self.cards = cards
     self.backup = backup
   end
 
   def draw
-    card = cards.shift
+    card = cards.delete(cards.sample)
 
     if card
       card
@@ -1918,22 +1964,25 @@ class Deck
     end
   end
 
+  def add(card)
+    cards.push card
+  end
+
   NoCardsError = Class.new(StandardError)
 end
 
 class Hand
-  attr_reader :player, :cards
+  attr_reader :cards
 
-  def initialize(player, cards = [])
-    @player = player
+  def initialize(cards = [])
     @cards = cards
   end
 
-  def discard(card)
+  def take(card)
     @cards.delete(card) or fail "Card #{card.inspect} not found in hand."
   end
 
-  def add(cards)
+  def add(*cards)
     @cards.push *cards
   end
 end
@@ -2234,8 +2283,10 @@ class Game
 
     self.deck = Deck.new(Cards.early_war, discarded)
 
-    self.us_hand = Hand.new(US)
-    self.ussr_hand = Hand.new(USSR)
+    self.hands = {
+      US   => Hand.new,
+      USSR => Hand.new
+    }
 
     self.history = History.new
 
@@ -2291,11 +2342,15 @@ class Game
   def deal_cards
     puts "dealing cards..."
 
-    # TODO INCREASE TO EIGHT
-    2.times do
-      us_hand.add(deck.draw)
-      ussr_hand.add(deck.draw)
+    # TODO: make this 8
+    6.times do
+      hand(US).add(deck.draw)
+      hand(USSR).add(deck.draw)
     end
+  end
+
+  def hand(player)
+    hands.fetch(player)
   end
 
   def status

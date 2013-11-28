@@ -16,14 +16,14 @@ class TestHandAndDeck < MiniTest::Unit::TestCase
   def test_deck_draw_uses_backup_if_provided
     deck = Deck.new([:a, :b, :c], @backup)
 
-    3.times { assert [:a, :b, :c].include?(deck.draw) }
-    3.times { assert [:x, :y, :z].include?(deck.draw) }
+    3.times { assert_includes [:a, :b, :c], deck.draw }
+    3.times { assert_includes [:x, :y, :z], deck.draw }
   end
 
   def test_draw
-    assert_equal @deck.cards.size, 3
-    assert [:a, :b, :c].include?(@deck.draw)
-    assert_equal @deck.cards.size, 2
+    assert_equal @deck.cards.size, 3, "Starting deck has 3 cards"
+    assert_includes [:a, :b, :c], @deck.draw
+    assert_equal @deck.cards.size, 2, "One card should be removed from deck"
   end
 
   def test_deck_is_shuffled

@@ -77,7 +77,8 @@ DeStalinization = [
       Countries.reject { |c| c.controlled_by?(US) }
     },
     limit_per_country: 2,
-    total_influence: 4
+    total_influence: 4,
+    must_use_all_influence: false # player can relocate *up to* 4 influence.
   )
 ]
 

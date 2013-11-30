@@ -559,10 +559,13 @@ OrtegaElectedInNicaragua = [
     countries: [Nicaragua],
     limit_per_country: all_influence(US)
   ),
-  FreeCoup(
-    player: USSR,
-    countries: [Nicaragua],
-    ops: 2
+  Either(
+    FreeCoup(
+      player: USSR,
+      countries: [Nicaragua],
+      ops: 2
+    ),
+    Noop()
   )
 ]
 
@@ -582,7 +585,8 @@ TearDownThisWall = [
     ),
     Realignment(
       # TODO
-    )
+    ),
+    Noop()
   )
 ]
 
@@ -602,7 +606,8 @@ Junta = [
     ),
     Realignment(
       # TODO
-    )
+    ),
+    Noop()
   )
 ]
 

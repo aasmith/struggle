@@ -8,6 +8,7 @@
 # Need a single point of truth for the removal of modifiers, this data is
 # currently repeated in several places.
 #
+# TurnEnd is assumed to fire upon advancement of the turn marker (4.5 H).
 
 def all_influence(player)
   lambda { |c| c.influence(player) }
@@ -655,7 +656,7 @@ BearTrap = [
 Modifiers::BearTrap = [
   Modifier(
     before: ActionRound(player: USSR)
-    cancel: [
+    cancel_challenge: [
       Discard(player: USSR, ops: 2),
       DieRoll(player: USSR, value: 1..4)
     ]
@@ -673,6 +674,117 @@ Quagmire = [
 
 # TODO: Same as bear trap, just swap USSR for US.
 Modifiers::Quagmire = Modifiers::BearTrap
+
+Containment = [
+  AddModifier(Containment)
+]
+
+Modifiers::Containment = [
+  ScoreModifier(
+    player: US,
+    type: :ops, # anywhere an ops score is evaluated.
+    amount: +1,
+    max: 4
+    cancel: TurnEnd
+  )
+]
+
+BrezhnevDoctrine = [
+  AddModifier(Modifiers::BrezhnevDoctrine)
+]
+
+Modifiers::BrezhnevDoctrine = [
+  ScoreModifier(
+    player: USSR,
+    type: :ops,
+    amount: +1,
+    max: 4
+    cancel: TurnEnd
+  )
+]
+
+RedScarePurge = [
+  AddModifier(Modifiers::RedScarePurge)
+]
+
+Modifiers::RedScarePurge = [
+  ScoreModifier(
+    player: lambda { player },
+    type: :ops,
+    amount: -1,
+    mininum: 1,
+    cancel: TurnEnd
+  )
+]
+
+LatinAmericanDeathSquads = [
+  AddModifier(Modifiers::LatinAmericanDeathSquads)
+]
+
+Modifiers::LatinAmericanDeathSquads = [
+  ScoreModifier(
+    player: lambda { player },
+    type: :coup,
+    countries: [CentralAmerica, SouthAmerica],
+    amount: +1,
+    cancel: TurnEnd
+  ),
+  ScoreModifier(
+    player: lambda { player.opponent },
+    type: :coup,
+    countries: [CentralAmerica, SouthAmerica],
+    amount: -1,
+    cancel: TurnEnd
+  )
+]
+
+VietnamRevolts = [
+  AddInfluence(
+    player: USSR,
+    influence: USSR,
+    countries: [Vietnam],
+    limit_per_country: 2
+  ),
+  AddModifier(Modifiers::VietnamRevolts)
+]
+
+Modifiers::VietnamRevolts = [
+  ScoreModifier(
+    player: USSR,
+    type: :ops,
+    countries: [SoutheastAsia],
+    amount: +1,
+    cancel: TurnEnd
+  )
+]
+
+IranContraScandal = [
+  AddModifier(Modifiers::IranContraScandal)
+]
+
+Modifiers::IranContraScandal = [
+  ScoreModifier(
+    player: US,
+    type: :realignment,
+    amount: -1,
+    cancel: TurnEnd
+  )
+]
+
+SaltNegotiations = [
+  ImproveDefcon(2),
+  AddModifier(Modifiers::SaltNegotiations),
+  # getting cards from pile - TODO
+]
+
+Modifiers::SaltNegotiations = [
+  ScoreModifier(
+    player: nil, # this affects both players!
+    type: :coup,
+    amount: -1,
+    cancel: TurnEnd
+  )
+]
 
 
 TheReformer = [

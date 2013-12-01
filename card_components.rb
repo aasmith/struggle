@@ -5,6 +5,9 @@
 # become a first-class object with injection and an execute method.
 # Particularly those related to Wars, and VP awards.
 #
+# Need a single point of truth for the removal of modifiers, this data is
+# currently repeated in several places.
+#
 
 def all_influence(player)
   lambda { |c| c.influence(player) }
@@ -610,6 +613,66 @@ Junta = [
     Noop()
   )
 ]
+
+## Modifiers
+
+FlowerPower = [
+  PreventedBy(AnEvilEmpire),
+  AddModifier(Modifiers::FlowerPower)
+]
+
+WAR_CARDS = [
+  ArabIsraeliWar, KoreanWar, BrushWar, IndoPakistaniWar, IranIraqWar
+]
+
+# - on us play of any war card (or any war card except arab-israeli if camp
+#   david has been played)
+# - award the USSR 2 vp.
+Modifiers::FlowerPower = [
+  Modifier(
+    on: CardPlay(
+      player: US,
+      played_for: [:event, :operations], # operations: (influence,coup,realign)
+      card: lambda {
+        game.played?(CampDavidAccords, :event) ?
+          WAR_CARDS - [ArabIsraeliWar] :
+          WAR_CARDS
+      }
+    ),
+    actions: [
+      AwardVictoryPoints(player: USSR, amount: 2)
+    ]
+  )
+]
+
+BearTrap = [
+  AddModifier(Modifiers::BearTrap)
+]
+
+# - fires before each USSR action round
+# - cancelled by discarding >= 2 ops AND die roll 1-4
+# - if not cancelled, USSR can play a zero-op (scoring) card if they have one.
+Modifiers::BearTrap = [
+  Modifier(
+    before: ActionRound(player: USSR)
+    cancel: [
+      Discard(player: USSR, ops: 2),
+      DieRoll(player: USSR, value: 1..4)
+    ]
+    cancel_failure: [
+      CardPlay(player: USSR, max_ops: 0), # USSR must satisfy this if they
+                                          # have a suitable card
+      ActionRoundEnd(player: USSR)
+    ]
+  )
+]
+
+Quagmire = [
+  AddModifier(Modifiers::Quagmire)
+]
+
+# TODO: Same as bear trap, just swap USSR for US.
+Modifiers::Quagmire = Modifiers::BearTrap
 
 
 TheReformer = [

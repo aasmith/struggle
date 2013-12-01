@@ -669,6 +669,77 @@ ArmsRace = [
   )
 ]
 
+## Challenges
+
+# Challenges are tasks that must be undertaken by the specified
+# player either imediately, or defered . If the task cannot be met, then the failure block executes,
+# otherwise the success block is executed.
+
+# If the US fails to discard a >= 3 ops card, then the USSR removes all US
+# influence from West Germany.
+Blockade = [
+  Challenge(
+    player: US,
+    task: [
+      Discard(player: US, ops: [:>=, 3])
+    ],
+    failure: [
+      RemoveInfluence(
+        player: USSR,
+        influence: US,
+        countries: [WestGermany],
+        limit_per_country: all_influence(US)
+      )
+    ]
+  )
+]
+
+LatinAmericanDebtCrisis = [
+  Challenge(
+    player: US,
+    task: [
+      Discard(player: US, ops: [:>=, 3])
+    ],
+    failure: [
+      AnyTwo(
+        Countries.select{ |c| c.in?(SouthAmerica) }.map do |c|
+          AddInfluence(
+            player: USSR,
+            influence: USSR,
+            countries: [c],
+            limit_per_country: all_influence(USSR)
+          )
+        end
+      )
+    ]
+  )
+]
+
+# Challenge the US to play UN Intervention on their next action round.
+# Failure to do so results in 3 VP for USSR.
+#
+# Defcon always degrades by 1.
+WeWillBuryYou = [
+  Challenge(
+    player: US,
+    defer: ActionRound(player: US),
+    task: [
+      CardPlay(
+        player: US,
+        played_for: :event,
+        card: UnIntervention
+      )
+    ],
+    failure: [
+      AwardVictoryPoints(player: USSR, amount: 3)
+    ]
+  ),
+  DegradeDefcon(amount: 1)
+]
+
+
+
+
 ## Modifiers
 
 FlowerPower = [
@@ -711,7 +782,7 @@ Modifiers::BearTrap = [
   Modifier(
     before: ActionRound(player: USSR),
     cancel_challenge: [
-      Discard(player: USSR, ops: 2),
+      Discard(player: USSR, ops: [:>=, 2]),
       DieRoll(player: USSR, value: 1..4)
     ],
     cancel_failure: [

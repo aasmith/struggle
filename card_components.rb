@@ -654,6 +654,21 @@ HowILearnedToStopWorrying = [
   )
 ]
 
+ArmsRace = [
+  AwardVictoryPoints(
+    player: lambda { player },
+    amount: lambda {
+      more = game.military_ops(player) > game.military_ops(player.opponent)
+      met  = game.military_ops(player) >= game.required_military_ops
+
+      if    more && met then 3
+      elsif met         then 1
+      else  0
+      end
+    }
+  )
+]
+
 ## Modifiers
 
 FlowerPower = [

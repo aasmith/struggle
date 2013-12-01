@@ -631,6 +631,18 @@ DuckAndCover = [
   )
 ]
 
+CapturedNaziScientist = [
+  AdvanceSpaceRace(amount: 1)
+]
+
+OneSmallStep = [
+  AdvanceSpaceRace(
+    amount: lambda {
+      game.space_race(player) < game.space_race(player.opponent) ? 2 : 0
+    }
+  )
+]
+
 HowILearnedToStopWorrying = [
   ExpectMove(
     move: ChangeDefcon,

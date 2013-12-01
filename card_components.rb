@@ -620,11 +620,11 @@ NuclearTestBan = [
     player: lambda { player },
     amount: lambda { game.defcon - 2 }
   ),
-  ChangeDefcon(amount: 2)
+  ImproveDefcon(amount: 2)
 ]
 
 DuckAndCover = [
-  ChangeDefcon(amount: -1),
+  DegradeDefcon(amount: 1),
   AwardVictoryPoints(
     player: US,
     amount: lambda { 5 - game.defcon }
@@ -645,7 +645,7 @@ OneSmallStep = [
 
 HowILearnedToStopWorrying = [
   ExpectMove(
-    move: ChangeDefcon,
+    move: SetDefcon,
     player: lambda { player }
   ),
   AddMilitaryOps(
@@ -870,7 +870,7 @@ Modifiers::IranContraScandal = [
 ]
 
 SaltNegotiations = [
-  ChangeDefcon(amount: 2),
+  ImproveDefcon(amount: 2),
   AddModifier(Modifiers::SaltNegotiations),
   # getting cards from pile - TODO
 ]

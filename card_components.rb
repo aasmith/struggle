@@ -615,6 +615,22 @@ Junta = [
   )
 ]
 
+NuclearTestBan = [
+  AwardVictoryPoints(
+    player: lambda { player },
+    amount: lambda { game.defcon - 2 }
+  ),
+  ChangeDefcon(+2)
+]
+
+DuckAndCover = [
+  ChangeDefcon(-1),
+  AwardVictoryPoints(
+    player: US,
+    amount: lambda { 5 - game.defcon }
+  )
+]
+
 ## Modifiers
 
 FlowerPower = [
@@ -655,11 +671,11 @@ BearTrap = [
 # - if not cancelled, USSR can play a zero-op (scoring) card if they have one.
 Modifiers::BearTrap = [
   Modifier(
-    before: ActionRound(player: USSR)
+    before: ActionRound(player: USSR),
     cancel_challenge: [
       Discard(player: USSR, ops: 2),
       DieRoll(player: USSR, value: 1..4)
-    ]
+    ],
     cancel_failure: [
       CardPlay(player: USSR, max_ops: 0), # USSR must satisfy this if they
                                           # have a suitable card
@@ -684,7 +700,7 @@ Modifiers::Containment = [
     player: US,
     type: :ops, # anywhere an ops score is evaluated.
     amount: +1,
-    max: 4
+    max: 4,
     cancel: TurnEnd
   )
 ]
@@ -698,7 +714,7 @@ Modifiers::BrezhnevDoctrine = [
     player: USSR,
     type: :ops,
     amount: +1,
-    max: 4
+    max: 4,
     cancel: TurnEnd
   )
 ]
@@ -772,7 +788,7 @@ Modifiers::IranContraScandal = [
 ]
 
 SaltNegotiations = [
-  ImproveDefcon(2),
+  ChangeDefcon(+2),
   AddModifier(Modifiers::SaltNegotiations),
   # getting cards from pile - TODO
 ]

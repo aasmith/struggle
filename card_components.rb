@@ -620,11 +620,11 @@ NuclearTestBan = [
     player: lambda { player },
     amount: lambda { game.defcon - 2 }
   ),
-  ChangeDefcon(+2)
+  ChangeDefcon(amount: 2)
 ]
 
 DuckAndCover = [
-  ChangeDefcon(-1),
+  ChangeDefcon(amount: -1),
   AwardVictoryPoints(
     player: US,
     amount: lambda { 5 - game.defcon }
@@ -811,7 +811,7 @@ Modifiers::IranContraScandal = [
 ]
 
 SaltNegotiations = [
-  ChangeDefcon(+2),
+  ChangeDefcon(amount: 2),
   AddModifier(Modifiers::SaltNegotiations),
   # getting cards from pile - TODO
 ]

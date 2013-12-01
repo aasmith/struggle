@@ -631,6 +631,17 @@ DuckAndCover = [
   )
 ]
 
+HowILearnedToStopWorrying = [
+  ExpectMove(
+    move: ChangeDefcon,
+    player: lambda { player }
+  ),
+  AddMilitaryOps(
+    player: lambda { player },
+    amount: 5
+  )
+]
+
 ## Modifiers
 
 FlowerPower = [

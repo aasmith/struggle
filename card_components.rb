@@ -773,6 +773,24 @@ Modifiers::CubanMissileCrisis = [
   )
 ]
 
+U2Incident = [
+  AwardVictoryPoints(player: USSR, amount: 1),
+  AddModifier(Modifiers::U2Incident)
+]
+
+Modifiers::U2Incident = [
+  Modifiers(
+    on: Match(item: UnIntervention, type: :event),
+    triggers: AwardVictoryPoints(player: USSR, amount: 1),
+    cancel: [
+      Either(
+        Match(item: TurnEnd),
+        Match(item: UnIntervention, type: :event)
+      )
+    ]
+  )
+]
+
 Containment = [
   AddModifier(Containment)
 ]

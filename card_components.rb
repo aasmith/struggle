@@ -729,6 +729,50 @@ Quagmire = [
 # TODO: Same as bear trap, just swap USSR for US.
 Modifiers::Quagmire = Modifiers::BearTrap
 
+CubanMissileCrisis = [
+  SetDefcon(amount: 2),
+  AddModifier(Modifiers::CubanMissileCrisis)
+]
+
+# - A coup anywhere by anyone
+# - Triggers a game end for the opponent (they lose)
+# - Canceled at any time by USSR removing 2 influence from Cuba, or
+#   US removing 2 influence from WG or Turkey
+Modifiers::CubanMissileCrisis = [
+  Modifier(
+    on: Coup(),
+    triggers: GameEnd(
+      player: lambda { player.opponent }
+    ),
+    cancel: [ # Checks event history on each 'tick' for any of these matches
+      Either(
+        Match(
+          item: RemoveInfluence,
+          player: USSR,
+          country: Cuba,
+          amount: 2
+        ),
+        Match(
+          item: RemoveInfluence,
+          player: US,
+          country: WestGermany,
+          amount: 2
+        ),
+        Match(
+          item: RemoveInfluence,
+          player: US,
+          country: Turkey,
+          amount: 2
+        ),
+        Match(
+          item: TurnEnd
+        )
+      )
+    ]
+
+  )
+]
+
 Containment = [
   AddModifier(Containment)
 ]

@@ -798,8 +798,50 @@ StarWars = [
 
 ## Branches
 
+CulturalRevolution = [
+  Branch(
+    lambda { game.china_card_holder.us? },
+    ClaimChinaCard(
+      player: USSR,
+      playable: true
+    ),
+    AwardVictoryPoints(
+      player: USSR,
+      amount: 1
+    )
+  )
+]
 
+NixonPlaysTheChinaCard = [
+  Branch(
+    lambda { game.china_card_holder.us? },
+    AwardVictoryPoints(
+      player: US,
+      amount: 2
+    ),
+    ClaimChinaCard(
+      player: US,
+      playable: false
+    )
+  )
+]
 
+UssuriRiverSkirmish = [
+  Branch(
+    lambda { game.china_card_holder.ussr? },
+    ClaimChinaCard(
+      player: US,
+      playable: true
+    ),
+    AddInfluence(
+      player: US,
+      influence: US,
+      countries: [Asia],
+      limit_per_country: 2,
+      total_influence: 4
+    )
+  )
+]
 
 ## Modifiers
 

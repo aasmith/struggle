@@ -419,6 +419,37 @@ WarsawPactFormed = [
   )
 ]
 
+WillyBrandt = [
+  PreventedBy(TearDownThisWall),
+  AwardVictoryPoints(
+    player: USSR,
+    amount: 1
+  ),
+  AddInfluence(
+    player: USSR,
+    influence: USSR,
+    countries: [WestGermany],
+    limit_per_country: 1
+  )
+  # NOTE: The NATO card checks for the West Germany cancellation clause.
+]
+
+DeGaulleLeadsFrance = [
+  RemoveInfluence(
+    player: USSR,
+    influence: US,
+    countries: [France],
+    limit_per_country: 2
+  ),
+  AddInfluence(
+    player: USSR,
+    influence: USSR,
+    countries: [France],
+    limit_per_country: 1
+  )
+  # NOTE: The NATO card checks for the France cancellation clause.
+]
+
 AnEvilEmpire = [
   Cancels(FlowerPower),
   AwardVictoryPoints(
@@ -494,7 +525,7 @@ BrushWar = [
     player: lambda { player },
     countries: lambda do |game|
       # Remove US-controlled EU countries if Nato is in effect
-      countries = game.played?(Nato, :event) ?
+      countries = game.in_effect?(Nato) ?
         Countries.reject { |c| c.in?(Europe) && c.controlled_by?(US) } :
         Countries.all
 
@@ -737,6 +768,36 @@ WeWillBuryYou = [
   DegradeDefcon(amount: 1)
 ]
 
+Terrorism = [
+  Discard(
+    player: lambda { player.opponent },
+    random: true,
+    quantity: lambda {
+      player.ussr? && game.in_effect?(IranianHostageCrisis) ? 2 : 1
+    }
+  )
+]
+
+FiveYearPlan = [
+  Discard(
+    player: USSR,
+    random: true,
+    execute_event: lambda { |card| card.side == US }
+  )
+]
+
+# Event only playable if the required condition is met.
+StarWars = [
+  Requires(condition: lambda { game.space_race(US) > game.space_race(USSR) }),
+  PickFromDiscard(
+    player: US,
+    ops: [:>=, 1], # Not a scoring card
+    execute_event: true
+  )
+]
+
+## Branches
+
 
 
 
@@ -760,7 +821,7 @@ Modifiers::FlowerPower = [
       player: US,
       played_for: [:event, :operations], # operations: (influence,coup,realign)
       card: lambda {
-        game.played?(CampDavidAccords, :event) ?
+        game.in_effect?(CampDavidAccords) ?
           WAR_CARDS - [ArabIsraeliWar] :
           WAR_CARDS
       }
@@ -861,6 +922,98 @@ Modifiers::U2Incident = [
     ]
   )
 ]
+
+AldrichAmesRemix = [
+  AddModifier(Modifiers::AldrichAmesRemix),
+  Discard(
+    player: USSR,
+    hand: US,
+    quantity: 1
+  )
+]
+
+Modifiers::AldrichAmesRemix = [
+  Modifier(
+    on: Match(), # match anything
+    triggers: RevealHand(player: US),
+    cancel: Match(item: TurnEnd)
+  )
+]
+
+## Permission Modifiers
+
+# Permission modifiers must be consulted whenver a matching play occurs. If
+# the resulting ruling is negative, then the matching play should not go ahead.
+
+Nato = [
+  Either(
+    Requires(WarsawPactFormed),
+    Requires(MarshallPlan)
+  ),
+  AddModifier(Modifiers::Nato)
+]
+
+Modifiers::Nato = [
+  PermissionModifier(
+    on: Match(item: BrushWar, type: :event),
+    ruling: :deny
+  ),
+  PermissionModifier(
+    on: Match(
+      player: USSR,
+      item: [Coup, Realignment],
+      countries: lambda {
+        denied = Countries.select { |c| c.controlled_by?(US) && c.in?(Europe) }
+        denied.delete(WestGermany) if game.in_effect?(WillyBrandt)
+        denied.delete(France)      if game.in_effect?(DeGaulleLeadsFrance)
+        denied
+      }
+    ),
+    ruling: :deny
+  )
+]
+
+UsJapanMutualDefensePact = [
+  AddInfluence(
+    player: US,
+    influence: US,
+    countries: [Japan],
+    limit_per_country: Japan.stability
+  ),
+  AddModifier(Modifiers::UsJapanMutualDefensePact)
+]
+
+Modifiers::UsJapanMutualDefensePact = [
+  PermissionModifier(
+    on: Match(
+      player: USSR
+      item: [Coup, Realignment],
+      countries: [Japan],
+    ),
+    ruling: :deny
+  )
+]
+
+TheReformer = [
+  AddInfluence(
+    player: USSR,
+    influence: USSR,
+    countries: [Europe],
+    limit_per_country: 2,
+    total_influence: lambda { |game| game.leader == USSR ? 6: 4 }
+  ),
+  AddModifier(Modifiers::TheReformer)
+]
+
+Modifiers::TheReformer = [
+  PermissionModifier(
+    on: Match(item: Coup, player: USSR),
+    ruling: :deny
+  )
+]
+
+
+## Score Modifiers
 
 Containment = [
   AddModifier(Containment)
@@ -973,31 +1126,67 @@ Modifiers::SaltNegotiations = [
   )
 ]
 
+## Custom Functions
 
-TheReformer = [
-  AddInfluence(
-    player: USSR,
-    influence: USSR,
-    countries: [Europe],
-    limit_per_country: 2,
-    total_influence: lambda { |game| game.vp < 0 ? 6: 4 }
-  ),
-  AddModifier(Modifiers::TheReformer) #TODO
+AskNotWhatYourCountry = [
+  ReplaceCards(player: US)
 ]
 
-WillyBrandt = [
-  PreventedBy(TearDownThisWall),
-  AwardVictoryPoints(
+NorthSeaOil = [
+  AddModifier(Modifiers::NorthSeaOil)
+]
+
+Modifiers::NorthSeaOil = [
+  TurnModifier(
+    player: US,
+    action_rounds: 8,
+    cancel: TurnEnd
+  )
+]
+
+## In Progress
+
+GrainSalesToSoviets = [
+  Discard(
     player: USSR,
-    amount: 1
-  ),
-  AddInfluence(
+    random: true
+  )
+  # TODO needs user input + if branching
+]
+
+
+NuclearSubs = []
+
+Modifiers::NuclearSubs = [
+  # Probably needs some new kind of modifier, not sure about this.
+  # patch overlays calls to functions to instead return the given value for
+  # the duration of the matched function's execution.
+  CoupModifier(
+    on: Coup(
+      player: US,
+      countries: Countries.select(&:battleground?)
+    ),
+    patch: {
+      DegradeDefcon: 0
+    },
+    cancel: Match(item: TurnEnd)
+  )
+]
+
+
+ShuttleDiplomacy = []
+
+Modifiers::ShuttleDiplomacy = [
+  # TODO: need input to chose excluded country
+  ScoreModifier(
     player: USSR,
-    influence: USSR,
-    countries: [WestGermany],
-    limit_per_country: 1
-  ),
-  AddModifier(Modifiers::WillyBrandt) #TODO
+    countries: lambda { something },
+    cancel: Match(
+      item: Scoring,
+      region: [MiddleEast, Asia]
+    ),
+    cancel_timing: :after
+  )
 ]
 
 

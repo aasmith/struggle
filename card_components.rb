@@ -982,7 +982,7 @@ CubanMissileCrisis = [
 Modifiers::CubanMissileCrisis = [
   Modifier(
     on: Coup(),
-    triggers: GameEnd(
+    triggers: LoseGame(
       player: lambda { player.opponent }
     ),
     cancel: [ # Checks event history on each 'tick' for any of these matches

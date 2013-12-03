@@ -805,10 +805,10 @@ Modifiers::SaltNegotiations = [
   )
 ]
 
-## Branches
+## Conditionals
 
 CulturalRevolution = [
-  Branch(
+  If(
     lambda { game.china_card_holder.us? },
     ClaimChinaCard(
       player: USSR,
@@ -822,7 +822,7 @@ CulturalRevolution = [
 ]
 
 NixonPlaysTheChinaCard = [
-  Branch(
+  If(
     lambda { game.china_card_holder.us? },
     AwardVictoryPoints(
       player: US,
@@ -836,7 +836,7 @@ NixonPlaysTheChinaCard = [
 ]
 
 UssuriRiverSkirmish = [
-  Branch(
+  If(
     lambda { game.china_card_holder.ussr? },
     ClaimChinaCard(
       player: US,
@@ -859,7 +859,7 @@ UssuriRiverSkirmish = [
 Glasnost = [
   AwardVictoryPoints(player: USSR, amount: 2),
   ImproveDefcon(amount: 1),
-  Branch(
+  If(
     lambda { game.in_effect?(TheReformer) },
     FreeMove(
       player: USSR,
@@ -872,7 +872,7 @@ Glasnost = [
 SovietsShootDownKal007 = [
   DegradeDefcon(amount: 1),
   AwardVictoryPoints(player: US, amount: 2),
-  Branch(
+  If(
     lambda { SouthKorea.controlled_by?(US) },
     FreeMove(
       player: US,

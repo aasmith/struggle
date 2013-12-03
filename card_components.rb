@@ -73,19 +73,6 @@ EastEuropeanUnrest = [
   )
 ]
 
-DeStalinization = [
-  RelocateInfluence(
-    player: USSR,
-    influence: USSR,
-    destination_countries: lambda {
-      Countries.reject { |c| c.controlled_by?(US) }
-    },
-    limit_per_country: 2,
-    total_influence: 4,
-    must_use_all_influence: false # player can relocate *up to* 4 influence.
-  )
-]
-
 IndependentReds = [
   AddInfluence(
     player: US,
@@ -787,12 +774,34 @@ FiveYearPlan = [
 ]
 
 # Event only playable if the required condition is met.
+#
+# PickFromDiscard should always show the opponent the picked card.
+#
 StarWars = [
   Requires(condition: lambda { game.space_race(US) > game.space_race(USSR) }),
   PickFromDiscard(
     player: US,
     ops: [:>=, 1], # Not a scoring card
     execute_event: true
+  )
+]
+
+SaltNegotiations = [
+  ImproveDefcon(amount: 2),
+  AddModifier(Modifiers::SaltNegotiations),
+  PickFromDiscard(
+    player: lambda { player },
+    ops: [:>=, 1], # Not a scoring card
+    execute_event: false
+  )
+]
+
+Modifiers::SaltNegotiations = [
+  ScoreModifier(
+    player: nil, # this affects both players!
+    type: :coup,
+    amount: -1,
+    cancel: TurnEnd
   )
 ]
 
@@ -842,6 +851,64 @@ UssuriRiverSkirmish = [
     )
   )
 ]
+
+## Bonus card play
+
+# It should be noted that all offers to play an extra bonus card are optional.
+
+Glasnost = [
+  AwardVictoryPoints(player: USSR, amount: 2),
+  ImproveDefcon(amount: 1),
+  Branch(
+    lambda { game.in_effect?(TheReformer) },
+    FreeMove(
+      player: USSR,
+      type: [:influence, :realignment],
+      ops: 4
+    )
+  )
+]
+
+SovietsShootDownKal007 = [
+  DegradeDefcon(amount: 1),
+  AwardVictoryPoints(player: US, amount: 2),
+  Branch(
+    lambda { SouthKorea.controlled_by?(US) },
+    FreeMove(
+      player: US,
+      type: [:influence, :realignment],
+      ops: 4
+    )
+  )
+]
+
+LoneGunman = [
+  RevealHand(player: US),
+  FreeMove(
+    player: USSR,
+    type: [:operations],
+    ops: 1
+  )
+]
+
+AbmTreaty = [
+  ImproveDefcon(amount: 1),
+  FreeMove(
+    player: lambda { player },
+    type: [:operations],
+    ops: 4
+  )
+]
+
+CiaCreated = [
+  RevealHand(player: USSR),
+  FreeMove(
+    player: US,
+    type: [:operations],
+    ops: 1
+  )
+]
+
 
 ## Modifiers
 
@@ -982,6 +1049,40 @@ Modifiers::AldrichAmesRemix = [
   )
 ]
 
+TheChinaCard = [
+  Either(
+    Move(
+      player: lambda { player },
+      type: [:operations],
+      ops: 4
+    ),
+    Move(
+      player: lambda { player },
+      type: [:operations],
+      countries: [Asia.countries],
+      ops: 5
+    )
+  ),
+  AddModifier(Modifiers::TheChinaCard),
+  ClaimChinaCard(
+    player: lambda { player.opponent },
+    playable: false
+  )
+]
+
+Modifiers::TheChinaCard = [
+  Modifier(
+    on: Match(
+      item: TurnEnd,
+      number: 10
+    ),
+    triggers: AwardVictoryPoints(
+      player: lambda { game.china_card_holder },
+      amount: 1
+    )
+  )
+]
+
 ## Permission Modifiers
 
 # Permission modifiers must be consulted whenver a matching play occurs. If
@@ -1042,7 +1143,7 @@ TheReformer = [
     influence: USSR,
     countries: [Europe],
     limit_per_country: 2,
-    total_influence: lambda { |game| game.leader == USSR ? 6: 4 }
+    total_influence: lambda { |game| game.leader == USSR ? 6 : 4 }
   ),
   AddModifier(Modifiers::TheReformer)
 ]
@@ -1153,22 +1254,120 @@ Modifiers::IranContraScandal = [
   )
 ]
 
-SaltNegotiations = [
-  ImproveDefcon(amount: 2),
-  AddModifier(Modifiers::SaltNegotiations),
-  # getting cards from pile - TODO
+## Scoring Modifiers
+
+# Scoring modifiers change how one or more countries are scored whenver the
+# modifier is triggered.
+
+FormosanResolution = [
+  AddModifier(Modifiers::FormosanResolution)
 ]
 
-Modifiers::SaltNegotiations = [
-  ScoreModifier(
-    player: nil, # this affects both players!
-    type: :coup,
-    amount: -1,
-    cancel: TurnEnd
+Modifiers::FormosanResolution = [
+  ScoringModifier(
+    on: Match(
+      item: Score,
+      regions: [Asia],
+    ),
+    countries: lambda { Taiwan.controlled_by?(US) ? [Taiwan] : [] },
+    battleground: true,
+    cancel: [
+      Match(
+        player: US,
+        item: ChinaCard,
+        type: :event
+      )
+    ]
+  )
+]
+
+## Scoring Cards
+
+AsiaScoring = [
+  Score(
+    region: Asia,
+    presence: 3,
+    domination: 7,
+    control: 9,
+    battleground: 1,
+    superpower: 1
+  )
+]
+
+EuropeScoring = [
+  Score(
+    region: Europe,
+    presence: 3,
+    domination: 7,
+    control: :victory,
+    battleground: 1,
+    superpower: 1
+  )
+]
+
+MiddleEastScoring = [
+  Score(
+    region: MiddleEast,
+    presence: 3,
+    domination: 5,
+    control: 7,
+    battleground: 1
+  )
+]
+
+CentralAmericaScoring = [
+  Score(
+    region: CentralAmerica,
+    presence: 1,
+    domination: 3,
+    control: 5,
+    battleground: 1,
+    superpower: 1
+  )
+]
+
+SouthAmericaScoring = [
+  Score(
+    region: SouthAmerica,
+    presence: 2,
+    domination: 5,
+    control: 6,
+    battleground: 1
+  )
+]
+
+AfricaScoring = [
+  Score(
+    region: Africa,
+    presence: 1,
+    domination: 4,
+    control: 6,
+    battleground: 1
+  )
+]
+
+SoutheastAsiaScoring = [
+  # Award VP for each controlled country
+  ScoreCountries(
+    countries: [SoutheastAsia],
+    amount: lambda { |country| country == Thailand ? 2 : 1 }
   )
 ]
 
 ## Custom Functions
+
+DeStalinization = [
+  RelocateInfluence(
+    player: USSR,
+    influence: USSR,
+    destination_countries: lambda {
+      Countries.reject { |c| c.controlled_by?(US) }
+    },
+    limit_per_country: 2,
+    total_influence: 4,
+    must_use_all_influence: false # player can relocate *up to* 4 influence.
+  )
+]
 
 AskNotWhatYourCountry = [
   ReplaceCards(player: US)

@@ -1385,6 +1385,82 @@ Modifiers::NorthSeaOil = [
   )
 ]
 
+## Cards that take a custom move as actionable input
+
+Wargames = [
+  Requires(condition: lambda { |game| game.defcon == 2 }),
+  Either(
+    ExpectMove(
+      move: WargamesInput,
+      value: :award_vp_and_end_game,
+      player: lambda { player }
+    ),
+    ExpectMove(
+      move: WargamesInput,
+      value: :award_vp,
+      player: lambda { player }
+    ),
+    ExpectMove(
+      move: WargamesInput,
+      value: :nothing,
+      player: lambda { player }
+    )
+  ),
+  If(
+    Match(
+      item: WargamesInput,
+      value: :award_vp_and_end_game,
+      player: lambda { player }
+    ),
+    [
+      AwardVictoryPoints(
+        player: lambda { player.opponent },
+        amount: 6
+      ),
+      EndGame()
+    ]
+  ),
+  If(
+    Match(
+      item: WargamesInput,
+      value: :award_vp,
+      player: lambda { player }
+    ),
+    [
+      AwardVictoryPoints(
+        player: lambda { player.opponent },
+        amount: 6
+      )
+    ]
+  )
+]
+
+Chernobyl = [
+  Either(
+    *[Europe, Asia, MiddleEast, Africa, CentralAmerica, SouthAmerica].map do |r|
+      ExpectMove(
+        player: US,
+        move: ChernobylInput,
+        value: r.name.to_sym
+      )
+    end
+  ),
+  [Europe, Asia, MiddleEast, Africa, CentralAmerica, SouthAmerica].map do |r|
+    If(
+      Match(
+        player: US,
+        item: ChernobylInput,
+        value: r.name.to_sym
+      ),
+      PermissionModifier(
+        on: Match(player: USSR, item: OperationalInfluence),
+        cancel: Match(item: TurnEnd),
+        ruling: :deny
+      )
+    )
+  end
+]
+
 ## In Progress
 
 GrainSalesToSoviets = [

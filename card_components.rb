@@ -749,7 +749,7 @@ WeWillBuryYou = [
       )
     ],
     failure: [
-      AwardVictoryPoints(player: USSR, amount: 3)
+      AwardVictoryPoints(player: USSR, amount: 3, immediate: true)
     ]
   ),
   DegradeDefcon(amount: 1)
@@ -783,6 +783,22 @@ StarWars = [
     player: US,
     ops: [:>=, 1], # Not a scoring card
     execute_event: true
+  )
+]
+
+UnIntervention = [
+  # Not allowed during headline. Player must have a opponent card in hand.
+  Requires(condition: lambda { |game|
+    !game.turn.zero? && game.hand(player).any? { |c| c.side == player.opponent }
+  }),
+
+  # Discard an opponent card from the current player's hand. Do not execute
+  # event. Use ops value for operations.
+  Discard(
+    player: lambda { player },
+    side: lambda { player.opponent },
+    execute_event: false,
+    execute: [:operations]
   )
 ]
 
@@ -886,7 +902,7 @@ LoneGunman = [
   RevealHand(player: US),
   FreeMove(
     player: USSR,
-    type: [:operations],
+    type: :operations,
     ops: 1
   )
 ]
@@ -895,7 +911,7 @@ AbmTreaty = [
   ImproveDefcon(amount: 1),
   FreeMove(
     player: lambda { player },
-    type: [:operations],
+    type: :operations,
     ops: 4
   )
 ]
@@ -904,7 +920,7 @@ CiaCreated = [
   RevealHand(player: USSR),
   FreeMove(
     player: US,
-    type: [:operations],
+    type: :operations,
     ops: 1
   )
 ]
@@ -1129,7 +1145,7 @@ UsJapanMutualDefensePact = [
 Modifiers::UsJapanMutualDefensePact = [
   PermissionModifier(
     on: Match(
-      player: USSR
+      player: USSR,
       item: [Coup, Realignment],
       countries: [Japan],
     ),
@@ -1256,7 +1272,7 @@ Modifiers::IranContraScandal = [
 
 ## Scoring Modifiers
 
-# Scoring modifiers change how one or more countries are scored whenver the
+# Scoring modifiers change how one or more countries are scored whenever the
 # modifier is triggered.
 
 FormosanResolution = [
@@ -1278,6 +1294,22 @@ Modifiers::FormosanResolution = [
         type: :event
       )
     ]
+  )
+]
+
+NuclearSubs = [
+  AddModifier(Modifiers::NuclearSubs)
+]
+
+Modifiers::NuclearSubs = [
+  ScoringModifier(
+    on: Match(
+      type: Coup,
+      player: US,
+      countries: Countries.select(&:battleground?)
+    ),
+    battleground: false,
+    cancel: Match(item: TurnEnd)
   )
 ]
 
@@ -1354,6 +1386,73 @@ SoutheastAsiaScoring = [
   )
 ]
 
+## Dice Rolls
+
+# Dice rolls expect both players to roll a die.
+
+Summit = [
+  RollDies(
+    scoring: lambda { |superpower| # addtional points for each superpower roll
+      game.regions.select { |r|
+        r.controlled_by?(superpower) || r.dominated_by?(superpower)
+      }.size
+    },
+    allow_ties: true,
+    winner: [
+      AwardVictoryPoints(
+        player: lambda { |roll_result| roll_result.winner },
+        amount: 2
+      ),
+      Either(
+        DegradeDefcon(
+          player: lambda { |result| result.winner },
+          amount: 1
+        ),
+        ImproveDefcon(
+          player: lambda { |result| result.winner },
+          amount: 1
+        )
+      )
+    ]
+  )
+]
+
+OlympicGames = [
+  Either(
+    ExpectMove(
+      player: lambda { player.opponent },
+      item: SponsorOlympicGames
+    ),
+    ExpectMove(
+      player: lambda { player.opponent },
+      item: BoycottOlympicGames
+    )
+  ),
+  If(
+    Match(item: SponsorOlympicGames),
+    RollDies(
+      scoring: lambda { |superpower|
+        superpower == game.player ? 2 : 0
+      },
+      allow_ties: false, # ties are re-rolled
+      winner: [
+        AwardVictoryPoints(
+          player: lambda { |result| result.winner },
+          amount: 2
+        )
+      ]
+    ),
+    [
+      DegradeDefcon(amount: 1),
+      FreeMove(
+        player: lambda { player },
+        type: :operations,
+        ops: 4
+      )
+    ]
+  )
+]
+
 ## Custom Functions
 
 DeStalinization = [
@@ -1382,6 +1481,86 @@ Modifiers::NorthSeaOil = [
     player: US,
     action_rounds: 8,
     cancel: TurnEnd
+  )
+]
+
+Defectors = [
+  If(
+    lambda { |game| game.turn.zero? }, # if headline phase?
+    CancelEvent(player: USSR, discard: true), # supercedes other headline plays
+    If(
+      Match(
+        player: USSR,
+        item: Defectors,
+        type: :event
+      ),
+      AwardVictoryPoints(player: US, amount: 1)
+    )
+  )
+]
+
+GrainSalesToSoviets = [
+  PickAndPlayFromHand(
+    player: US,
+    hand: USSR,
+    random: true,
+
+    # Actions that occur if the player:
+    #  - selects the picked card
+    #  - rejects the picked card
+    #  - has an opponent with an empty hand
+
+    select: [
+      ExpectMove(
+        item: lambda { |selected_card| selected_card.name },
+        player: US,
+        type: [:event, :operations, :space]
+      ),
+      Discard(
+        card: lambda { |selected_card| selected_card.name }
+      )
+    ],
+    reject: [
+      FreeMove(
+        player: US,
+        type: [:operations],
+        ops: 2
+      )
+    ],
+    empty_hand: [
+      FreeMove(
+        player: US,
+        type: [:operations],
+        ops: 2
+      )
+    ]
+  )
+]
+
+MissileEnvy = [
+  ExchangeCard(
+    player: lambda { player },
+    execute_event: lambda { |new_card|
+      new_card.side == player || new_card.side.nil?
+    },
+    execute_ops: lambda {
+      new_card.side == player.opponent
+    }
+  ),
+  AddModifier(Modifiers::MissileEnvy)
+]
+
+Modifiers::MissileEnvy = [
+  Modifier(
+    on: Match(
+      item: ActionRound,
+      player: lambda { player.opponent }
+    ),
+    triggers: ExpectMove(
+      item: MissileEnvy,
+      player: lambda { player.opponent },
+      type: :operations
+    )
   )
 ]
 
@@ -1461,49 +1640,60 @@ Chernobyl = [
   end
 ]
 
-## In Progress
-
-GrainSalesToSoviets = [
-  Discard(
-    player: USSR,
-    random: true
-  )
-  # TODO needs user input + if branching
+# This card has to sit in "limbo" - does not instantly go to the discard
+# pile.
+#
+# This is addressed in the cardspec with a new param
+#   limbo_after_event: true
+#
+# This will remove the card from the player's hand, but will not add it to
+# either the discard or removed-from-play pile.
+#
+ShuttleDiplomacy = [
+  AddModifier(Modifiers::ShuttleDiplomacy)
 ]
 
-
-NuclearSubs = []
-
-Modifiers::NuclearSubs = [
-  # Probably needs some new kind of modifier, not sure about this.
-  # patch overlays calls to functions to instead return the given value for
-  # the duration of the matched function's execution.
-  CoupModifier(
-    on: Coup(
-      player: US,
-      countries: Countries.select(&:battleground?)
-    ),
-    patch: {
-      DegradeDefcon: 0
-    },
-    cancel: Match(item: TurnEnd)
-  )
-]
-
-
-ShuttleDiplomacy = []
+asian_mideast_battlegrounds = Countries.select do |c|
+  c.battleground? && (c.in?(MiddleEast) || c.in?(Asia))
+end
 
 Modifiers::ShuttleDiplomacy = [
-  # TODO: need input to chose excluded country
-  ScoreModifier(
-    player: USSR,
-    countries: lambda { something },
-    cancel: Match(
-      item: Scoring,
-      region: [MiddleEast, Asia]
+  Modifier(
+    before: Match(
+      item: Score,
+      regions: [MiddleEast, Asia]
     ),
-    cancel_timing: :after
+    triggers: [
+      Either(
+        asian_mideast_battlegrounds.map do |c|
+          [
+            ExpectMove(
+              player: US,
+              item: ShuttleDiplomacyExcludeCountry,
+              value: c.name.to_sym
+            ),
+            ScoringModifier( # No 'on' param means instant activation
+              player: USSR,
+              countries: c,
+              score: 0
+            )
+          ]
+        end
+      ),
+      Discard(
+        card: ShuttleDiplomacy
+      )
+    ],
+    cancel: Either(
+      Match(
+        item: Score,
+        regions: [MiddleEast, Asia]
+      ),
+      Match( # This card doesn't apply to final scoring.
+        item: TurnEnd,
+        number: 10
+      )
+    )
   )
 ]
-
 

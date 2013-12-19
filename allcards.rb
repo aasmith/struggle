@@ -387,7 +387,8 @@ RedScarePurge = Card.new(
 #  :side => US,
 #  :remove_after_event => false,
 #  :validator => Validators::Defectors,
-#  :modifier => Modifiers::Defectors
+#  :modifier => Modifiers::Defectors,
+#  :always_evaluate_first => true # for headlines only
 #)
 #
 #BrushWar = Card.new(
@@ -804,6 +805,7 @@ RedScarePurge = Card.new(
 #  :ops => 3,
 #  :side => US,
 #  :remove_after_event => false,
+#  :discard_after_event => true,
 #  :validator => Validators::ShuttleDiplomacy,
 #  :modifier => Modifiers::ShuttleDiplomacy
 #)

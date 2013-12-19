@@ -1,8 +1,8 @@
 require "minitest/autorun"
 
-require "s"
+require "struggle"
 
-class TestVictoryTrack < MiniTest::Unit::TestCase
+class TestVictoryTrack < Minitest::Test
 
   def setup
     @vt = VictoryTrack.new
@@ -12,33 +12,50 @@ class TestVictoryTrack < MiniTest::Unit::TestCase
     assert @vt.points.zero?
   end
 
-  def test_add
-    @vt.add(US, 2)
-    assert_equal @vt.points, -2, "US should be ahead by 2 points"
+  def test_award
+    @vt.award(US, 5)
+    assert_equal(5, @vt.score)
 
-    @vt.add(USSR, 4)
-    assert_equal @vt.points, 2, "USSR should be ahead by 2 points"
+    @vt.award(USSR, 10)
+    assert_equal(-5, @vt.score)
   end
 
-  def test_subtract
-    @vt.subtract(US, 2)
-    assert_equal @vt.points, 2, "USSR should be ahead by 2 points"
-
-    @vt.subtract(USSR, 4)
-    assert_equal @vt.points, -2, "US should be ahead by 2 points"
-  end
-
-  def test_add_only_positive
+  def test_negative_award
     assert_raises(ArgumentError) do
-      @vt.add(US, -2)
+      @vt.award(US, -1)
+    end
+
+    assert_raises(ArgumentError) do
+      @vt.award(USSR, -1)
     end
   end
 
-  def test_subtract_only_positive
-    assert_raises(ArgumentError) do
-      @vt.subtract(US, -2)
-    end
+  def test_victory_for_us
+    @vt.award(US, 19)
+    refute @vt.victor, "No one should win at 19 VP"
+    refute @vt.victory?
+
+    @vt.award(US, 1)
+    assert_equal US, @vt.victor, "US should win at 20 VP"
+    assert @vt.victory?
+
+    @vt.award(US, 1)
+    assert_equal US, @vt.victor, "US should win at >20 VP"
+    assert @vt.victory?
   end
 
+  def test_victory_for_ussr
+    @vt.award(USSR, 19)
+    refute @vt.victor, "No one should win at 19 VP"
+    refute @vt.victory?
+
+    @vt.award(USSR, 1)
+    assert_equal USSR, @vt.victor, "USSR should win at -20 VP"
+    assert @vt.victory?
+
+    @vt.award(USSR, 1)
+    assert_equal USSR, @vt.victor, "USSR should win at <20 VP"
+    assert @vt.victory?
+  end
 end
 

@@ -1,80 +1,90 @@
 require "minitest/autorun"
 
-require "s"
+require "struggle"
 
-class TestDefcon < MiniTest::Unit::TestCase
-
-  def setup
-    @defcon = Defcon.new
-  end
+class TestDefcon < Minitest::Test
 
   def test_initialize
-    assert_equal @defcon.value, 5
+    defcon = Defcon.new
+    assert_equal 5, defcon.value
+
+    defcon = Defcon.new 3
+    assert_equal 3, defcon.value
   end
 
-  def test_decrease
-    @defcon.decrease(USSR, 1)
-    assert_equal @defcon.value, 4
+  def test_degrade
+    defcon = Defcon.new
+    defcon.degrade(USSR, 1)
 
-    assert_raises ArgumentError do
-      @defcon.decrease(USSR, -1)
+    assert_equal 4, defcon.value
+
+    assert_raises ArgumentError, "Should not allow negative values" do
+      defcon.degrade(USSR, -1)
     end
-  end
 
-  def test_increase
-    @defcon.decrease(USSR, 2)
-
-    @defcon.increase(USSR, 1)
-    assert_equal @defcon.value, 4
-
-    assert_raises ArgumentError do
-      @defcon.increase(USSR, -1)
+    assert_raises InvalidDefcon, "Should not allow value outside of range" do
+      defcon.degrade(USSR, 10)
     end
+
+    assert_equal 4, defcon.value, "Should still be at previous setting"
   end
 
-  def test_change
-    @defcon.change(USSR, -3)
-    assert_equal @defcon.value, 2
+  def test_improve
+    defcon = Defcon.new 3
 
-    @defcon.change(USSR, 2)
-    assert_equal @defcon.value, 4
+    defcon.improve(USSR, 1)
+    assert_equal 4, defcon.value
+
+    assert_raises ArgumentError, "Should not allow negative values" do
+      defcon.improve(USSR, -1)
+    end
+
+    assert_raises InvalidDefcon, "Should not allow value outside of range" do
+      defcon.improve(USSR, 10)
+    end
+
+    assert_equal 4, defcon.value, "Should still be at previous setting"
   end
 
   def test_set
-    @defcon.set(USSR, 3)
-    assert_equal @defcon.value, 3
+    defcon = Defcon.new
 
-    @defcon.set(USSR, 6)
-    assert_equal @defcon.value, 5
+    defcon.set(USSR, 3)
+    assert_equal 3, defcon.value
 
-    @defcon.set(USSR, 0)
-    assert_equal @defcon.value, 1
-
-    assert_raises Defcon::ImmutableDefcon do
-      @defcon.set(USSR, 5)
+    assert_raises InvalidDefcon, "Should not allow value outside of range" do
+      defcon.set(USSR, 6)
     end
+
+    assert_raises InvalidDefcon, "Should not allow value outside of range" do
+      defcon.set(USSR, 0)
+    end
+
+    assert_equal 3, defcon.value, "Should still be at previous setting"
   end
 
   def test_nuclear_war
-    refute @defcon.nuclear_war?
+    defcon = Defcon.new
+    refute defcon.nuclear_war?
 
-    @defcon.set(USSR, 2)
-    refute @defcon.nuclear_war?
+    defcon.set(USSR, 2)
+    refute defcon.nuclear_war?
 
-    @defcon.decrease(USSR, 1)
-    assert @defcon.nuclear_war?
+    defcon.degrade(USSR, 1)
+    assert defcon.nuclear_war?
 
-    assert_equal @defcon.destroyed_by, USSR
+    assert_equal USSR, defcon.destroyed_by
 
-    # continuing to set DEFCON after DEFCON 1 is a pointless exercise
-    assert_raises Defcon::ImmutableDefcon do
-      @defcon.decrease(USSR, 1)
+    assert_raises(ImmutableDefcon, "Setting DEFCON after war should fail") do
+      defcon.improve(USSR, 2)
     end
   end
 
   def test_player_present
+    defcon = Defcon.new
+
     assert_raises ArgumentError do
-      @defcon.decrease(nil, 1)
+      defcon.degrade(nil, 1)
     end
   end
 

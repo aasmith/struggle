@@ -1,6 +1,3 @@
-require "struggle/stack"
-require "struggle/models"
-
 class Engine
   attr_accessor :work_items
 

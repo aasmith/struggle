@@ -1,8 +1,6 @@
-require "minitest/autorun"
+require "helper"
 
-require "struggle"
-
-class TestDefcon < Minitest::Test
+class TestDefcon < Struggle::Test
 
   def test_initialize
     defcon = Defcon.new

@@ -1,34 +1,64 @@
-require "engine"
-
-require "superpowers"
-
 class Game
   def initialize
     @engine = Engine.new
   end
 
   def start
-    @engine.add_items x
+    @engine.work_items.push GameInstructions
+  end
+
+  def accept(move)
+    @engine.accept move
   end
 end
 
+def Instruction(const, *args, &block)
+  Instructions.const_get(const).new(*args, &block)
+end
 
-__END__
-StartingInfluence = NestingInstruction.new(
-  AddInfluence.new(USSR, 1, :syria),
-  AddInfluence.new(USSR, 1, :iraq),
-  AddInfluence.new(USSR, 3, :north_korea),
-  AddInfluence.new(USSR, 3, :east_germany),
-  AddInfluence.new(USSR, 1, :finland),
+def List(*args)
+  NestingInstruction.new(*args)
+end
 
-  AddInfluence.new(US, 1, :iran),
-  AddInfluence.new(US, 1, :israel),
-  AddInfluence.new(US, 1, :japan),
-  AddInfluence.new(US, 4, :australia),
-  AddInfluence.new(US, 1, :philippines),
-  AddInfluence.new(US, 1, :south_korea),
-  AddInfluence.new(US, 1, :panama),
-  AddInfluence.new(US, 1, :south_africa),
-  AddInfluence.new(US, 5, :united_kingdom)
+alias I Instruction
+alias L List
+
+StartingInfluence = List(
+  Instruction(AddInfluence, USSR, 1, :syria),
+  Instruction(AddInfluence, USSR, 1, :iraq),
+  Instruction(AddInfluence, USSR, 3, :north_korea),
+  Instruction(AddInfluence, USSR, 3, :east_germany),
+  Instruction(AddInfluence, USSR, 1, :finland),
+
+  Instruction(AddInfluence, US, 1, :iran),
+  Instruction(AddInfluence, US, 1, :israel),
+  Instruction(AddInfluence, US, 1, :japan),
+  Instruction(AddInfluence, US, 4, :australia),
+  Instruction(AddInfluence, US, 1, :philippines),
+  Instruction(AddInfluence, US, 1, :south_korea),
+  Instruction(AddInfluence, US, 1, :panama),
+  Instruction(AddInfluence, US, 1, :south_africa),
+  Instruction(AddInfluence, US, 5, :united_kingdom)
 )
 
+DealCards    = Instruction(EmptyInstruction)
+EarlyPhase   = Instruction(EmptyInstruction)
+MidPhase     = Instruction(EmptyInstruction)
+LatePhase    = Instruction(EmptyInstruction)
+FinalScoring = Instruction(EmptyInstruction)
+GameEnd      = Instruction(LambdaInstruction) { puts "END!!!" }
+
+GameInstructions = List(
+  StartingInfluence,
+  DealCards,
+  EarlyPhase,
+  MidPhase,
+  LatePhase,
+  FinalScoring,
+  GameEnd
+)
+
+__END__
+g = Game.new
+g.start
+g.accept nil

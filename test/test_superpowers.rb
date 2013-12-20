@@ -1,8 +1,6 @@
-require "minitest/autorun"
+require "helper"
 
-require "struggle"
-
-class TestSuperpowers < Minitest::Test
+class TestSuperpowers < Struggle::Test
 
   def test_no_instantiations
     [Superpower, US, USSR].each do |klass|

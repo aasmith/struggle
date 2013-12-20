@@ -249,6 +249,7 @@ MuslimRevolution = [
 ]
 
 PuppetGovernments = [
+  # optional
   AddInfluence(
     player: US,
     influence: US,

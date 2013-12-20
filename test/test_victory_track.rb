@@ -1,8 +1,6 @@
-require "minitest/autorun"
+require "helper"
 
-require "struggle"
-
-class TestVictoryTrack < Minitest::Test
+class TestVictoryTrack < Struggle::Test
 
   def setup
     @vt = VictoryTrack.new

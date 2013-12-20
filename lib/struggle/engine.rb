@@ -36,7 +36,7 @@ class Engine
   def accept(move)
     while work_item = work_items.pop do
 
-      if Instruction === work_item
+      if Instructions::Instruction === work_item
         results = [*work_item.execute]
 
         work_items.push(*results) if results.all? { |r| WorkItem === r }

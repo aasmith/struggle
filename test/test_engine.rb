@@ -1,8 +1,8 @@
-require "minitest/autorun"
+require "helper"
 
-require "struggle"
+class TestEngine < Struggle::Test
 
-class TestEngine < Minitest::Test
+  include Instructions
 
   def test_basic_arbitrator_execution
     arbitrator = MoveAcceptor.new
@@ -52,7 +52,7 @@ class TestEngine < Minitest::Test
 
     instruction1 = LambdaInstruction.new { instructions << "ex1" }
     instruction2 = LambdaInstruction.new { instructions << "ex2" }
-    nested_instr = NestingInstruction.new([instruction1, instruction2])
+    nested_instr = NestingInstruction.new(instruction1, instruction2)
 
     arbitrator = MoveAcceptor.new
 

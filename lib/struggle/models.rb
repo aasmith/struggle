@@ -26,7 +26,7 @@ end
 
 ### Misc
 
-def noimpl() raise("%s Not Implemented" % [caller_locations.first.label]) end
+def noimpl() raise("%s Not Implemented" % [caller_locations.first.to_s]) end
 
 module Injectible
   def needs(*attrs)
@@ -46,8 +46,11 @@ end
 class WorkItem
   extend Injectible
 
-  def initialize
+  def initialize(*args)
     @complete = false
+  end
+
+  def init(*args)
   end
 
   def complete?() @complete end
@@ -63,67 +66,69 @@ end
 
 ### Instructions
 
-class Instruction < WorkItem
-  def execute
-    returning action do
-      complete
+module Instructions
+  class Instruction < WorkItem
+    def execute
+      returning action do
+        complete
+      end
+    end
+
+    def action
+      noimpl
+    end
+
+    ##
+    # Returns +obj+ after calling +block+.
+    #
+    def returning(obj, &block)
+      obj.tap(&block)
     end
   end
 
-  def action
-    noimpl
+  class EmptyInstruction < Instruction
+    def action
+    end
   end
 
-  ##
-  # Returns +obj+ after calling +block+.
-  #
-  def returning(obj, &block)
-    obj.tap(&block)
-  end
-end
+  class LambdaInstruction < Instruction
+    def initialize(&block)
+      @block = block
+    end
 
-class EmptyInstruction < Instruction
-  def action
-  end
-end
-
-class LambdaInstruction < Instruction
-  def initialize(&block)
-    @block = block
+    def action
+      @block.call
+    end
   end
 
-  def action
-    @block.call
+  class NestingInstruction < Instruction
+    def initialize(*instructions)
+      @instructions = instructions
+    end
+
+    def action
+      @instructions
+    end
   end
-end
 
-class NestingInstruction < Instruction
-  def initialize(instructions)
-    @instructions = instructions
+  class AwardVictoryPoints < Instruction
+    attr_accessor :player, :amount
+
+    needs :victory_point_track
+
+    def action
+      victory_point_track.award(player, amount)
+    end
   end
 
-  def action
-    @instructions
-  end
-end
+  class AddInfluence < Instruction
+    attr_accessor :player, :amount, :country
 
-class AwardVictoryPoints < Instruction
-  attr_accessor :player, :amount
+    needs :countries
 
-  needs :victory_point_track
-
-  def action
-    victory_point_track.award(player, amount)
-  end
-end
-
-class AddInfluence < Instruction
-  attr_accessor :player, :amount, :country
-
-  needs :countries
-
-  def action
-    countries.find(country).add_influence!(player, amount)
+    def action
+      #countries.find(country).add_influence!(player, amount)
+    end
   end
 end
 

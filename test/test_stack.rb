@@ -1,8 +1,6 @@
-require "minitest/autorun"
+require "helper"
 
-require "struggle"
-
-class TestStack < Minitest::Test
+class TestStack < Struggle::Test
 
   def test_stack_changed?
     obj = Struct.new(:a).new

@@ -28,19 +28,6 @@ end
 
 def noimpl() raise("%s Not Implemented" % [caller_locations.first.to_s]) end
 
-module Injectible
-  def needs(*attrs)
-    @needs ||= []
-    @needs.push(*attrs)
-
-    if attrs.empty?
-      @needs
-    else
-      attr_accessor(*attrs)
-    end
-  end
-end
-
 ### WorkItem
 
 class WorkItem

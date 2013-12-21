@@ -11,7 +11,6 @@ class TestSuperpowers < Struggle::Test
   end
 
   def test_us
-    assert_equal US, Us
     assert_equal "US", US.name
     assert_equal "US", US.to_s
 
@@ -24,7 +23,6 @@ class TestSuperpowers < Struggle::Test
   end
 
   def test_ussr
-    assert_equal USSR, Ussr
     assert_equal "USSR", USSR.name
     assert_equal "USSR", USSR.to_s
 

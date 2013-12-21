@@ -9,14 +9,14 @@ class TestEngine < Struggle::Test
     move = EmptyMove.new
 
     e = Engine.new
-    e.work_items.push arbitrator
+    e.add_work_item arbitrator
 
     e.accept move
 
     assert arbitrator.complete?, "Provided move should satisfy the arbitrator"
     assert move.executed?, "Move should be executed after approval"
 
-    refute e.hint, "Should be nothing left to accept"
+    refute e.peek, "Should be nothing left to accept"
     # assert no more requirements
     # assert history has been filled
   end
@@ -30,7 +30,7 @@ class TestEngine < Struggle::Test
     move2 = EmptyMove.new
 
     e = Engine.new
-    e.work_items.push arbitrator1, instruction, arbitrator2
+    e.add_work_item arbitrator1, instruction, arbitrator2
 
     e.accept move1
 
@@ -44,7 +44,7 @@ class TestEngine < Struggle::Test
     assert arbitrator2.complete?, "Second arbitrator should accept second move"
     assert move2.executed?, "Should be executed by second arbitrator"
 
-    refute e.hint, "Should be nothing left to accept"
+    refute e.peek, "Should be nothing left to accept"
   end
 
   def test_nested_executables_execute_automatically
@@ -59,7 +59,7 @@ class TestEngine < Struggle::Test
     move = EmptyMove.new
 
     e = Engine.new
-    e.work_items.push arbitrator, nested_instr
+    e.add_work_item arbitrator, nested_instr
 
     e.accept move
 
@@ -72,20 +72,20 @@ class TestEngine < Struggle::Test
 
     assert_equal %w(ex1 ex2), instructions, "Instructions should be in order"
 
-    refute e.hint, "Should be nothing left to accept"
+    refute e.peek, "Should be nothing left to accept"
   end
 
-  def test_game_hint_progresses_execution
+  def test_peek_progresses_execution
     instruction = EmptyInstruction.new
 
     e = Engine.new
-    e.work_items.push instruction
+    e.add_work_item instruction
 
-    refute e.hint, "Should be nothing left to accept"
+    refute e.peek, "Should be nothing left to accept"
 
     assert instruction.complete?, "Should execute automatically"
 
-    refute e.hint, "Should be nothing left to accept"
+    refute e.peek, "Should be nothing left to accept"
   end
 
   ### MODIFIERS
@@ -97,7 +97,7 @@ class TestEngine < Struggle::Test
     e = Engine.new
     e.add_permission_modifier NegativePermissionModifier.new
 
-    e.work_items.push arbitrator
+    e.add_work_item arbitrator
 
     e.accept move
 
@@ -106,7 +106,7 @@ class TestEngine < Struggle::Test
     refute arbitrator.complete?, "arbitrator should not be satisfied"
     refute move.executed?, "Move should not be executed"
 
-    assert_equal arbitrator, e.hint,
+    assert_equal arbitrator, e.peek,
       "arbitrator should still be waiting for a move allowed by modifiers"
   end
 
@@ -133,7 +133,7 @@ class TestEngine < Struggle::Test
 
     e = Engine.new
     e.add_stack_modifier mod
-    e.work_items.push orig_arbitrator
+    e.add_work_item orig_arbitrator
 
     e.accept orig_move
 
@@ -143,7 +143,7 @@ class TestEngine < Struggle::Test
     refute orig_move.executed?,
       "Original move should not be executed"
 
-    assert_equal new_instruction, e.work_items.peek,
+    assert_equal new_instruction, e.peek!,
       "Newly inserted instruction should be top of stack"
 
     e.accept new_move
@@ -155,10 +155,25 @@ class TestEngine < Struggle::Test
     assert orig_arbitrator.complete?, "Original arb should be complete"
     assert orig_move.executed?, "Original move should be executed"
 
-    refute e.hint, "Should be nothing left in stack"
+    refute e.peek, "Should be nothing left in stack"
   end
 
   def xtest_modifier_lifecycle
+  end
+
+  def test_work_items_are_injected
+    item = Instructions::EmptyInstruction.new
+
+    fake_injector = Minitest::Mock.new.expect(:inject, nil, [item])
+
+    e = Engine.new
+    e.injector = fake_injector
+
+    e.add_work_item item
+
+    e.accept nil
+
+    fake_injector.verify
   end
 
   # This test makes use of an unrealistic/naive way of managing score.

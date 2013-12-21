@@ -32,17 +32,22 @@ def noimpl() raise("%s Not Implemented" % [caller_locations.first.to_s]) end
 
 class WorkItem
   extend Injectible
+  extend Arguments
 
   def initialize(*args)
     @complete = false
+
+    ap = ArgumentProvider.new(self)
+    ap.provide(args)
+
+    after_init
   end
 
-  def init(*args)
+  def after_init
   end
 
   def complete?() @complete end
   def incomplete?() !complete?() end
-
 
   private
 
@@ -50,6 +55,7 @@ class WorkItem
     @complete = true
   end
 end
+
 
 ### Instructions
 
@@ -73,11 +79,13 @@ module Instructions
     end
   end
 
+  # Used for testing.
   class EmptyInstruction < Instruction
     def action
     end
   end
 
+  # Used for testing.
   class LambdaInstruction < Instruction
     def initialize(&block)
       @block = block
@@ -108,13 +116,18 @@ module Instructions
     end
   end
 
+  ##
+  # Adds influence to a country, no questions asked.
+  #
+  # Requires the Countries registry.
+  #
   class AddInfluence < Instruction
-    attr_accessor :player, :amount, :country
+    arguments :player, :amount, :country
 
     needs :countries
 
     def action
-      #countries.find(country).add_influence!(player, amount)
+      countries.find(country).add_influence(player, amount)
     end
   end
 end

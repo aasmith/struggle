@@ -1,13 +1,21 @@
 class Engine
-  attr_accessor :work_items
+
+  attr_accessor :injector
 
   def initialize
-    self.work_items = Stack.new
+    @work_items = Stack.new
 
     @history = []
 
     @permission_modifiers = []
     @stack_modifiers = []
+
+    # Provide a defualt injector that does nothing.
+    self.injector = NullInjector.new(nil)
+  end
+
+  def add_work_item(*items)
+    @work_items.push(*items)
   end
 
   ## Modifiers
@@ -26,17 +34,19 @@ class Engine
 
   def notify_stack_modifiers(move)
     @stack_modifiers.each do |mod|
-      mod.notify(:on, move, work_items)
+      mod.notify(:on, move, @work_items)
     end
   end
 
   def accept(move)
-    while work_item = work_items.pop do
+    while work_item = @work_items.pop do
+
+      injector.inject(work_item)
 
       if Instructions::Instruction === work_item
         results = [*work_item.execute]
 
-        work_items.push(*results) if results.all? { |r| WorkItem === r }
+        @work_items.push(*results) if results.all? { |r| WorkItem === r }
 
       elsif MoveArbitrator === work_item
         work_item.execute_stashed_moves
@@ -46,9 +56,9 @@ class Engine
 
         elsif permitted?(move) && work_item.accepts?(move)
 
-          work_items.push work_item
+          @work_items.push work_item
 
-          stack_modified = work_items.stack_changed? do
+          stack_modified = @work_items.stack_changed? do
             notify_stack_modifiers(move)
           end
 
@@ -56,13 +66,13 @@ class Engine
             work_item.stash move
             break
           else
-            work_items.pop
+            @work_items.pop
             work_item.accept move
             move = nil
           end
 
         else
-          work_items.push work_item
+          @work_items.push work_item
           break
 
         end
@@ -74,9 +84,19 @@ class Engine
     end
   end
 
-  def hint
+  ##
+  # Execute any ioutstanding items on the stack and then peek.
+  #
+  def peek
     accept nil # Pass in a false move to push the game along
-    work_items.peek
+    peek!
+  end
+
+  ##
+  # Peek without first trying to execute the stack.
+  #
+  def peek!
+    @work_items.peek
   end
 
 end

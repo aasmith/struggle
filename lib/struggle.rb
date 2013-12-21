@@ -3,6 +3,8 @@ require "struggle/superpowers"
 require "struggle/stack"
 require "struggle/engine"
 require "struggle/injection"
+
+require "struggle/arguments"
 require "struggle/models"
 
 require "struggle/countries"

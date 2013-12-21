@@ -16,10 +16,14 @@ class Injector
     @source = source
   end
 
+  def needs(target)
+    target.class.respond_to?(:needs) ? target.class.needs : []
+  end
+
   def inject(target)
     failed = []
 
-    target.class.needs.each do |attr|
+    needs(target).each do |attr|
       if @source.respond_to?(attr)
         target.send("#{attr}=", @source.send(attr))
       else
@@ -36,5 +40,10 @@ class Injector
   end
 
   InadequateSourceError = Class.new(RuntimeError)
+end
+
+class NullInjector < Injector
+  def inject(target)
+  end
 end
 

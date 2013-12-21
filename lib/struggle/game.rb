@@ -1,10 +1,15 @@
 class Game
+  attr_accessor :countries
+
   def initialize
     @engine = Engine.new
+    @engine.injector = Injector.new(self)
+
+    self.countries = Countries.new(COUNTRY_DATA)
   end
 
   def start
-    @engine.work_items.push GameInstructions
+    @engine.add_work_item GameInstructions
   end
 
   def accept(move)
@@ -12,8 +17,10 @@ class Game
   end
 end
 
+include Instructions
+
 def Instruction(const, *args, &block)
-  Instructions.const_get(const).new(*args, &block)
+  const.new(*args, &block)
 end
 
 def List(*args)
@@ -58,7 +65,15 @@ GameInstructions = List(
   GameEnd
 )
 
+if __FILE__ == $0
+  eval DATA.read
+end
+
 __END__
+
 g = Game.new
 g.start
 g.accept nil
+
+require 'pp'
+pp g

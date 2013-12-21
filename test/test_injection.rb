@@ -40,6 +40,18 @@ class TestInjection < Struggle::Test
     end
   end
 
+  def test_injector_does_nothing_on_non_injectibles
+    source = Struct.new(:a).new(123)
+    innocent_bystander = Struct.new(:a).new
+
+    injector = Injector.new(source)
+
+    injector.inject(innocent_bystander)
+
+    refute innocent_bystander.a,
+      "Should not be injected because no needs were supplied"
+  end
+
   class Needy
     extend Injectible
 

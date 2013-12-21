@@ -82,8 +82,8 @@ class Country
     swords = battleground? ? "⚔" : ""
     adjacent = adjacent_superpower && "#{adjacent_superpower.symbol}"
 
-    basic = "%s %s%s (US:%s, USSR:%s)" % [
-      name, swords, adjacent, influence(US), influence(USSR)
+    basic = "%s %s [%s%s] (US:%s, USSR:%s)" % [
+      name, adjacent, stability, swords, influence(US), influence(USSR)
     ]
 
     extra = if controlled_by?(US)
@@ -92,8 +92,10 @@ class Country
               "Controlled by USSR"
             end
 
-    [basic, extra].compact.join(" ")
+    [basic, extra].compact.join(" ").squeeze(" ")
   end
+
+  alias inspect to_s
 
   NegativeInfluenceError = Class.new(ArgumentError)
 end

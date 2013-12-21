@@ -16,15 +16,18 @@ class ArgumentProvider
     @target = target
   end
 
-  def provide(args)
-    # SMELL: Re-implement something ruby already does... :(
-    if (expected = @target.class.arguments.size) != (actual = args.size)
-      raise ArgumentError, "Expected %s args, got %s" % [expected, actual]
-    end
+  def required_arguments
+    @target.class.arguments
+  end
 
-    @target.class.arguments.zip(args).each do |name, value|
-      @target.send("#{name}=", value)
-    end
+  def provide(**args)
+    extra = args.keys - required_arguments
+    missing = required_arguments - args.keys
+
+    raise ArgumentError, "Too many args: #{extra.inspect}"  unless extra.empty?
+    raise ArgumentError, "Missing args: #{missing.inspect}" unless missing.empty?
+
+    args.each { |k,v| @target.send("#{k}=", v) }
   end
 end
 

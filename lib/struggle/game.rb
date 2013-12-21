@@ -19,8 +19,8 @@ end
 
 include Instructions
 
-def Instruction(const, *args, &block)
-  const.new(*args, &block)
+def Instruction(const, **named_args, &block)
+  const.new(named_args, &block)
 end
 
 def List(*args)

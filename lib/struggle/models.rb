@@ -34,7 +34,7 @@ class WorkItem
   extend Injectible
   extend Arguments
 
-  def initialize(*args)
+  def initialize(**args)
     @complete = false
 
     ap = ArgumentProvider.new(self)

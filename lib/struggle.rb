@@ -11,6 +11,7 @@ require "struggle/countries"
 require "struggle/country"
 require "struggle/deck"
 require "struggle/defcon"
+require "struggle/turn_marker"
 require "struggle/victory_track"
 
 class Struggle

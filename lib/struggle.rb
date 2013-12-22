@@ -9,6 +9,7 @@ require "struggle/models"
 
 require "struggle/countries"
 require "struggle/country"
+require "struggle/deck"
 require "struggle/defcon"
 require "struggle/victory_track"
 

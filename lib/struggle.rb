@@ -9,6 +9,7 @@ require "struggle/models"
 
 require "struggle/countries"
 require "struggle/country"
+require "struggle/china_card"
 require "struggle/deck"
 require "struggle/defcon"
 require "struggle/turn_marker"

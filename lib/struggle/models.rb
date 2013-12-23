@@ -87,7 +87,7 @@ module Instructions
 
   # Used for testing.
   class LambdaInstruction < Instruction
-    def initialize(&block)
+    def initialize(*, &block)
       @block = block
     end
 
@@ -122,12 +122,130 @@ module Instructions
   # Requires the Countries registry.
   #
   class AddInfluence < Instruction
-    arguments :player, :amount, :country
+    arguments :influence, :amount, :country
 
     needs :countries
 
     def action
-      countries.find(country).add_influence(player, amount)
+      countries.find(country).add_influence(influence, amount)
+    end
+  end
+
+  class AddToDeck < Instruction
+    arguments :phase
+
+    needs :cards, :deck
+
+    def action
+      deck.add(cards.select { |c| c.phase == phase })
+    end
+  end
+
+  class ClaimChinaCard < Instruction
+    arguments :player, :playable
+
+    needs :china_card
+
+    def action
+      china_card.holder = player
+      china_card.playable = playable
+    end
+  end
+
+  class SetPhasingPlayer < Instruction
+    arguments :player
+
+    needs :phasing_player
+
+    def action
+      phasing_player.player = player
+    end
+  end
+
+  class ImproveDefcon < Instruction
+    needs :defcon, :phasing_player
+
+    def action
+      defcon.improve(1)
+    end
+  end
+
+  class DealCards < Instruction
+    arguments :target
+
+    needs :deck, :hands, :discards
+
+    def action
+      satisfied = { US => false, USSR => false }
+
+      until satisfied.values.all? do
+        [USSR, US].each do |player|
+          if hands.get(player).size < target
+            deck.add discards if deck.empty?
+
+            hands.add(player, deck.draw)
+          else
+            satisfied[player] = true
+          end
+        end
+      end
+    end
+  end
+
+  class FlipChinaCard < Instruction
+    needs :china_card
+
+    def action
+      china_card.flip_up
+    end
+  end
+
+  class AdvanceTurn < Instruction
+    needs :turn
+
+    def action
+      turn.advance
+    end
+  end
+
+  class CheckHeldCards < Instruction
+    needs :hands
+
+    def action
+      # Order is important here -- if both players are holding scoring cards
+      # then USSR loses.
+
+      return EndGame.new(winner: US)   if hands.get(USSR).any?(&:scoring?)
+      return EndGame.new(winner: USSR) if hands.get(US).any?(&:scoring?)
+    end
+  end
+
+  class CheckMilitaryOps < Instruction
+    needs :military_ops, :defcon
+
+    def action
+      result = military_ops.calculate_vp(defcon)
+
+      if result.vp > 0
+        return AwardVictoryPoints(player: result.player, amount: result.vp)
+      end
+    end
+  end
+
+  class ResetMilitaryOps < Instruction
+    needs :military_ops
+
+    def action
+      military_ops.reset
+    end
+  end
+
+  class EndGame < Instruction
+    arguments :winner
+
+    # TODO make this set game.over and a game winner
+    def action
+      puts "#{winner} WINS!"
     end
   end
 end

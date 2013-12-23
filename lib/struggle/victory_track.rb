@@ -1,5 +1,3 @@
-require "struggle/superpowers"
-
 class VictoryTrack
 
   # -20 = USSR victory, +20 = US victory

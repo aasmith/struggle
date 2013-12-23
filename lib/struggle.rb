@@ -17,6 +17,7 @@ require "struggle/defcon"
 require "struggle/hands"
 require "struggle/military_ops"
 require "struggle/phasing_player"
+require "struggle/space_race"
 require "struggle/turn_marker"
 require "struggle/victory_track"
 

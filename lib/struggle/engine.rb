@@ -10,7 +10,7 @@ class Engine
     @permission_modifiers = []
     @stack_modifiers = []
 
-    # Provide a defualt injector that does nothing.
+    # Provide a default injector that does nothing.
     self.injector = NullInjector.new(nil)
   end
 

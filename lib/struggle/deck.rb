@@ -20,5 +20,9 @@ class Deck
     @cards.empty?
   end
 
+  def size
+    @cards.size
+  end
+
   EmptyDeckError = Class.new(RuntimeError)
 end

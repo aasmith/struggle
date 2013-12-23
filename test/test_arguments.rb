@@ -14,7 +14,7 @@ class ArgumentsTest < Struggle::Test
       Target.new(a: 1, b: 2, c: 3)
     end
 
-    assert_match(/Too many args/, ex.message)
+    assert_match(/too many args/, ex.message)
   end
 
   def test_too_few_arguments
@@ -22,7 +22,7 @@ class ArgumentsTest < Struggle::Test
       Target.new(a: 1)
     end
 
-    assert_match(/Missing args/, ex.message)
+    assert_match(/missing args/, ex.message)
   end
 
   class Target

@@ -24,8 +24,13 @@ class ArgumentProvider
     extra = args.keys - required_arguments
     missing = required_arguments - args.keys
 
-    raise ArgumentError, "Too many args: #{extra.inspect}"  unless extra.empty?
-    raise ArgumentError, "Missing args: #{missing.inspect}" unless missing.empty?
+    unless extra.empty?
+      raise ArgumentError, "#{@target.class} too many args: #{extra.inspect}"
+    end
+
+    unless missing.empty?
+      raise ArgumentError, "#{@target.class} missing args: #{missing.inspect}"
+    end
 
     args.each { |k,v| @target.send("#{k}=", v) }
   end

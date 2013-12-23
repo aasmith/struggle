@@ -75,6 +75,27 @@ class TestEngine < Struggle::Test
     refute e.peek, "Should be nothing left to accept"
   end
 
+  def test_nested_executables_dont_need_to_return_an_array
+    instructions = []
+
+    child = LambdaInstruction.new { instructions << "child" }
+
+    parent = LambdaInstruction.new do
+      instructions << "parent"
+      child # return a single instruction -- not an array
+    end
+
+    e = Engine.new
+    e.add_work_item parent
+
+    e.accept nil
+
+    assert parent.complete?
+    assert child.complete?
+
+    assert_equal %w(parent child), instructions
+  end
+
   def test_peek_progresses_execution
     instruction = EmptyInstruction.new
 

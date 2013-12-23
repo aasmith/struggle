@@ -30,15 +30,11 @@ class TestDefcon < Struggle::Test
   def test_improve
     defcon = Defcon.new 3
 
-    defcon.improve(USSR, 1)
+    defcon.improve(1)
     assert_equal 4, defcon.value
 
     assert_raises ArgumentError, "Should not allow negative values" do
-      defcon.improve(USSR, -1)
-    end
-
-    assert_raises InvalidDefcon, "Should not allow value outside of range" do
-      defcon.improve(USSR, 10)
+      defcon.improve(-1)
     end
 
     assert_equal 4, defcon.value, "Should still be at previous setting"
@@ -74,16 +70,27 @@ class TestDefcon < Struggle::Test
     assert_equal USSR, defcon.destroyed_by
 
     assert_raises(ImmutableDefcon, "Setting DEFCON after war should fail") do
-      defcon.improve(USSR, 2)
+      defcon.improve(2)
     end
   end
 
-  def test_player_present
+  def test_defcon_maxes_at_five
     defcon = Defcon.new
 
-    assert_raises ArgumentError do
+    defcon.improve(1)
+
+    assert_equal 5, defcon.value
+  end
+
+  def test_player_only_needed_when_going_to_nuclear_war
+    defcon = Defcon.new 2
+
+    assert_raises ArgumentError, "Should require player when going to 1" do
       defcon.degrade(nil, 1)
     end
+
+    defcon.improve(1)
+    assert_equal 3, defcon.value, "Defcon should improve without needing player"
   end
 
 end

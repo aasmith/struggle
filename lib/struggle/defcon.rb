@@ -6,10 +6,10 @@ class Defcon
     @destroyed_by = nil
   end
 
-  def improve(player, amount)
+  def improve(amount = nil)
     raise ArgumentError, "Must be positive" if amount < 0
 
-    set(player, value + amount)
+    set(nil, (target = value + amount) > 5 ? 5 : target)
   end
 
   def degrade(player, amount)
@@ -19,8 +19,8 @@ class Defcon
   end
 
   def set(player, value)
-    if player.nil?
-      raise ArgumentError, "Player needed when tampering with DEFCON"
+    if player.nil? && value == 1
+      raise ArgumentError, "Player needed when setting DEFCON to WAR!"
     end
 
     if nuclear_war?

@@ -7,6 +7,8 @@ require "struggle/injection"
 require "struggle/arguments"
 require "struggle/models"
 
+require "struggle/card"
+require "struggle/cards"
 require "struggle/countries"
 require "struggle/country"
 require "struggle/china_card"

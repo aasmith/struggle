@@ -3,7 +3,7 @@
 # and playability.
 #
 class ChinaCard
-  attr_reader :holder, :playable
+  attr_accessor :holder, :playable
 
   def initialize
     @holder = USSR

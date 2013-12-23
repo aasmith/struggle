@@ -12,6 +12,7 @@ require "struggle/country"
 require "struggle/china_card"
 require "struggle/deck"
 require "struggle/defcon"
+require "struggle/military_ops"
 require "struggle/turn_marker"
 require "struggle/victory_track"
 

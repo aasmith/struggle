@@ -1,3 +1,14 @@
 #!/usr/bin/env ruby
 
-abort "you need to write me"
+$: << "lib" << "."
+
+require 'struggle'
+require 'struggle/game'
+
+g = Game.new
+g.start
+g.accept nil
+
+require 'pp'
+pp g
+

@@ -170,6 +170,10 @@ module Instructions
     end
   end
 
+  ##
+  # Deals cards from the deck. If there are no more cards in the deck,
+  # the +discard+ pile is transferred into the deck.
+  #
   class DealCards < Instruction
     arguments :target
 
@@ -181,7 +185,10 @@ module Instructions
       until satisfied.values.all? do
         [USSR, US].each do |player|
           if hands.get(player).size < target
-            deck.add discards if deck.empty?
+            if deck.empty?
+              deck.add discards
+              discards.clear
+            end
 
             hands.add(player, deck.draw)
           else

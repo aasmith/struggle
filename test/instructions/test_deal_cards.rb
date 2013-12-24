@@ -101,6 +101,9 @@ class DealCardsTest < Struggle::Test
 
     assert_equal expected_order, hands.master.map { |e| e.card },
       "All regular cards should be dealt before dealing discards"
+
+    assert discards.empty?,
+      "Adding discards to the deck should empty the source array"
   end
 
   # A hand that shares.

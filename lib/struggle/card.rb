@@ -14,5 +14,13 @@ class Card
     phase == :early
   end
 
+  def inspect
+    star = remove_after_event ? "*" : ""
+    underline = "" # display on board until cancelled - TODO?
+
+    "%3s: [%s %4s %-5s] %s%s%s%s" % [
+      id, ops, side || '-', phase.to_s.upcase, underline, name, underline, star
+    ]
+  end
 end
 

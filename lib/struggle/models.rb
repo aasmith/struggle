@@ -77,6 +77,14 @@ module Instructions
     def returning(obj, &block)
       obj.tap(&block)
     end
+
+    def inspect
+      args = self.class.arguments.map do |a|
+        "%s: %s" % [a, send(a).inspect]
+      end
+
+      "%s(%s)" % [self.class.name.sub(/^Instructions/, "I"), args.join(", ")]
+    end
   end
 
   # Used for testing.

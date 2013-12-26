@@ -9,7 +9,7 @@ class Defcon
   def improve(amount = nil)
     raise ArgumentError, "Must be positive" if amount < 0
 
-    set(nil, (target = value + amount) > 5 ? 5 : target)
+    set(nil, [value + amount, 5].min)
   end
 
   def degrade(player, amount)

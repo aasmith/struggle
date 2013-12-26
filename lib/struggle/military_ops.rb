@@ -5,7 +5,7 @@ class MilitaryOps
   end
 
   def increment(player, amount)
-    @ops[player] = (x = @ops[player] + amount) > 5 ? 5 : x
+    @ops[player] = [@ops[player] + amount, 5].min
   end
 
   def value(player)

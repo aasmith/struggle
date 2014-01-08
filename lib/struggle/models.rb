@@ -267,38 +267,79 @@ end
 
 ### MoveArbitrators
 
-class MoveArbitrator < WorkItem
-  def initialize
-    super
+module Arbitrators
+  class MoveArbitrator < WorkItem
+    def initialize(**args)
+      super
 
-    @stashed_moves = []
-    @executed_moves = []
-  end
+      @stashed_moves = []
+      @executed_moves = []
+    end
 
-  def accepts?(move) noimpl end
+    def accepts?(move) noimpl end
 
-  def accept(move)
-    move.execute
-    complete
-  end
-
-  def stash(move)
-    @stashed_moves.push move
-  end
-
-  def execute_stashed_moves
-    while move = @stashed_moves.pop do
+    def accept(move)
       move.execute
-      @executed_moves.push move
+      after_execute(move)
+    end
+
+    # Override in subclasses.
+    def after_execute(move)
       complete
+    end
+
+    def stash(move)
+      @stashed_moves.push move
+    end
+
+    def execute_stashed_moves
+      while move = @stashed_moves.pop do
+        accept move
+        @executed_moves.push move
+      end
+    end
+
+    def hint() noimpl end
+  end
+
+  class MoveAcceptor < MoveArbitrator
+    def accepts?(move) move end # true if move is not nil
+  end
+
+  class AddInfluence < MoveArbitrator
+    arguments :player, :influence, :countries, :total_influence
+
+    attr_reader :remaining_influence
+
+    def after_init
+      @remaining_influence = total_influence
+    end
+
+    def after_execute(move)
+      @remaining_influence -= move.instruction.amount
+
+      complete if @remaining_influence.zero?
+    end
+
+    # TODO use minitest assertions?
+    def accepts?(move)
+      move.player == player &&
+        move.instruction.influence == influence &&
+        countries.include?(move.instruction.country) &&
+        move.instruction.amount <= remaining_influence
     end
   end
 
-  def hint() notimpl end
-end
+  class WipCardPlay < MoveArbitrator
+    arguments :player
 
-class MoveAcceptor < MoveArbitrator
-  def accepts?(move) move end # true if move is not nil
+    needs :space_race, :hands
+
+    def accepts?(move)
+      # check space race eligibility
+      # check card in hand
+    end
+  end
 end
 
 ### Modifiers

@@ -48,7 +48,7 @@ class Engine
 
         @work_items.push(*results) if results.all? { |r| WorkItem === r }
 
-      elsif MoveArbitrator === work_item
+      elsif Arbitrators::MoveArbitrator === work_item
         work_item.execute_stashed_moves
 
         if work_item.complete?

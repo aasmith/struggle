@@ -1,6 +1,6 @@
 require "helper"
 
-class DealCardsTest < Struggle::Test
+class InstructionTests::DealCardsTest < Struggle::Test
 
   def test_deal
     cards = Cards.new.select { |c| c.early? }

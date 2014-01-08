@@ -1,6 +1,6 @@
 require "helper"
 
-class AddInfluenceTest < Struggle::Test
+class InstructionTests::AddInfluenceTest < Struggle::Test
 
   def test_add_influence
     country = FakeCountry.new

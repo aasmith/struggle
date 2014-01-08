@@ -2,10 +2,11 @@ require "helper"
 
 class TestEngine < Struggle::Test
 
-  include Instructions
+  I = Instructions
+  A = Arbitrators
 
   def test_basic_arbitrator_execution
-    arbitrator = MoveAcceptor.new
+    arbitrator = A::MoveAcceptor.new
     move = EmptyMove.new
 
     e = Engine.new
@@ -22,9 +23,9 @@ class TestEngine < Struggle::Test
   end
 
   def test_instructions_execute_automatically
-    instruction = EmptyInstruction.new
-    arbitrator1 = MoveAcceptor.new
-    arbitrator2 = MoveAcceptor.new
+    instruction = I::EmptyInstruction.new
+    arbitrator1 = A::MoveAcceptor.new
+    arbitrator2 = A::MoveAcceptor.new
 
     move1 = EmptyMove.new
     move2 = EmptyMove.new
@@ -50,11 +51,11 @@ class TestEngine < Struggle::Test
   def test_nested_executables_execute_automatically
     instructions = []
 
-    instruction1 = LambdaInstruction.new { instructions << "ex1" }
-    instruction2 = LambdaInstruction.new { instructions << "ex2" }
-    nested_instr = NestingInstruction.new(instruction1, instruction2)
+    instruction1 = I::LambdaInstruction.new { instructions << "ex1" }
+    instruction2 = I::LambdaInstruction.new { instructions << "ex2" }
+    nested_instr = I::NestingInstruction.new(instruction1, instruction2)
 
-    arbitrator = MoveAcceptor.new
+    arbitrator = A::MoveAcceptor.new
 
     move = EmptyMove.new
 
@@ -78,9 +79,9 @@ class TestEngine < Struggle::Test
   def test_nested_executables_dont_need_to_return_an_array
     instructions = []
 
-    child = LambdaInstruction.new { instructions << "child" }
+    child = I::LambdaInstruction.new { instructions << "child" }
 
-    parent = LambdaInstruction.new do
+    parent = I::LambdaInstruction.new do
       instructions << "parent"
       child # return a single instruction -- not an array
     end
@@ -97,7 +98,7 @@ class TestEngine < Struggle::Test
   end
 
   def test_peek_progresses_execution
-    instruction = EmptyInstruction.new
+    instruction = I::EmptyInstruction.new
 
     e = Engine.new
     e.add_work_item instruction
@@ -112,7 +113,7 @@ class TestEngine < Struggle::Test
   ### MODIFIERS
 
   def test_permission_modifier_denies_move
-    arbitrator = MoveAcceptor.new
+    arbitrator = A::MoveAcceptor.new
     move = EmptyMove.new
 
     e = Engine.new
@@ -142,11 +143,11 @@ class TestEngine < Struggle::Test
   # This game will now need one extra move to empty the stack.
   #
   def test_stack_modifier_adds_items_to_stack
-    orig_arbitrator = MoveAcceptor.new
+    orig_arbitrator = A::MoveAcceptor.new
     orig_move = EmptyMove.new
 
-    new_instruction = EmptyInstruction.new
-    new_arbitrator = MoveAcceptor.new
+    new_instruction = I::EmptyInstruction.new
+    new_arbitrator = A::MoveAcceptor.new
 
     mod = StackModifier.new(new_instruction, new_arbitrator)
 
@@ -183,7 +184,7 @@ class TestEngine < Struggle::Test
   end
 
   def test_work_items_are_injected
-    item = Instructions::EmptyInstruction.new
+    item = I::EmptyInstruction.new
 
     fake_injector = Minitest::Mock.new.expect(:inject, nil, [item])
 

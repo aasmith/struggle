@@ -1,5 +1,3 @@
-require 'delegate'
-
 class PhasingPlayer < SimpleDelegator
 
   alias player= __setobj__

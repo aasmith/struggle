@@ -1,3 +1,5 @@
+require 'delegate'
+
 require "struggle/superpowers"
 
 require "struggle/stack"
@@ -15,6 +17,7 @@ require "struggle/china_card"
 require "struggle/deck"
 require "struggle/defcon"
 require "struggle/hands"
+require "struggle/victory"
 require "struggle/military_ops"
 require "struggle/phasing_player"
 require "struggle/space_race"

@@ -1,7 +1,7 @@
 class Game
   attr_accessor :countries, :deck, :turn, :defcon, :china_card, :space_race,
                 :cards, :military_ops, :victory_track, :hands, :phasing_player,
-                :discards
+                :discards, :removed, :limbo, :victory
 
   def initialize
     @engine = Engine.new
@@ -13,6 +13,7 @@ class Game
     self.deck = Deck.new
     self.turn = TurnMarker.new
     self.defcon = Defcon.new
+    self.victory = Victory.new
     self.china_card = ChinaCard.new
     self.space_race = SpaceRace.new
     self.military_ops = MilitaryOps.new
@@ -22,6 +23,11 @@ class Game
     self.hands = Hands.new
 
     self.discards = []
+    self.removed = []
+
+    # Limbo is for cards that stay on the board but get put into the discard
+    # pile once they are cancelled (i.e. Shuttle Diplomacy).
+    self.limbo = []
   end
 
   def start

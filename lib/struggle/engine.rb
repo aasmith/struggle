@@ -54,7 +54,7 @@ class Engine
         if work_item.complete?
           next
 
-        elsif permitted?(move) && work_item.accepts?(move)
+        elsif move && permitted?(move) && work_item.accepts?(move)
 
           @work_items.push work_item
 

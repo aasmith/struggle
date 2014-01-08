@@ -189,15 +189,3 @@ GameInstructions = List(
   GameEnd # set game.over = true, game.winner = x
 )
 
-if __FILE__ == $0
-  eval DATA.read, binding, __FILE__, __LINE__
-end
-
-__END__
-
-g = Game.new
-g.start
-g.accept nil
-
-require 'pp'
-pp g

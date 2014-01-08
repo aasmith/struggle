@@ -19,7 +19,7 @@ class HandsTest < Struggle::Test
       h.get(USSR) << Object.new
     end
 
-    assert_match /can't modify frozen Array/, ex.message
+    assert_match(/can't modify frozen Array/, ex.message)
   end
 
   def test_add

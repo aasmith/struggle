@@ -85,7 +85,7 @@ class Engine
   end
 
   ##
-  # Execute any ioutstanding items on the stack and then peek.
+  # Execute any outstanding items on the stack and then peek.
   #
   def peek
     accept nil # Pass in a false move to push the game along

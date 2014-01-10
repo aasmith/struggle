@@ -5,6 +5,11 @@
 class Move
   attr_accessor :player, :instruction
 
+  def initialize(player: nil, instruction: nil)
+    self.player = player
+    self.instruction = instruction
+  end
+
   def execute
     instruction.execute
   end
@@ -14,11 +19,6 @@ class Move
   end
 end
 
-class EmptyMove < Move
-  def initialize() @executed = false end
-  def execute() @executed = true end
-  def executed?() @executed end
-end
 
 class CardPlay < Move
   attr_accessor :operation, :card
@@ -120,7 +120,7 @@ module Instructions
   end
 
   class AwardVictoryPoints < Instruction
-    attr_accessor :player, :amount
+    arguments :player, :amount
 
     needs :victory_point_track
 
@@ -135,12 +135,12 @@ module Instructions
   # Requires the Countries registry.
   #
   class AddInfluence < Instruction
-    arguments :influence, :amount, :country
+    arguments :influence, :amount, :country_name
 
     needs :countries
 
     def action
-      countries.find(country).add_influence(influence, amount)
+      countries.find(country_name).add_influence(influence, amount)
     end
   end
 
@@ -235,8 +235,12 @@ module Instructions
       # Order is important here -- if both players are holding scoring cards
       # then USSR loses.
 
-      return EndGame.new(winner: US)   if hands.get(USSR).any?(&:scoring?)
-      return EndGame.new(winner: USSR) if hands.get(US).any?(&:scoring?)
+      return winner(US)   if hands.get(USSR).any?(&:scoring?)
+      return winner(USSR) if hands.get(US).any?(&:scoring?)
+    end
+
+    def winner(player)
+      [DeclareWinner.new(player: player), EndGame.new]
     end
   end
 
@@ -260,14 +264,32 @@ module Instructions
     end
   end
 
-  class EndGame < Instruction
-    arguments :winner
+  class DeclareWinner < Instruction
+    arguments :player
 
-    # TODO make this set game.over and a game winner
+    needs :victory
+
     def action
-      puts "#{winner} WINS!"
+      victory.winner = player
     end
   end
+
+  class FinalScoring < Instruction
+
+    def action
+    end
+  end
+
+  class EndGame < Instruction
+    needs :victory
+
+    # Set game.over = true. Winner should be set by another instruction. if
+    # not set, then winner will be nil and a draw is assumed.
+    def action
+      puts "GAME OVER: Winner #{victory}"
+    end
+  end
+
 end
 
 ### MoveArbitrators
@@ -307,12 +329,8 @@ module Arbitrators
     def hint() noimpl end
   end
 
-  class MoveAcceptor < MoveArbitrator
-    def accepts?(move) move end # true if move is not nil
-  end
-
   class AddInfluence < MoveArbitrator
-    arguments :player, :influence, :countries, :total_influence
+    arguments :player, :influence, :country_names, :total_influence
 
     attr_reader :remaining_influence
 
@@ -330,7 +348,7 @@ module Arbitrators
     def accepts?(move)
       move.player == player &&
         move.instruction.influence == influence &&
-        countries.include?(move.instruction.country) &&
+        country_names.include?(move.instruction.country_name) &&
         move.instruction.amount <= remaining_influence
     end
   end
@@ -369,3 +387,4 @@ class StackModifier
     @seen = true
   end
 end
+

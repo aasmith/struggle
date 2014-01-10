@@ -7,9 +7,9 @@ class InstructionTests::AddInfluenceTest < Struggle::Test
     countries = FakeCountries.new(country)
 
     instruction = Instructions::AddInfluence.new(
-      influence: :player,
-      amount:    :amount,
-      country:   country
+      influence:    :player,
+      amount:       :amount,
+      country_name: "foo"
     )
 
     instruction.countries = countries

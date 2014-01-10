@@ -22,5 +22,14 @@ class Card
       id, ops, side || '-', phase.to_s.upcase, underline, name, underline, star
     ]
   end
+
+  # Make the getting of ops a special condition. Card ops should be
+  # determined using an OpsResolver (TODO)
+
+  private :ops
+
+  def ops!
+    @ops
+  end
 end
 

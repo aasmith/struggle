@@ -37,59 +37,95 @@ class Game
   def accept(move)
     @engine.accept move
   end
+
+  def hint
+    @engine.peek
+  end
 end
 
-include Instructions
-
 def Instruction(const, **named_args, &block)
-  const.new(named_args, &block)
+  Instructions.const_get(const).new(named_args, &block)
 end
 
 def List(*args)
-  NestingInstruction.new(*args)
+  Instructions::NestingInstruction.new(*args)
+end
+
+def Arbitrator(const, **named_args, &block)
+  Arbitrators.const_get(const).new(named_args, &block)
+end
+
+module ContextHelpers
+  class ContextHelper
+    extend Injectible
+
+    def value
+      raise "impl"
+    end
+  end
+
+  class EastEuropeanCountries < ContextHelper
+
+    needs :countries
+
+    def value
+      countries.
+        select { |c| c.in?(EasternEurope) }.
+        map    { |c| c.name }
+    end
+  end
+
+  class WestEuropeanCountries < ContextHelper
+
+    needs :countries
+
+    def value
+      countries.
+        select { |c| c.in?(WesternEurope) }.
+        map    { |c| c.name }
+    end
+  end
 end
 
 alias I Instruction
 alias L List
 
 StartingInfluence = List(
-  I(AddInfluence, influence: USSR, amount: 1, country: :syria),
-  I(AddInfluence, influence: USSR, amount: 1, country: :iraq),
-  I(AddInfluence, influence: USSR, amount: 3, country: :north_korea),
-  I(AddInfluence, influence: USSR, amount: 3, country: :east_germany),
-  I(AddInfluence, influence: USSR, amount: 1, country: :finland),
+  I(:AddInfluence, influence: USSR, amount: 1, country_name: "Syria"),
+  I(:AddInfluence, influence: USSR, amount: 1, country_name: "Iraq"),
+  I(:AddInfluence, influence: USSR, amount: 3, country_name: "North Korea"),
+  I(:AddInfluence, influence: USSR, amount: 3, country_name: "East Germany"),
+  I(:AddInfluence, influence: USSR, amount: 1, country_name: "Finland"),
 
-  I(AddInfluence, influence: US, amount: 1, country: :iran),
-  I(AddInfluence, influence: US, amount: 1, country: :israel),
-  I(AddInfluence, influence: US, amount: 1, country: :japan),
-  I(AddInfluence, influence: US, amount: 4, country: :australia),
-  I(AddInfluence, influence: US, amount: 1, country: :philippines),
-  I(AddInfluence, influence: US, amount: 1, country: :south_korea),
-  I(AddInfluence, influence: US, amount: 1, country: :panama),
-  I(AddInfluence, influence: US, amount: 1, country: :south_africa),
-  I(AddInfluence, influence: US, amount: 5, country: :united_kingdom),
+  I(:AddInfluence, influence: US, amount: 1, country_name: "Iran"),
+  I(:AddInfluence, influence: US, amount: 1, country_name: "Israel"),
+  I(:AddInfluence, influence: US, amount: 1, country_name: "Japan"),
+  I(:AddInfluence, influence: US, amount: 4, country_name: "Australia"),
+  I(:AddInfluence, influence: US, amount: 1, country_name: "Philippines"),
+  I(:AddInfluence, influence: US, amount: 1, country_name: "South Korea"),
+  I(:AddInfluence, influence: US, amount: 1, country_name: "Panama"),
+  I(:AddInfluence, influence: US, amount: 1, country_name: "South Africa"),
+  I(:AddInfluence, influence: US, amount: 5, country_name: "United Kingdom"),
 
-  #Await(AddInfluence,
-  #  player: USSR,
-  #  influence: USSR,
-  #  countries: EE.countries,
-  #  total_influence: 6
-  #),
+  Arbitrator(:AddInfluence,
+    player: USSR,
+    influence: USSR,
+    country_names: ContextHelpers::EastEuropeanCountries.new,
+    total_influence: 6
+  ),
 
-  #Await(AddInfluence,
-  #  player: US,
-  #  influence: US,
-  #  countries: WE.countries,
-  #  total_influence: 7
-  #)
-
+  Arbitrator(:AddInfluence,
+    player: US,
+    influence: US,
+    country_names: ContextHelpers::WestEuropeanCountries.new,
+    total_influence: 7
+  )
 )
 
 Setup = List(
-  Instruction(AddToDeck, phase: :early),
-  Instruction(DealCards, target: 8), # DealCards should always take more from
-                                     # the discard if the draw deck runs out
-  Instruction(ClaimChinaCard, player: USSR, playable: true),
+  Instruction(:AddToDeck, phase: :early),
+  Instruction(:DealCards, target: 8),
+  Instruction(:ClaimChinaCard, player: USSR, playable: true),
   StartingInfluence
 )
 
@@ -97,12 +133,18 @@ Setup = List(
 ExpectMove = List()
 
 UssrActionRound = List(
-  Instruction(SetPhasingPlayer, player: USSR),
+  Instruction(:SetPhasingPlayer, player: USSR),
+
+  #Arbitrator(:WipCardPlay,
+  #  player: USSR,
+
+  #),
+
   ExpectMove
 )
 
 UsActionRound = List(
-  Instruction(SetPhasingPlayer, player: US),
+  Instruction(:SetPhasingPlayer, player: US),
   ExpectMove
 )
 
@@ -118,16 +160,16 @@ HeadlinePhase = List()
 EndActionRound = List()
 
 EarlyPhaseTurn = List(
-  I(ImproveDefcon),
-  I(DealCards, target: 8),
+  I(:ImproveDefcon),
+  I(:DealCards, target: 8),
   HeadlinePhase,
   ActionRound, # x6
   EndActionRound, # for certain events to trigger off of
-  I(CheckMilitaryOps),
-  I(ResetMilitaryOps),
-  I(CheckHeldCards), # check no scoring cards
-  I(FlipChinaCard), # make it 'playable'
-  I(AdvanceTurn)
+  I(:CheckMilitaryOps),
+  I(:ResetMilitaryOps),
+  I(:CheckHeldCards), # check no scoring cards
+  I(:FlipChinaCard), # make it 'playable'
+  I(:AdvanceTurn)
 )
 
 EarlyPhase = List(
@@ -137,20 +179,20 @@ EarlyPhase = List(
 )
 
 MidPhaseTurn = List(
-  I(ImproveDefcon),
-  I(DealCards, target: 9),
+  I(:ImproveDefcon),
+  I(:DealCards, target: 9),
   HeadlinePhase,
   ActionRound, # x7
   EndActionRound, # for certain events to trigger off of
-  I(CheckMilitaryOps),
-  I(ResetMilitaryOps),
-  I(CheckHeldCards), # check no scoring cards
-  I(FlipChinaCard), # make it 'playable'
-  I(AdvanceTurn)
+  I(:CheckMilitaryOps),
+  I(:ResetMilitaryOps),
+  I(:CheckHeldCards), # check no scoring cards
+  I(:FlipChinaCard), # make it 'playable'
+  I(:AdvanceTurn)
 )
 
 MidPhase = List(
-  Instruction(AddToDeck, phase: :mid),
+  Instruction(:AddToDeck, phase: :mid),
   MidPhaseTurn,
   MidPhaseTurn,
   MidPhaseTurn,
@@ -158,34 +200,34 @@ MidPhase = List(
 )
 
 LatePhaseTurn = List(
-  I(ImproveDefcon),
-  I(DealCards, target: 9),
+  I(:ImproveDefcon),
+  I(:DealCards, target: 9),
   HeadlinePhase,
   ActionRound, # x7
   EndActionRound, # for certain events to trigger off of
-  I(CheckMilitaryOps),
-  I(ResetMilitaryOps),
-  I(CheckHeldCards), # check no scoring cards
-  I(FlipChinaCard), # make it 'playable'
-  I(AdvanceTurn)
+  I(:CheckMilitaryOps),
+  I(:ResetMilitaryOps),
+  I(:CheckHeldCards), # check no scoring cards
+  I(:FlipChinaCard), # make it 'playable'
+  I(:AdvanceTurn)
 )
 
 LatePhase = List(
-  Instruction(AddToDeck, phase: :late),
+  Instruction(:AddToDeck, phase: :late),
   LatePhaseTurn,
   LatePhaseTurn,
   LatePhaseTurn
 )
 
 FinalScoring = List()
-GameEnd      = Instruction(LambdaInstruction) { puts "END!!!" }
+#GameEnd      = Instruction(LambdaInstruction) { puts "END!!!" }
 
 GameInstructions = List(
   Setup,
   EarlyPhase,
   MidPhase,
   LatePhase,
-  FinalScoring,
-  GameEnd # set game.over = true, game.winner = x
+  FinalScoring, # set a winner here if applicable
+  I(:EndGame)
 )
 

@@ -6,7 +6,7 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
     @arbitrator = Arbitrators::AddInfluence.new(
       player: USSR,
       influence: USSR,
-      countries: [:east_germany, :west_germany],
+      country_names: [:east_germany, :west_germany],
       total_influence: 6
     )
   end
@@ -16,7 +16,7 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
       player: USSR,
       instruction: Instructions::AddInfluence.new(
         influence: USSR,
-        country: :east_germany,
+        country_name: :east_germany,
         amount: 6
       )
     )
@@ -44,7 +44,7 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
       player: USSR,
       instruction: Instructions::AddInfluence.new(
         influence: USSR,
-        country: :east_germany,
+        country_name: :east_germany,
         amount: 4
       )
     )
@@ -63,14 +63,14 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
       player: USSR,
       instruction: Instructions::AddInfluence.new(
         influence: USSR,
-        country: :nonexistant,
+        country_name: :nonexistant,
         amount: 6
       )
     )
 
     refute @arbitrator.accepts?(move), "The country should be invalid"
 
-    move.instruction.country = :east_germany
+    move.instruction.country_name = :east_germany
     assert @arbitrator.accepts?(move)
   end
 
@@ -79,7 +79,7 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
       player: USSR,
       instruction: Instructions::AddInfluence.new(
         influence: US,
-        country: :east_germany,
+        country_name: :east_germany,
         amount: 6
       )
     )
@@ -95,7 +95,7 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
       player: USSR,
       instruction: Instructions::AddInfluence.new(
         influence: USSR,
-        country: :east_germany,
+        country_name: :east_germany,
         amount: 7
       )
     )
@@ -111,7 +111,7 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
       player: US,
       instruction: Instructions::AddInfluence.new(
         influence: USSR,
-        country: :east_germany,
+        country_name: :east_germany,
         amount: 6
       )
     )

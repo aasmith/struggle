@@ -7,7 +7,30 @@ require 'struggle/game'
 
 g = Game.new
 g.start
-g.accept nil
+
+g.accept(
+  Move.new(
+    player: USSR,
+    instruction: Instructions::AddInfluence.new(
+      influence: USSR,
+      country_name: "East Germany",
+      amount: 6
+    )
+  )
+)
+
+g.accept(
+  Move.new(
+    player: US,
+    instruction: Instructions::AddInfluence.new(
+      influence: US,
+      country_name: "Italy",
+      amount: 7
+    )
+  )
+)
+
+p g.hint
 
 require 'pp'
 pp g

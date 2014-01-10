@@ -20,7 +20,7 @@ class Injector
     target.class.respond_to?(:needs) ? target.class.needs : []
   end
 
-  def inject(target)
+  def inject(target, descend: true)
     failed = []
 
     needs(target).each do |attr|
@@ -36,6 +36,16 @@ class Injector
         "Source %s failed to provide variables %s for target %s" % [
           @source, failed.join(',').inspect, target
         ]
+    end
+
+    descend(target) if descend
+  end
+
+  def descend(target)
+    if target.class.respond_to?(:arguments)
+      target.class.arguments.each do |arg|
+        inject(target.send(arg, unbox: false), descend: false)
+      end
     end
   end
 

@@ -52,9 +52,35 @@ class TestInjection < Struggle::Test
       "Should not be injected because no needs were supplied"
   end
 
+  def test_injector_injects_arguments
+    needy_wrapper = NeedyWrapper.new
+    needy_wrapper.foo = @needy
+    needy_wrapper.bar = Object.new
+
+    source = Struct.new(:a, :b).new(123, 456)
+    injector = Injector.new(source)
+
+    injector.inject(needy_wrapper)
+
+    assert_equal 123, needy_wrapper.a
+
+    assert_equal 123, @needy.a, "Nested targets should be injected"
+    assert_equal 456, @needy.b, "Nested targets should be injected"
+  end
+
   class Needy
     extend Injectible
 
     needs :a, :b
   end
+
+  class NeedyWrapper
+    extend Injectible
+    extend Arguments
+
+    needs :a
+
+    arguments :foo, :bar
+  end
+
 end

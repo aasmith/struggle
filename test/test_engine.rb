@@ -3,10 +3,9 @@ require "helper"
 class TestEngine < Struggle::Test
 
   I = Instructions
-  A = Arbitrators
 
   def test_basic_arbitrator_execution
-    arbitrator = A::MoveAcceptor.new
+    arbitrator = MoveAcceptor.new
     move = EmptyMove.new
 
     e = Engine.new
@@ -22,10 +21,35 @@ class TestEngine < Struggle::Test
     # assert history has been filled
   end
 
+  def test_arbitrator_stays_on_top_until_completed
+    arbitrator = MultiMoveAcceptor.new
+    move1 = EmptyMove.new
+    move2 = EmptyMove.new
+
+    e = Engine.new
+    e.add_work_item arbitrator
+
+    assert_equal arbitrator, e.peek, "Arbitrator should be top of stack"
+
+    e.accept move1
+
+    assert move1.executed?, "Move should be executed"
+    refute arbitrator.complete?, "Arbitrator should still need another move"
+
+    assert_equal arbitrator, e.peek, "Arbitrator should still be top of stack"
+
+    e.accept move2
+
+    assert move2.executed?, "Move should be executed"
+    assert arbitrator.complete?, "Arbitrator must be complete after 2nd move"
+
+    assert_nil e.peek, "Arbitrator should move off, stack should be empty"
+  end
+
   def test_instructions_execute_automatically
     instruction = I::EmptyInstruction.new
-    arbitrator1 = A::MoveAcceptor.new
-    arbitrator2 = A::MoveAcceptor.new
+    arbitrator1 = MoveAcceptor.new
+    arbitrator2 = MoveAcceptor.new
 
     move1 = EmptyMove.new
     move2 = EmptyMove.new
@@ -55,7 +79,7 @@ class TestEngine < Struggle::Test
     instruction2 = I::LambdaInstruction.new { instructions << "ex2" }
     nested_instr = I::NestingInstruction.new(instruction1, instruction2)
 
-    arbitrator = A::MoveAcceptor.new
+    arbitrator = MoveAcceptor.new
 
     move = EmptyMove.new
 
@@ -113,7 +137,7 @@ class TestEngine < Struggle::Test
   ### MODIFIERS
 
   def test_permission_modifier_denies_move
-    arbitrator = A::MoveAcceptor.new
+    arbitrator = MoveAcceptor.new
     move = EmptyMove.new
 
     e = Engine.new
@@ -143,11 +167,11 @@ class TestEngine < Struggle::Test
   # This game will now need one extra move to empty the stack.
   #
   def test_stack_modifier_adds_items_to_stack
-    orig_arbitrator = A::MoveAcceptor.new
+    orig_arbitrator = MoveAcceptor.new
     orig_move = EmptyMove.new
 
     new_instruction = I::EmptyInstruction.new
-    new_arbitrator = A::MoveAcceptor.new
+    new_arbitrator = MoveAcceptor.new
 
     mod = StackModifier.new(new_instruction, new_arbitrator)
 
@@ -238,6 +262,27 @@ class TestEngine < Struggle::Test
     refute move.executed?, "Modified move should not be executed"
 
     assert_equal 1, move.amount, "Amount should be reduced by modifier"
+  end
+
+  class MoveAcceptor < Arbitrators::MoveArbitrator
+    def accepts?(move) move end # true if move is not nil
+  end
+
+  # Only marks itself as complete once it has accepted two moves.
+  class MultiMoveAcceptor < Arbitrators::MoveArbitrator
+    def initialize(**)
+      super
+
+      @num_accepted = 0
+    end
+
+    def accepts?(move)
+      @num_accepted += 1 if move
+    end
+
+    def after_execute(move)
+      complete if @num_accepted >= 2
+    end
   end
 
 end

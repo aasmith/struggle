@@ -2,6 +2,8 @@ require "country_data"
 
 class Countries
 
+  include Enumerable
+
   def initialize(data)
     @countries = data.map { |row| Country.new(*row) }
   end
@@ -26,6 +28,10 @@ class Countries
     else
       raise CountryNotFoundError, "No country found for #{name.inspect}"
     end
+  end
+
+  def each(&block)
+    @countries.each(&block)
   end
 
   AmbiguousNameError = Class.new(ArgumentError)

@@ -32,6 +32,9 @@ class Game
 
   def start
     @engine.add_work_item GameInstructions
+
+    @engine.add_permission_modifier ChinaCardPermissionModifier.new
+    @engine.add_permission_modifier SpaceRacePermissionModifier.new
   end
 
   def accept(move)
@@ -134,13 +137,7 @@ ExpectMove = List()
 
 UssrActionRound = List(
   Instruction(:SetPhasingPlayer, player: USSR),
-
-  #Arbitrator(:WipCardPlay,
-  #  player: USSR,
-
-  #),
-
-  ExpectMove
+  Arbitrator(:CardPlay, player: USSR)
 )
 
 UsActionRound = List(

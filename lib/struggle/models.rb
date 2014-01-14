@@ -20,10 +20,6 @@ class Move
 end
 
 
-class CardPlay < Move
-  attr_accessor :operation, :card
-end
-
 ### Misc
 
 def noimpl() raise("%s Not Implemented" % [caller_locations.first.to_s]) end
@@ -299,6 +295,72 @@ module Instructions
     end
   end
 
+  ##
+  # Encapsulates playing a card. Returns instructions that discard the
+  # card as well as the appropriate arbitrator for the selected card action.
+  #
+  class PlayCard < Instruction
+    arguments :player, :card_ref, :card_action
+
+    VALID_CARD_ACTIONS = %i(event influence coup realignment space)
+
+    def after_init
+      unless VALID_CARD_ACTIONS.include?(card_action)
+        raise "bad card_action #{card_action.inspect}"
+      end
+    end
+
+    def action
+      discard = Instructions::Discard.new(player: player, card_ref: card_ref)
+
+      action_instructions =
+        case card_action
+        when :event
+          # TODO lookup card sequence
+        when :influence
+          Arbitrators::RestrictedInfluence.new
+        when :coup
+          Arbitrators::Coup.new
+        when :realignment
+          Arbitrators::RealignmentRoll.new
+        when :space
+          Arbitrators::SpaceRace.new
+        end
+
+      [discard, *action_instructions]
+    end
+  end
+
+  ##
+  # Removes +card+ from +player+ hand. The removed card is placed in the
+  # discard pile.
+  #
+  # In the case of the China Card, it is surrendered to the opponent by
+  # returing a SurrenderChinaCard instruction.
+  #
+  class Discard < Instruction
+    arguments :player, :card_ref
+
+    needs :cards, :hands, :discards
+
+    def action
+      card = cards.find_by_ref(card_ref)
+
+      if card.china_card?
+        return Instructions::SurrenderChinaCard.new
+      else
+        discards << card if hand.remove(player, card)
+      end
+    end
+  end
+
+  ##
+  # An instruction that does nothing. Typically used to signal that a player
+  # is either unable or is electing not to play.
+  #
+  class Noop < Instruction
+  end
+
 end
 
 ### MoveArbitrators
@@ -335,6 +397,24 @@ module Arbitrators
       end
     end
 
+    def correct_player?(move)
+      # XXX
+      #
+      # UGH - this surfaces the whole 'do we need a player attr on Move and
+      # sometimes on the Instruction as well' problem. At least ringfence it
+      # into here for now.
+      #
+      # XXX
+      instruction_player =
+        move.instruction &&
+        move.instruction.respond_to?(:player) &&
+        move.instruction.player
+
+      instruction_player ?
+        player == instruction_player && player == move.player :
+        player == move.player
+    end
+
     def hint() noimpl end
   end
 
@@ -355,27 +435,138 @@ module Arbitrators
 
     # TODO use minitest assertions?
     def accepts?(move)
-      move.player == player &&
+      correct_player?(move) &&
         move.instruction.influence == influence &&
         country_names.include?(move.instruction.country_name) &&
         move.instruction.amount <= remaining_influence
     end
   end
 
-  class WipCardPlay < MoveArbitrator
+  class CardPlay < MoveArbitrator
+    OPERATIONS = %i(coup realignment influence space)
+
     arguments :player
 
-    needs :space_race, :hands
+    needs :deck, :china_card, :space_race, :hands, :cards
 
+    # used for tracking state over two-instruction plays
+    attr_accessor :previous_card, :previous_action
+
+    def after_execute(move)
+      if noop?(move) || second_part?
+        complete
+      else
+        card = cards.find_by_ref(move.instruction.card_ref)
+
+        if card.side == player.opponent && !space?(move)
+          self.previous_card   = move.instruction.card_ref
+          self.previous_action = move.instruction.card_action
+        else
+          complete
+        end
+      end
+    end
+
+    ##
+    # Checks the move is valid against numerous conditions.
+    #
+    # If the player is unable to play a card (i.e. empty hand) then accept
+    # a noop instruction.
+    #
+    # Otherwise, check the move contains a CardPlay instruction and that the
+    # player has the card in hand (or is playable in the case of the china
+    # card).
+    #
+    # If the card contains an opponent event, then also verify that two moves
+    # are played -- one for an event and one for an operation, in either order
+    # and using the same card.
+    #
+    # If the card contains an opponent event, but is being spaced, then ensure
+    # a one part move.
+    #
+    # Other conditions, such as space race eligiblity are validated upstream
+    # by permission modifiers.
+    #
     def accepts?(move)
-      # check space race eligibility
-      # check card in hand
+      return false unless correct_player?(move)
+
+      if able_to_play?
+        card_play?(move) && valid_card?(move)
+      else
+        noop?(move)
+      end
+    end
+
+    ##
+    # The player is able to play if this is the second part of a card play,
+    # or their hand is not empty.
+    #
+    def able_to_play?
+      second_part? || !hands.hand(player).empty?
+    end
+
+    def noop?(move)
+      Instructions::Noop === move.instruction
+    end
+
+    def card_play?(move)
+      Instructions::PlayCard === move.instruction
+    end
+
+    def valid_card?(move)
+      if second_part?
+        same_card_as_previous?(move) && opposing_action?(move)
+      else
+        card_in_possession?(move)
+      end
+    end
+
+    def space?(move)
+      move.instruction.card_action == :space
+    end
+
+    def opposing_action?(move)
+      action = move.instruction.card_action
+
+      if action == :event
+        OPERATIONS.include?(previous_action)
+      else
+        previous_action == :event
+      end
+    end
+
+    def same_card_as_previous?(move)
+      previous_card && previous_card == move.instruction.card_ref
+    end
+
+    def card_in_possession?(move)
+      card = cards.find_by_ref(move.instruction.card_ref)
+
+      if card.china_card?
+        china_card.playable_by?(player)
+      else
+        hands.hand(player).include?(card)
+      end
+    end
+
+    ##
+    # Is this the second part of a two-part move?
+    #
+    # This is only known for sure once the first move has been executed.
+    #
+    def second_part?
+      previous_card || previous_action
     end
   end
 end
 
 ### Modifiers
 
+##
+# Always says no to every move.
+#
+# Used for testing.
+#
 class NegativePermissionModifier
   def allows?(move)
     false
@@ -394,6 +585,55 @@ class StackModifier
     work_items.push(*@items_to_insert)
 
     @seen = true
+  end
+end
+
+
+class PermissionModifier
+  extend Injectible
+
+  def allows?(move)
+    noimpl
+  end
+end
+
+##
+# Updates and consults with the SpaceRace class to ensure each move is
+# made in compliance with current space race restrictions.
+#
+class SpaceRacePermissionModifier < PermissionModifier
+
+  needs :space_race
+
+  def allows?(move)
+    return true # TODO
+    # note move and see if space race will allow it.
+    #
+    # update space race component.
+    #
+    # if spacing and player has used up space race, return false.
+  end
+end
+
+##
+# Rejects any attempt to play the China Card as an event.
+#
+# Should be present as a permission modifier throughout the game.
+#
+class ChinaCardPermissionModifier < PermissionModifier
+
+  needs :cards, :china_card
+
+  def allows?(move)
+    !eventing_china_card?(move)
+  end
+
+  def eventing_china_card?(move)
+    return false unless Instructions::PlayCard === move
+
+    card = cards.find_by_ref(move.instruction.card_ref)
+
+    card.china_card? && move.instruction.card_action == :event
   end
 end
 

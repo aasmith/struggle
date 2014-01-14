@@ -30,6 +30,32 @@ g.accept(
   )
 )
 
+# skip headline for now...
+
+# play opponent card, first for the event
+g.accept(
+  Move.new(
+    player: USSR,
+    instruction: Instructions::PlayCard.new(
+      player: USSR,
+      card_ref: "Defectors",
+      card_action: :event,
+    )
+  )
+)
+
+# and then for influence
+g.accept(
+  Move.new(
+    player: USSR,
+    instruction: Instructions::PlayCard.new(
+      player: USSR,
+      card_ref: "Defectors",
+      card_action: :influence,
+    )
+  )
+)
+
 p g.hint
 
 require 'pp'

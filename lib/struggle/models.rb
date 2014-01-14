@@ -185,7 +185,7 @@ module Instructions
   end
 
   class ImproveDefcon < Instruction
-    needs :defcon, :phasing_player
+    needs :defcon
 
     def action
       defcon.improve(1)

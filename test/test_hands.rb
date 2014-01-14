@@ -9,17 +9,15 @@ class HandsTest < Struggle::Test
     assert h.get(USSR).empty?
   end
 
-  def test_hands_are_frozen
+  def test_any_returned_hands_are_frozen
     h = Hands.new
     c = Object.new
 
     h.add(USSR, c)
 
-    ex = assert_raises(RuntimeError) do
-      h.get(USSR) << Object.new
-    end
-
-    assert_match(/can't modify frozen Array/, ex.message)
+    assert h.get(USSR).frozen?,    "Hand should be frozen"
+    assert h.clear(USSR).frozen?,  "Hand should not be modifiable via clear"
+    assert h.add(USSR, c).frozen?, "Hand should not be modifiable via add"
   end
 
   def test_add
@@ -30,5 +28,32 @@ class HandsTest < Struggle::Test
 
     assert_equal [c], h.get(USSR), "USSR should have one card in their hand"
     assert_equal [],  h.get(US),   "US should have no cards in their hand"
+
+    h.add(US, c)
+
+    assert_equal [c], h.get(USSR), "USSR should have one card in their hand"
+    assert_equal [c], h.get(US),  "US should have one card in their hand"
+  end
+
+  def test_remove
+    h = Hands.new
+    c = Object.new
+
+    h.add(USSR, c)
+
+    assert_equal c, h.remove(USSR, c), "Should return removed card"
+
+    assert_nil h.remove(USSR, c), "Should return nil if the card is not present"
+  end
+
+  def test_clear
+    h = Hands.new
+    c = Object.new
+
+    h.add(USSR, c)
+    h.add(US, c)
+
+    assert_equal [],  h.clear(USSR), "USSR should have no cards"
+    assert_equal [c], h.get(US), "US hand should still be populated"
   end
 end

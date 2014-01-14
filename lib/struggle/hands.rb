@@ -5,7 +5,7 @@ class Hands
   end
 
   def add(player, card)
-    @hands.fetch(player) << card
+    (@hands.fetch(player) << card).dup.freeze
   end
 
   def remove(player, card)
@@ -19,7 +19,7 @@ class Hands
   alias hand get
 
   def clear(player)
-    @hands.fetch(player).clear
+    @hands.fetch(player).clear.dup.freeze
   end
 end
 

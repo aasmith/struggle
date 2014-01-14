@@ -8,6 +8,11 @@ class Cards
     @cards = cards
   end
 
+  def find_by_ref(ref)
+    detect { |card| card.ref == ref } or
+      raise "Couldnt find card with reference #{ref.inspect}"
+  end
+
   def each(&block)
     @cards.each(&block)
   end

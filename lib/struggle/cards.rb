@@ -54,15 +54,14 @@ class Cards
         ops: 3,
         side: US,
       ),
-      # TODO move this somewhere else
-      # Card.new(
-      #   ref: "TheChinaCard",
-      #   id: 6,
-      #   name: "The China Card",
-      #   phase: :early,
-      #   ops: 4,
-      #   side: nil,
-      # ),
+       Card.new(
+         ref: "TheChinaCard",
+         id: 6,
+         name: "The China Card",
+         phase: :early,
+         ops: 4,
+         side: nil,
+      ),
       Card.new(
         ref: "SocialistGovernments",
         id: 7,

@@ -30,4 +30,8 @@ class ChinaCard
     transfer(superpower)
     flip_up
   end
+
+  def playable_by?(player)
+    playable? && holder == player
+  end
 end

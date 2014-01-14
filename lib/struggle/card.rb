@@ -31,5 +31,13 @@ class Card
   def ops!
     @ops
   end
+
+  def china_card?
+    ref == "TheChinaCard"
+  end
+
+  def contains_event?
+    !china_card?
+  end
 end
 

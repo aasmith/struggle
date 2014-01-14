@@ -150,7 +150,7 @@ module Instructions
     needs :cards, :deck
 
     def action
-      deck.add(cards.select { |c| c.phase == phase })
+      deck.add(cards.select { |c| c.phase == phase && !c.china_card? })
     end
   end
 
@@ -162,6 +162,15 @@ module Instructions
     def action
       china_card.holder = player
       china_card.playable = playable
+    end
+  end
+
+  class SurrenderChinaCard < Instruction
+    needs :china_card
+
+    def action
+      china_card.holder = china_card.holder.opponent
+      china_card.playable = false
     end
   end
 

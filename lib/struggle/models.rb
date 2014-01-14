@@ -576,15 +576,15 @@ end
 class StackModifier
   def initialize(*items_to_insert)
     @items_to_insert = items_to_insert
-    @seen = false # execute this only once
+    @executed = false # execute this only once
   end
 
   def notify(event, move, work_items)
-    return if @seen
+    return if @executed
 
     work_items.push(*@items_to_insert)
 
-    @seen = true
+    @executed = true
   end
 end
 

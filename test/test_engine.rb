@@ -204,9 +204,6 @@ class TestEngine < Struggle::Test
     refute e.peek, "Should be nothing left in stack"
   end
 
-  def xtest_modifier_lifecycle
-  end
-
   def test_work_items_are_injected
     item = I::EmptyInstruction.new
 

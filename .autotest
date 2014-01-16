@@ -4,14 +4,9 @@ require "autotest/restart"
 
 Autotest.add_hook :initialize do |at|
 
-  at.extra_files << "./s.rb"
-
-  at.add_mapping(/s.rb/) do |f, _|
-    at.files_matching(/test_.*rb$/)
+  %w[.git .DS_Store ._* tmp log doc docs Attic tags].each do |exception|
+    at.add_exception(exception)
   end
 
 end
 
-# Autotest.add_hook :run_command do |at|
-#   system "rake build"
-# end

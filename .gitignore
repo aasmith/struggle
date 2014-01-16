@@ -4,4 +4,5 @@ bin/*
 !.gitignore
 !.autotest
 Gemfile.lock
+tags
 

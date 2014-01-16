@@ -51,14 +51,12 @@ g.accept Moves::HeadlineCardPlay.new(USSR, Comecon)
 
 puts "Expecting US headline"
 p g.expectations.explain
-
 # Awaits a usa headline play
 g.accept Moves::HeadlineCardPlay.new(US, TrumanDoctrine)
 
 
 puts "Expect summary of headline cards played"
 g.status # "Headline plays: USSR Comecon, USA Truman Doctrine"
-
 
 # Players may now execute moves according to ordering (ussr first)
 
@@ -117,7 +115,6 @@ g.accept Moves::Influence.new(USSR, C[:thailand], +1)
 g.accept Moves::Influence.new(USSR, C[:thailand], +1)
 g.accept Moves::Influence.new(USSR, C[:vietnam], +1)
 
-# Stupid move, this is a no-op...
 g.accept Moves::CardPlay.new(US, Nato, :event)
 
 g.accept Moves::CardPlay.new(USSR, FiveYearPlan, [:event, :influence])
@@ -141,5 +138,12 @@ g.accept Moves::Influence.new(US, C[:finland], -1)
 
 g.accept Moves::CardPlay.new(USSR, EuropeScoring, :event)
 g.accept Moves::EuropeScoring.new(USSR)
+
+p g.expectations.explain
+
+p g.expectations
+p g.modifiers
+
+g._debug_cards
 
 File.write "game.out", Marshal.dump(g)

@@ -62,9 +62,9 @@ quagmire
  - realignment
  - scoring card
 
- ~ hand/deck management (including discarding of event cards etc)
+ X hand/deck management (including discarding of event cards etc)
  - china card management - this is not in the "hand", also has flipped state
- ~ turn/round/player tracking: possibly some kind of executor inserted
+ X turn/round/player tracking: possibly some kind of executor inserted
    between ordered expectations? - player tracking remaining
 
  - explain why rejections occur - make Validators print in a readable way
@@ -73,6 +73,14 @@ quagmire
  - OMG TESTS (unit and integration)
  - look in manual for italicised examples of play for good integration tests
      i.e. Section 5.2 - examples 1-4
+
+ - unit tests for cards needs much game context - make this easier. currently
+   card testing is really only in play.rb
+
+events that occur during the headline phase are not logged as happening, and
+are therefore not removed from play. maybe the validators should expect a
+subsequent CardPlay move with that card to occur as an event
+
 
 FIXED
 =====
@@ -98,7 +106,18 @@ engine implementation:
 Early War:
 
    6. China Card
+
   26. CIA Created
+
+    - Needs a mechanism for revealing USSR hand. This should probably be done
+      with a Modifier.
+      
+      A call to some hand-management method asking for the opponents cards
+      should usually fail, except when this modifier is in place?
+
+    - Needs a way to set expectations for a influence/coup/realignment. This
+      logic currently sits inside Moves::CardPlay and should be extracted.
+
   32. UN Intervention
   35. Formosan Resolution
  103. Defectors

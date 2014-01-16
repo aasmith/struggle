@@ -1,5 +1,6 @@
 # encoding: UTF-8
 
+raise "zzzzzzzzzz"
 require "country_data"
 
 class Game
@@ -89,6 +90,8 @@ class Game
     add_immediate_expectations new_validators
     add_modifiers new_modifiers
 
+    puts "DERPPPPPPPP"
+    p action_or_move
     action_or_move.after
 
     history.add action_or_move
@@ -170,7 +173,7 @@ class UnacceptableActionOrMove < StandardError
   end
 
   def to_s
-    <<-ERR.strip.gsub(/^\s+/,"  ")
+    <<-ERR.strip.squeeze
     Invalid move or action.
     Move: #{@action_or_move.inspect}
     could not be matched against:
@@ -421,7 +424,7 @@ end
 module Moves
   class Move
     def to_s
-      "Move TODO in #{self.class.name}"
+      "Move#to_s TODO in #{self.class.name}"
     end
 
     def execute
@@ -444,6 +447,7 @@ module Moves
   # The representation of playing a card. The resulting moves the player
   # may make are not part of a CardPlay.
   class CardPlay < Move
+
     # The player taking the action.
     attr_accessor :player
 
@@ -658,6 +662,7 @@ module Moves
     end
 
     def after
+      puts "xxxxxxxxx"
       remove_or_discard_card
     end
 
@@ -665,6 +670,7 @@ module Moves
     # the card should have any lasting effect after play, then this is
     # captured in a Modifier.
     def remove_or_discard_card
+      p [card.remove_after_event, event_executed?]
       if card.remove_after_event? && event_executed?
         removed.add(card)
       else
@@ -697,7 +703,9 @@ module Moves
 
     def headline?; true; end
 
-    def execute; end
+    def execute
+      mark_event_executed
+    end
 
     def to_s
       "%s headlines %s" % [player, card]
@@ -797,7 +805,7 @@ module Moves
     def execute
       defcon.decrease(player, 1) if country.battleground?
 
-      todo "increase military ops by score"
+      todo "increase military ops by score" # if not a free coup
 
       stability = country.stability * 2
 
@@ -827,6 +835,9 @@ module Moves
 
   # An alternate version of a Coup used in "free coup" moves that doesn't
   # test for geographic/defcon qualifiers (Section 6.3.5)
+  #
+  # Does not count toward milary ops (Section 8.2.5)
+  #
   class FreeCoup < Coup
     def can_coup?(defcon)
       country.presence?(player.opponent)
@@ -967,7 +978,6 @@ module Moves
     end
 
     def execute
-      # TODO: all of this
       if boycott?
         defcon.decrease(sponsor, 1)
         todo "play_as_4_op_card"
@@ -1587,6 +1597,11 @@ module Validators
         expected_player == move.player &&
         accessible_countries.include?(move.country) &&
         move.affordable?
+    end
+
+    def explain
+      "%s to place influence per regular influence-placement rules" %
+        expected_player
     end
   end
 
@@ -2381,6 +2396,19 @@ class Game
     Country.find(:united_kingdom, countries).add_influence!(US, 5)
 
     @starting_influence_placed = true
+  end
+
+  # TODO utility method for debugging -- remove.
+  def _debug_cards
+    require 'pp'
+
+    puts "HAND/CARD STATUS", ""
+
+    %w(deck discarded removed hands).each do |attr|
+      puts attr.capitalize, "-"*attr.size
+      pp send(attr)
+      puts
+    end
   end
 end
 

@@ -1,7 +1,7 @@
 class Game
   attr_accessor :countries, :deck, :turn, :defcon, :china_card, :space_race,
                 :cards, :military_ops, :victory_track, :hands, :phasing_player,
-                :discards, :removed, :limbo, :victory
+                :current_cards, :discards, :removed, :limbo, :victory
 
   def initialize
     @engine = Engine.new
@@ -21,6 +21,9 @@ class Game
     self.phasing_player = PhasingPlayer.new
 
     self.hands = Hands.new
+
+    # Cards that are currently being played.
+    self.current_cards = []
 
     self.discards = []
     self.removed = []

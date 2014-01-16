@@ -9,6 +9,30 @@
 # currently repeated in several places.
 #
 # TurnEnd is assumed to fire upon advancement of the turn marker (4.5 H).
+#
+# Cards that are instead returned to the discard pile if the opponent triggers
+# the event but the event does not occur (See 5.2 example 4):
+#
+#  - Star Wars
+#  - Kitchen Debates
+#  - Our Man in Tehran (optional card)
+#
+# TODO RE: DISCARD/REMOVE/LIMBO:
+#
+# The removing/discarding/limboing of a card as part of event play must be
+# expressed as an instruction in the list of instructions that make up an
+# event. This is because only the event instructions themselves can
+# communicate the concept of an event being triggered and executing through
+# to its end. Certain cards, such as those above may have an event that is not
+# fully executed.
+#
+# See Decolonization, TrumanDoctrine, StarWars and ShuttleDiplomacy for
+# examples of cards that manage their own disposal. TODO All cards need to do
+# this.
+#
+# TODO does this mean the remove_after_event and other fields should be
+# remvoed from the Card class?
+#
 
 # Constant Definitions
 
@@ -81,7 +105,8 @@ Decolonization = [
     influence: USSR,
     limit_per_country: 1,
     countries: [Africa, SoutheastAsia],
-    total_influence: 4)
+    total_influence: 4),
+  Discard(Decolonization)
 ]
 
 TrumanDoctrine = [
@@ -91,7 +116,8 @@ TrumanDoctrine = [
     countries: lambda { Europe.uncontrolled },
     limit_per_country: all_influence(USSR),
     total_countries: 1
-  )
+  ),
+  Remove(TrumanDoctrine)
 ]
 
 SuezCrisis = [
@@ -116,6 +142,7 @@ SocialistGovernments = [
 ]
 
 EastEuropeanUnrest = [
+  # TODO Use an If here for determining early/mid/late actions
   RemoveInfluence(
     player: US,
     influence: USSR,
@@ -539,6 +566,8 @@ AllianceForProgress = [
   )
 ]
 
+# Needs a Requires condition because of leading if.
+# See NOTES and section 5.2 ex4
 KitchenDebates = [
   AwardVictoryPoints(
     player: US,
@@ -840,11 +869,17 @@ FiveYearPlan = [
 # PickFromDiscard should always show the opponent the picked card.
 #
 StarWars = [
-  Requires(condition: lambda { game.space_race(US) > game.space_race(USSR) }),
-  PickFromDiscard(
-    player: US,
-    ops: [:>=, 1], # Not a scoring card
-    execute_event: true
+  If(
+    lambda { game.space_race(US) > game.space_race(USSR) }),
+    [
+      PickFromDiscard(
+        player: US,
+        ops: [:>=, 1], # Not a scoring card
+        execute_event: true
+      ),
+      Remove(StarWars)
+    ],
+    Discard(StarWars)
   )
 ]
 
@@ -1713,7 +1748,8 @@ Chernobyl = [
 # either the discard or removed-from-play pile.
 #
 ShuttleDiplomacy = [
-  AddModifier(Modifiers::ShuttleDiplomacy)
+  AddModifier(Modifiers::ShuttleDiplomacy),
+  Limbo(ShuttleDiplomacy)
 ]
 
 asian_mideast_battlegrounds = Countries.select do |c|
@@ -1749,6 +1785,7 @@ Modifiers::ShuttleDiplomacy = [
           end
         end
       ),
+      # This is how the card gets from limbo back to discard pile...
       Discard(
         card: ShuttleDiplomacy
       )
@@ -1764,64 +1801,5 @@ Modifiers::ShuttleDiplomacy = [
       )
     )
   )
-]
-
-
-#############################################################
-
-__END__
-
-ActionRound = [
-  ExpectMove(),
-  ExpectMove(),
-  ActionRoundEnd
-]
-
-class SixTurnActionRound
-  needs :turn
-
-  attr_accessor :turn
-
-  def reduce
-    [
-      HeadlineRound,
-      ActionRound,
-      ActionRound,
-      ActionRound,
-      ActionRound,
-      ActionRound,
-      ActionRound,
-      TurnEnd(turn: turn)
-    ]
-  end
-end
-
-SixTurnActionRound = [
-  HeadlineRound,
-  ActionRound,
-  ActionRound,
-  ActionRound,
-  ActionRound,
-  ActionRound,
-  ActionRound,
-  TurnEnd
-]
-
-EarlyPhase = [
-  SixTurnActionRound(turn: 1),
-  SixTurnActionRound(turn: 2),
-  SixTurnActionRound(turn: 3)
-]
-
-MidPhase = [
-  AddMidCards,
-  ...
-]
-
-Game = [
-  EarlyPhase,
-  MidPhase,
-  LatePhase,
-  FinalScoring
 ]
 

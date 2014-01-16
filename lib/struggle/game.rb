@@ -156,14 +156,19 @@ ActionRound = List(
 HeadlinePhase = List()
 
 # TODO
-EndActionRound = List()
+EndActionRounds = List()
 
 EarlyPhaseTurn = List(
   I(:ImproveDefcon),
   I(:DealCards, target: 8),
   HeadlinePhase,
-  ActionRound, # x6
-  EndActionRound, # for certain events to trigger off of
+  ActionRound,
+  ActionRound,
+  ActionRound,
+  ActionRound,
+  ActionRound,
+  ActionRound,
+  EndActionRounds, # for certain events to trigger off of
   I(:CheckMilitaryOps),
   I(:ResetMilitaryOps),
   I(:CheckHeldCards), # check no scoring cards
@@ -181,8 +186,14 @@ MidPhaseTurn = List(
   I(:ImproveDefcon),
   I(:DealCards, target: 9),
   HeadlinePhase,
-  ActionRound, # x7
-  EndActionRound, # for certain events to trigger off of
+  ActionRound,
+  ActionRound,
+  ActionRound,
+  ActionRound,
+  ActionRound,
+  ActionRound,
+  ActionRound,
+  EndActionRounds, # for certain events to trigger off of
   I(:CheckMilitaryOps),
   I(:ResetMilitaryOps),
   I(:CheckHeldCards), # check no scoring cards
@@ -202,8 +213,14 @@ LatePhaseTurn = List(
   I(:ImproveDefcon),
   I(:DealCards, target: 9),
   HeadlinePhase,
-  ActionRound, # x7
-  EndActionRound, # for certain events to trigger off of
+  ActionRound,
+  ActionRound,
+  ActionRound,
+  ActionRound,
+  ActionRound,
+  ActionRound,
+  ActionRound,
+  EndActionRounds, # for certain events to trigger off of
   I(:CheckMilitaryOps),
   I(:ResetMilitaryOps),
   I(:CheckHeldCards), # check no scoring cards

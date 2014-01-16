@@ -1,5 +1,3 @@
-require "country_data"
-
 class Countries
 
   include Enumerable

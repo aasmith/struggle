@@ -9,6 +9,8 @@ require "struggle/injection"
 require "struggle/arguments"
 require "struggle/models"
 
+require "struggle/data/countries"
+
 require "struggle/card"
 require "struggle/cards"
 require "struggle/countries"

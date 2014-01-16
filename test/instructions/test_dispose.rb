@@ -3,7 +3,7 @@ require "helper"
 class InstructionTests::DisposeTest < Struggle::Test
 
   def test_surrenders_china_card
-    instruction = Instructions::Dispose.new(card_ref: "SomeCard")
+    instruction = Instructions::Dispose.new(card_ref: "TheChinaCard")
     instruction.cards = AlwaysChinaCards.new
 
     instructions = instruction.action
@@ -15,7 +15,7 @@ class InstructionTests::DisposeTest < Struggle::Test
   end
 
   def test_discards_card
-    instruction = Instructions::Dispose.new(card_ref: "SomeCard")
+    instruction = Instructions::Dispose.new(card_ref: "NotTheChinaCard")
     instruction.cards = NeverChinaCards.new
 
     instructions = instruction.action

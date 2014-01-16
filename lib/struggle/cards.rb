@@ -327,13 +327,13 @@ class Cards
         side: US,
         always_evaluate_first: true # for headlines only
       ),
-        Card.new(
-          ref: "BrushWar",
-          id: 36,
-          name: "Brush War",
-          phase: :mid,
-          ops: 3,
-          side: nil,
+      Card.new(
+        ref: "BrushWar",
+        id: 36,
+        name: "Brush War",
+        phase: :mid,
+        ops: 3,
+        side: nil,
       ),
       Card.new(
         ref: "CentralAmericaScoring",

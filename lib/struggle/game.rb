@@ -135,17 +135,16 @@ Setup = List(
   StartingInfluence
 )
 
-# TODO
-ExpectMove = List()
-
 UssrActionRound = List(
   Instruction(:SetPhasingPlayer, player: USSR),
-  Arbitrator(:CardPlay, player: USSR)
+  Arbitrator(:CardPlay, player: USSR),
+  Instruction(:DisposeCurrentCards)
 )
 
 UsActionRound = List(
   Instruction(:SetPhasingPlayer, player: US),
-  ExpectMove
+  Arbitrator(:CardPlay, player: US),
+  Instruction(:DisposeCurrentCards)
 )
 
 ActionRound = List(

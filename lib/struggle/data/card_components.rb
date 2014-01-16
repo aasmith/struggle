@@ -1786,7 +1786,9 @@ Modifiers::ShuttleDiplomacy = [
         end
       ),
       # This is how the card gets from limbo back to discard pile...
-      Discard(
+      TransferCard(
+        from: :limbo,
+        to:   :discards,
         card: ShuttleDiplomacy
       )
     ],

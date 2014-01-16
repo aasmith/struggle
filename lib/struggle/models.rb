@@ -296,8 +296,8 @@ module Instructions
   end
 
   ##
-  # Encapsulates playing a card. Returns instructions that discard the
-  # card as well as the appropriate arbitrator for the selected card action.
+  # Encapsulates playing a card. Returns the appropriate
+  # instructions/arbitrators for the selected card action.
   #
   class PlayCard < Instruction
     arguments :player, :card_ref, :card_action
@@ -319,18 +319,12 @@ module Instructions
         card_ref: card_ref
       )
 
-      dispose = Instructions::Dispose.new(
-        card_ref: card_ref
-      )
-
       action_instructions = case card_action
-        # Don't add disposal for event -- card events manage their own
-        # remove/discard/limbo.
         when :event       then sequence # TODO lookup card sequence
-        when :influence   then [Arbitrators::RestrictedInfluence.new, dispose]
-        when :coup        then [Arbitrators::Coup.new, dispose]
-        when :realignment then [Arbitrators::RealignmentRoll.new, dispose]
-        when :space       then [Arbitrators::SpaceRace.new, dispose]
+        when :influence   then Arbitrators::RestrictedInfluence.new
+        when :coup        then Arbitrators::Coup.new
+        when :realignment then Arbitrators::RealignmentRoll.new
+        when :space       then Arbitrators::SpaceRace.new
       end
 
       [remove_from_hand, add_to_current_cards, *action_instructions]
@@ -338,31 +332,31 @@ module Instructions
   end
 
   ##
-  # Removes the card from +current_cards+, and then discards it.
+  # Removes cards from +current_cards+, discarding if needed.
   #
   # In the case of the China Card, it is handed to the opponent.
   #
-  class Dispose < Instruction
-    arguments :card_ref
-
-    needs :cards
+  class DisposeCurrentCards < Instruction
+    needs :current_cards
 
     def action
-      remove_from_current_cards = Instructions::RemoveCurrentCard.new(
-        card_ref: card_ref
-      )
+      instructions = []
 
-      card = cards.find_by_ref(card_ref)
+      current_cards.each do |card|
+        remove_from_current_cards = Instructions::RemoveCurrentCard.new(
+          card_ref: card.ref
+        )
 
-      discard_or_surrender = card.china_card? ?
-        Instructions::SurrenderChinaCard.new :
-        Instructions::Discard.new(card_ref: card_ref)
+        discard_or_surrender = card.china_card? ?
+          Instructions::SurrenderChinaCard.new :
+          Instructions::Discard.new(card_ref: card.ref)
 
-      [remove_from_current_cards, discard_or_surrender]
+        instructions.push remove_from_current_cards, discard_or_surrender
+      end
+
+      instructions
     end
   end
-
-  # Unambiguous card dumping instructions
 
   card_dumpers = [
     %i(Discard discards),
@@ -376,16 +370,23 @@ module Instructions
   #   class Remove  < Instruction
   #   class Limbo   < Instruction
   #
+  # Discards/Removes/Limbos the specified card, unless it is already in any
+  # of the three piles.
+  #
   card_dumpers.each do |class_name, card_pile_name|
     klass = Class.new(Instruction) do
       arguments :card_ref
 
-      needs :cards, card_pile_name
+      needs :cards, :discards, :removed, :limbo
 
       define_method :action do
         card = cards.find_by_ref(card_ref)
 
-        send(card_pile_name) << card
+        already_disposed = %i(discards removed limbo).any? do |pile|
+          send(pile).include?(card)
+        end
+
+        send(card_pile_name) << card unless already_disposed
       end
     end
 

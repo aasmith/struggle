@@ -1,10 +1,10 @@
 require "helper"
 
-class InstructionTests::DisposeTest < Struggle::Test
+class InstructionTests::DisposeCurrentCardsTest < Struggle::Test
 
   def test_surrenders_china_card
-    instruction = Instructions::Dispose.new(card_ref: "TheChinaCard")
-    instruction.cards = AlwaysChinaCards.new
+    instruction = Instructions::DisposeCurrentCards.new
+    instruction.current_cards = [FakeChinaCard.new]
 
     instructions = instruction.action
 
@@ -15,8 +15,8 @@ class InstructionTests::DisposeTest < Struggle::Test
   end
 
   def test_discards_card
-    instruction = Instructions::Dispose.new(card_ref: "NotTheChinaCard")
-    instruction.cards = NeverChinaCards.new
+    instruction = Instructions::DisposeCurrentCards.new
+    instruction.current_cards = [FakeNotChinaCard.new]
 
     instructions = instruction.action
 
@@ -26,15 +26,23 @@ class InstructionTests::DisposeTest < Struggle::Test
     assert_kind_of Instructions::Discard,           instructions[1]
   end
 
-  class AlwaysChinaCards
-    def find_by_ref(_)
-      Struct.new(:china_card?).new(true)
+  class FakeChinaCard
+    def ref
+      "cc"
+    end
+
+    def china_card?
+      true
     end
   end
 
-  class NeverChinaCards
-    def find_by_ref(_)
-      Struct.new(:china_card?).new(false)
+  class FakeNotChinaCard
+    def ref
+      "ncc"
+    end
+
+    def china_card?
+      false
     end
   end
 

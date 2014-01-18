@@ -1,9 +1,5 @@
 ## EXAMPLE MODELS
 
-### Misc
-
-def noimpl() raise("%s Not Implemented" % [caller_locations.first.to_s]) end
-
 ### Instructions
 
 module Instructions
@@ -68,7 +64,7 @@ class PermissionModifier
   extend Injectible
 
   def allows?(move)
-    noimpl
+    raise NotImplementedError
   end
 end
 

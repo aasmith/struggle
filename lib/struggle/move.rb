@@ -11,7 +11,7 @@ class Move
   end
 
   def executed?
-    noimpl
+    raise NotImplementedError
   end
 end
 

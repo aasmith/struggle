@@ -6,7 +6,9 @@ class MoveArbitrator < WorkItem
     @executed_moves = []
   end
 
-  def accepts?(move) noimpl end
+  def accepts?(move)
+    raise NotImplementedError
+  end
 
   def accept(move)
     before_execute(move)
@@ -51,8 +53,6 @@ class MoveArbitrator < WorkItem
       player == instruction_player && player == move.player :
       player == move.player
   end
-
-  def hint() noimpl end
 
 end
 

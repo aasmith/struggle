@@ -6,7 +6,7 @@ class Instruction < WorkItem
   end
 
   def action
-    noimpl
+    raise NotImplementedError
   end
 
   ##

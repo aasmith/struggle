@@ -97,5 +97,15 @@ class Country
 
   alias inspect to_s
 
+  # Duplicates the influence hash.
+  #--
+  # This is called on the new copy of the class. The original is passed in,
+  # if needed.
+
+  def initialize_copy(orig)
+    super
+    @influence = @influence.dup
+  end
+
   NegativeInfluenceError = Class.new(ArgumentError)
 end

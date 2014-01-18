@@ -132,5 +132,15 @@ class TestCountry < Struggle::Test
     refute isolated.player_adjacent_to_superpower?(USSR)
     refute isolated.player_adjacent_to_superpower?(US)
   end
+
+  def test_dup
+    c = Country.new("A", 1, false, [], [])
+
+    d = c.dup
+
+    refute_same c.instance_variable_get("@influence"),
+      d.instance_variable_get("@influence"),
+      "Influence hash should be duplicated"
+  end
 end
 

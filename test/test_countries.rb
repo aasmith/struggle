@@ -39,4 +39,11 @@ class TestCountries < Struggle::Test
   def test_find_not_found
     assert_raises(Countries::CountryNotFoundError) { @countries.find(:xyz) }
   end
+
+  def test_dup
+    d = @countries.dup
+
+    refute_same d.find(:poland), @countries.find(:poland),
+      "Each country should be duplicated"
+  end
 end

@@ -6,6 +6,10 @@ class Countries
     @countries = data.map { |row| Country.new(*row) }
   end
 
+  def initialize_copy(orig)
+    @countries = @countries.map(&:dup)
+  end
+
   ##
   # Looks through the given array of countries for an unambiguous
   # match on country name. Name can be a String or Symbol.

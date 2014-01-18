@@ -3,16 +3,14 @@
 require "rubygems"
 require "hoe"
 
-# Hoe.plugin :compiler
-# Hoe.plugin :gem_prelude_sucks
-# Hoe.plugin :inline
-# Hoe.plugin :racc
-# Hoe.plugin :rcov
-# Hoe.plugin :rubyforge
-
 Hoe.spec "struggle" do
   developer("Andrew A Smith", "andy@tinnedfruit.org")
 
+  self.readme_file = "README.md"
+
+  self.extra_rdoc_files = FileList['*.md']
+
+  license ""
   # license "MIT" # this should match the license in the README
 end
 

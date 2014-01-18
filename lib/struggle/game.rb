@@ -47,6 +47,10 @@ class Game
   def hint
     @engine.peek
   end
+
+  def hand(player)
+    hands.get(player)
+  end
 end
 
 def Instruction(const, **named_args, &block)

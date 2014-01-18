@@ -17,7 +17,7 @@ class Countries
   # Not finding a country with the given name is considered an error.
   #
   def find(name)
-    name = Regexp.new(name.to_s.gsub(/_/, " "), :i)
+    name = /^#{name.to_s.gsub('_', ' ')}/i
 
     results = @countries.select do |country|
       country.name =~ name

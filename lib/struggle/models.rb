@@ -452,6 +452,7 @@ module Arbitrators
     def accepts?(move) noimpl end
 
     def accept(move)
+      before_execute(move)
       move.execute
       after_execute(move)
     end
@@ -459,6 +460,10 @@ module Arbitrators
     # Override in subclasses.
     def after_execute(move)
       complete
+    end
+
+    # Override in subclasses.
+    def before_execute(move)
     end
 
     def stash(move)

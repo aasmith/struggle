@@ -261,12 +261,12 @@ class TestEngine < Struggle::Test
     assert_equal 1, move.amount, "Amount should be reduced by modifier"
   end
 
-  class MoveAcceptor < Arbitrators::MoveArbitrator
+  class MoveAcceptor < MoveArbitrator
     def accepts?(move) move end # true if move is not nil
   end
 
   # Only marks itself as complete once it has accepted two moves.
-  class MultiMoveAcceptor < Arbitrators::MoveArbitrator
+  class MultiMoveAcceptor < MoveArbitrator
     def initialize(**)
       super
 

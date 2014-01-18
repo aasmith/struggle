@@ -5,8 +5,17 @@ require "struggle/superpowers"
 require "struggle/stack"
 require "struggle/engine"
 require "struggle/injection"
-
 require "struggle/arguments"
+
+require "struggle/move"
+require "struggle/work_item"
+require "struggle/instruction"
+require "struggle/move_arbitrator"
+
+require "struggle/instructions"
+require "struggle/arbitrators"
+
+# TODO delete or graduate components out of here.
 require "struggle/models"
 
 require "struggle/data/countries"

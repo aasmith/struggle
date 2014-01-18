@@ -43,14 +43,14 @@ class Engine
 
       injector.inject(work_item)
 
-      if Instructions::Instruction === work_item
+      if Instruction === work_item
         results = [*work_item.execute]
 
         @history << work_item
 
         @work_items.push(*results) if results.all? { |r| WorkItem === r }
 
-      elsif Arbitrators::MoveArbitrator === work_item
+      elsif MoveArbitrator === work_item
         work_item.execute_stashed_moves
 
         if work_item.complete?

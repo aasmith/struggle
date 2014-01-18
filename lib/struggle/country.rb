@@ -51,7 +51,6 @@ class Country
     @influence[player] -= amount
   end
 
-  # TODO: does this belong here? Maybe add to AddRestrictedInfluence instead
   def price_of_influence(player)
     controlled_by?(player.opponent) ? 2 : 1
   end
@@ -75,6 +74,8 @@ class Country
   def player_adjacent_to_superpower?(player)
     adjacent_superpower == player
   end
+
+  alias adjacent_superpower? player_adjacent_to_superpower?
 
   alias battleground? battleground
 

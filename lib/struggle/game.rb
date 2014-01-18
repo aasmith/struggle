@@ -136,12 +136,24 @@ Setup = List(
 )
 
 UssrActionRound = List(
+  # TODO might need this to comply with 6.1.1 -- capturing country markers
+  # that are in place at the begining of the player's AR
+  #
+  # sets game.countries_snapshot = game.countries.dup
+  #
+  # the AddRestrictedInfluence arbitrator can access this var instead.
+  #
+  # Instruction(:SnapshotCountries)
+
   Instruction(:SetPhasingPlayer, player: USSR),
   Arbitrator(:CardPlay, player: USSR),
   Instruction(:DisposeCurrentCards)
 )
 
 UsActionRound = List(
+  # TODO see above
+  # Instruction(:SnapshotCountries)
+
   Instruction(:SetPhasingPlayer, player: US),
   Arbitrator(:CardPlay, player: US),
   Instruction(:DisposeCurrentCards)

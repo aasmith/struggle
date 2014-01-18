@@ -319,15 +319,36 @@ module Instructions
         card_ref: card_ref
       )
 
-      action_instructions = case card_action
-        when :event       then sequence # TODO lookup card sequence
-        when :influence   then Arbitrators::RestrictedInfluence.new
-        when :coup        then Arbitrators::Coup.new
-        when :realignment then Arbitrators::RealignmentRoll.new
-        when :space       then Arbitrators::SpaceRace.new
-      end
+      action_instructions = send card_action
 
       [remove_from_hand, add_to_current_cards, *action_instructions]
+    end
+
+    # TODO lookup event instruction list
+    def event
+      Noop.new
+    end
+
+    def influence
+      Arbitrators::AddRestrictedInfluence.new(
+        player: player,
+        influence: player,
+        operation_points: ops #TODO determine card ops
+      )
+    end
+
+    #TODO all of the below
+
+    def coup
+      Arbitrators::Coup.new
+    end
+
+    def realignment
+      Arbitrators::RealignmentRoll.new
+    end
+
+    def space
+      Arbitrators::SpaceRace.new
     end
   end
 

@@ -4,6 +4,8 @@ require "minitest/mock"
 require "struggle"
 
 class Struggle::Test < Minitest::Test
+  parallelize_me!
+  make_my_diffs_pretty!
 end
 
 module InstructionTests end

@@ -34,6 +34,7 @@ class Engine
 
   def notify_stack_modifiers(move)
     @stack_modifiers.each do |mod|
+      # TODO Change this interface. Put the stuff into @work_items ourselves.
       mod.notify(:on, move, @work_items)
     end
   end
@@ -48,20 +49,19 @@ class Engine
       injector.inject(work_item)
 
       if Instruction === work_item
-        results = [*work_item.execute]
+        results = work_item.execute
 
         @history << work_item
 
-        if !results.empty? && results.all? { |r| WorkItem === r }
-          @work_items.push(*results)
-        end
+        push_onto_stack(*results) if all_work_items? results
 
       elsif MoveArbitrator === work_item
-        results = [*work_item.execute_stashed_moves]
+        results = work_item.execute_stashed_moves
 
-        if !results.empty? && results.all? { |r| WorkItem === r }
-          @work_items.push(*results)
+        if all_work_items? results
+          push_onto_stack(*results)
 
+        # TODO This branch needs a unit test.
         elsif work_item.complete?
           @history << work_item
           next
@@ -70,7 +70,7 @@ class Engine
 
           injector.inject(move.instruction)
 
-          @work_items.push work_item
+          push_onto_stack work_item
 
           stack_modified = @work_items.stack_changed? do
             notify_stack_modifiers(move)
@@ -84,9 +84,7 @@ class Engine
           else
             results = work_item.accept(move)
 
-            if !results.empty? && results.all? { |r| WorkItem === r }
-              @work_items.push(*results)
-            end
+            push_onto_stack(*results) if all_work_items? results
           end
 
           # Move has been used for this iteration, don't leave it lying
@@ -95,7 +93,7 @@ class Engine
 
         # Not able to accept this move, put the item back and stop the loop.
         else
-          @work_items.push work_item
+          push_onto_stack work_item
           break
 
         end
@@ -110,6 +108,16 @@ class Engine
     end
 
     d "LEAVING STACK LOOP"
+  end
+
+  def all_work_items?(items)
+    items = [*items]
+
+    !items.empty? && items.all? { |r| WorkItem === r }
+  end
+
+  def push_onto_stack *stuff
+    @work_items.push(*stuff)
   end
 
   ##

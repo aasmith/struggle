@@ -134,7 +134,95 @@ class TestEngine < Struggle::Test
     refute e.peek, "Should be nothing left to accept"
   end
 
+  def test_arbitrators_can_return_instructions
+    instructions = []
+
+    instruction1 = I::LambdaInstruction.new { instructions << "ex1" }
+    instruction2 = I::LambdaInstruction.new { instructions << "ex2" }
+    nested_instr = I::NestingInstruction.new(instruction1, instruction2)
+
+    arbitrator = MoveAcceptor.new
+
+    move = Move.new
+    move.player = USSR
+    move.instruction = nested_instr
+
+    e = Engine.new
+    e.add_work_item arbitrator
+
+    assert_equal arbitrator, e.peek, "Arbitrator should be waiting for a move"
+
+    refute nested_instr.complete?, "Arbitrator should not execute instruction"
+    refute instruction1.complete?, "Arbitrator should not execute instruction"
+    refute instruction2.complete?, "Arbitrator should not execute instruction"
+
+    e.accept move
+
+    assert nested_instr.complete?, "Arbitrator should execute given a move"
+    assert instruction1.complete?, "Arbitrator should execute given a move"
+    assert instruction2.complete?, "Arbitrator should execute given a move"
+
+    assert_equal %w(ex1 ex2), instructions, "Instructions should be in order"
+
+    assert arbitrator.complete?
+  end
+
   ### MODIFIERS
+
+  # Engine stack, with one stack modifier:
+  #
+  # [arbitrator]
+  #
+  # Add a move, the modifier fires, and the stack becomes
+  #
+  # [mod-new-instr, arbitrator(with stashed move)]
+  #
+  # Execution should still continue until the stack becomes
+  #
+  # [nested-instr]
+  #
+  # [instruction1, instruction2]
+  #
+  # []
+  #
+  def test_resumed_arbitrators_can_return_instructions
+    instructions = []
+
+    instruction1 = I::LambdaInstruction.new { instructions << "ex1" }
+    instruction2 = I::LambdaInstruction.new { instructions << "ex2" }
+    nested_instr = I::NestingInstruction.new(instruction1, instruction2)
+
+    arbitrator = MoveAcceptor.new
+
+    move = Move.new
+    move.player = USSR
+    move.instruction = nested_instr
+
+    new_instruction = I::EmptyInstruction.new
+
+    mod = StackModifier.new(new_instruction)
+
+    e = Engine.new
+    e.add_stack_modifier mod
+    e.add_work_item arbitrator
+
+    e.accept move
+
+    assert_nil e.peek!, "Engine should be empty"
+
+    assert new_instruction.complete?
+
+    assert nested_instr.complete?
+    assert instruction1.complete?
+    assert instruction2.complete?
+
+    assert move.executed?
+
+    assert_equal %w(ex1 ex2), instructions, "Instructions should be in order"
+
+    assert arbitrator.complete?, "Original arbitrator should be complete"
+
+  end
 
   def test_permission_modifier_denies_move
     arbitrator = MoveAcceptor.new
@@ -167,15 +255,15 @@ class TestEngine < Struggle::Test
   # This game will now need one extra move to empty the stack.
   #
   def test_stack_modifier_adds_items_to_stack
-    orig_arbitrator = MoveAcceptor.new
-    orig_move = EmptyMove.new
+    orig_arbitrator = MoveAcceptor.new label: :orig
+    orig_move = EmptyMove.new label: :orig
 
     new_instruction = I::EmptyInstruction.new
-    new_arbitrator = MoveAcceptor.new
+    new_arbitrator = MoveAcceptor.new label: :new
 
     mod = StackModifier.new(new_instruction, new_arbitrator)
 
-    new_move = EmptyMove.new
+    new_move = EmptyMove.new label: :new
 
     e = Engine.new
     e.add_stack_modifier mod
@@ -189,8 +277,11 @@ class TestEngine < Struggle::Test
     refute orig_move.executed?,
       "Original move should not be executed"
 
-    assert_equal new_instruction, e.peek!,
-      "Newly inserted instruction should be top of stack"
+    assert new_instruction.complete?,
+      "Newly inserted instruction should be complete"
+
+    assert_equal new_arbitrator, e.peek,
+      "Newly inserted arbitrator should be top of stack"
 
     e.accept new_move
 

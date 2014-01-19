@@ -39,7 +39,11 @@ class Engine
   end
 
   def accept(move)
+    d "ENTERING STACK LOOP"
+
     while work_item = @work_items.pop do
+
+      debug_start_of_iteration(work_item, move)
 
       injector.inject(work_item)
 
@@ -48,12 +52,17 @@ class Engine
 
         @history << work_item
 
-        @work_items.push(*results) if results.all? { |r| WorkItem === r }
+        if !results.empty? && results.all? { |r| WorkItem === r }
+          @work_items.push(*results)
+        end
 
       elsif MoveArbitrator === work_item
-        work_item.execute_stashed_moves
+        results = [*work_item.execute_stashed_moves]
 
-        if work_item.complete?
+        if !results.empty? && results.all? { |r| WorkItem === r }
+          @work_items.push(*results)
+
+        elsif work_item.complete?
           @history << work_item
           next
 
@@ -68,14 +77,23 @@ class Engine
           end
 
           if stack_modified
+            # stack has been modified, save the move inside
+            # the current work item, and continue the loop again
+            # from the top.
             work_item.stash move
-            break
           else
-            work_item.accept move
-            move = nil
+            results = work_item.accept(move)
 
+            if !results.empty? && results.all? { |r| WorkItem === r }
+              @work_items.push(*results)
+            end
           end
 
+          # Move has been used for this iteration, don't leave it lying
+          # around for the next one.
+          move = nil
+
+        # Not able to accept this move, put the item back and stop the loop.
         else
           @work_items.push work_item
           break
@@ -86,7 +104,12 @@ class Engine
         raise "unknown item #{work_item.inspect}"
 
       end
+
+      debug_end_of_iteration(work_item)
+
     end
+
+    d "LEAVING STACK LOOP"
   end
 
   ##
@@ -102,6 +125,41 @@ class Engine
   #
   def peek!
     @work_items.peek
+  end
+
+  private
+
+  def d(*msg)
+    puts(*msg) if DEBUG_ENGINE
+  end
+
+  def debug_start_of_iteration(work_item, move)
+    if DEBUG_ENGINE
+      puts
+      puts "START iteration"
+      puts "---------------------------"
+      puts "top of stack is"
+
+      pp work_item
+
+      if move
+        puts "move is"
+        pp move
+      else
+        puts "no move present"
+      end
+
+      puts "---------------------------"
+      puts
+    end
+  end
+
+  def debug_end_of_iteration(work_item)
+    if DEBUG_ENGINE
+      puts "end of iteration, work_item:"
+      pp work_item
+      puts "END iteration"
+    end
   end
 
 end

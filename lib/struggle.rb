@@ -39,3 +39,5 @@ require "struggle/victory_track"
 class Struggle
   VERSION = "1.0.0"
 end
+
+DEBUG_ENGINE = ENV["STRUGGLE_DEBUG_ENGINE"]

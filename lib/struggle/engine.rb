@@ -72,7 +72,7 @@ class Engine
 
           push_onto_stack work_item
 
-          stack_modified = @work_items.stack_changed? do
+          stack_modified = @work_items.monitor do
             notify_stack_modifiers(move)
           end
 

@@ -19,7 +19,7 @@ class Stack
   ##
   # 'Watches' the stack for any insertions or removals during execution of
   # +block+. If the stack has changed, then true is returned.
-  def stack_changed?(&block)
+  def monitor(&block)
     raise ArgumentError, "no block provided" unless block_given?
 
     before = @items.dup

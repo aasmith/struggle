@@ -1,3 +1,5 @@
+require "pp"
+
 require "minitest/autorun"
 require "minitest/mock"
 

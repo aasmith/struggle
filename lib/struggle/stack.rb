@@ -1,19 +1,19 @@
 
 class Stack
   def initialize
-    @stack = []
+    @items = []
   end
 
   def push(*items)
-    @stack.unshift(*items)
+    @items.unshift(*items)
   end
 
   def pop
-    @stack.shift
+    @items.shift
   end
 
   def peek
-    @stack.first
+    @items.first
   end
 
   ##
@@ -22,11 +22,11 @@ class Stack
   def stack_changed?(&block)
     raise ArgumentError, "no block provided" unless block_given?
 
-    before = @stack.dup
+    before = @items.dup
 
     block.call
 
-    after = @stack
+    after = @items
 
     before != after
   end

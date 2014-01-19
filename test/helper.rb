@@ -30,3 +30,11 @@ class EmptyMove < Move
   end
 end
 
+# No dot printing right now, thx
+#module Minitest
+#  class ProgressReporter
+#    undef record
+#    def record _
+#    end
+#  end
+#end

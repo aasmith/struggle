@@ -262,6 +262,11 @@ class TestEngine < Struggle::Test
   end
 
   class MoveAcceptor < MoveArbitrator
+    def initialize(**args)
+      @label = args.delete(:label)
+      super()
+    end
+
     def accepts?(move) move end # true if move is not nil
   end
 

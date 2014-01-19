@@ -12,7 +12,9 @@ module Instructions
 
   # Used for testing.
   class LambdaInstruction < Instruction
-    def initialize(*, &block)
+    def initialize(**_, &block)
+      super()
+
       @block = block
     end
 
@@ -23,6 +25,7 @@ module Instructions
 
   class If < Instruction
     def initialize(cond, cond_true, cond_false)
+      super()
     end
 
     def action

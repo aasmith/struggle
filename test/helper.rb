@@ -14,8 +14,9 @@ module ArbitratorTests end
 # Commonly used fake / empty test classes
 
 class EmptyMove < Move
-  def initialize(*)
-    super
+  def initialize(**args)
+    @label = args.delete(:label)
+    super(args)
 
     @executed = false
   end

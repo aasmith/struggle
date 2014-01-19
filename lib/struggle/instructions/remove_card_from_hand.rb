@@ -7,7 +7,7 @@ module Instructions
     def action
       card = cards.find_by_ref(card_ref)
 
-      hands.hand(player).remove(card)
+      hands.remove(player, card)
     end
   end
 end

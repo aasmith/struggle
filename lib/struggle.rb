@@ -1,4 +1,5 @@
 require 'delegate'
+require 'set'
 
 require "struggle/superpowers"
 

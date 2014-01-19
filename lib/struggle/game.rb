@@ -23,14 +23,14 @@ class Game
     self.hands = Hands.new
 
     # Cards that are currently being played.
-    self.current_cards = []
+    self.current_cards = Set.new
 
-    self.discards = []
-    self.removed = []
+    self.discards = Set.new
+    self.removed = Set.new
 
     # Limbo is for cards that stay on the board but get put into the discard
     # pile once they are cancelled (i.e. Shuttle Diplomacy).
-    self.limbo = []
+    self.limbo = Set.new
   end
 
   def start

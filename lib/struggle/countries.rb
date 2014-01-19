@@ -36,6 +36,10 @@ class Countries
     @countries.each(&block)
   end
 
+  def inspect
+    "<Countries ...>"
+  end
+
   AmbiguousNameError = Class.new(ArgumentError)
   CountryNotFoundError = Class.new(RuntimeError)
 end

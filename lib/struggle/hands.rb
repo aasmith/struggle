@@ -21,5 +21,9 @@ class Hands
   def clear(player)
     @hands.fetch(player).clear.dup.freeze
   end
+
+  def inspect
+    "<Hands: US: %s cards, USSR: %s cards>" % [get(US).size, get(USSR).size]
+  end
 end
 

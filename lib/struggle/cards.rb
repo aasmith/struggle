@@ -17,6 +17,10 @@ class Cards
     @cards.each(&block)
   end
 
+  def inspect
+    "<Card Database>"
+  end
+
   def generate_cards
     [
       Card.new(

@@ -24,5 +24,9 @@ class Deck
     @cards.size
   end
 
+  def inspect
+    "<Deck with #{size} cards>"
+  end
+
   EmptyDeckError = Class.new(RuntimeError)
 end

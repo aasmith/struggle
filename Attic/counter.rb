@@ -145,6 +145,8 @@ class TestCounter < Minitest::Test
     self.rs = ExtraCount.new(-1)
   end
 
+  # TODO the names of these tests are terrible.
+
   def test_basic
     c = Counter.new 3
 
@@ -178,6 +180,14 @@ class TestCounter < Minitest::Test
     assert c.done?
   end
 
+  def test_upper_bounds_of_mixed_conditionals_variant
+    c = Counter.new 4, rs, vr
+
+    assert c.accepts? *seasia(4)
+    c.accept          *seasia(4)
+    assert c.done?
+  end
+
   def test_lower_bounds_of_mixed_conditionals
     c = Counter.new 1, rs, vr
 
@@ -199,6 +209,20 @@ class TestCounter < Minitest::Test
 
     assert c.accepts? *seasia(4)
     c.accept          *seasia(4)
+    assert c.done?
+  end
+
+  def test_upper_bounds_of_unconditionals_with_conditional
+    c = Counter.new 3, ct, vr
+
+    assert c.accepts? *seasia(5)
+    c.accept          *seasia(5)
+    assert c.done?
+
+    c = Counter.new 3, ct, vr
+
+    assert c.accepts? *asia(4)
+    c.accept          *asia(4)
     assert c.done?
   end
 

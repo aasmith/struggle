@@ -310,48 +310,6 @@ class TestEngine < Struggle::Test
     fake_injector.verify
   end
 
-  # This test makes use of an unrealistic/naive way of managing score.
-  # ScoreModifiers should probably be stored with and modify a centralized
-  # ScoreResolver component.
-  def xtest_score_modification
-    arbitrator = MoveAcceptor.new
-    arbitrator.derp
-
-    move = AmountMove.new
-    move.amount = 2
-
-    e = Engine.new
-    e.add_score_modifier NegativeScoreModifier.new
-    e.add_expectations exp
-
-    e.accept move
-
-    assert exp.satisfied?
-    assert move.executed?
-
-    assert_equal 1, move.amount, "Amount should be reduced by modifier"
-  end
-
-  def xtest_score_modification_making_move_invalid
-    exp = AmountMoveExpectation.new
-    exp.amount = 2
-
-    move = AmountMove.new
-    move.amount = 2
-
-    e = Engine.new
-    e.add_score_modifier NegativeScoreModifier.new
-    e.add_expectations exp
-
-    e.accept move
-
-    refute exp.allows?(move), "Move should now have an unacceptable amount"
-    refute exp.satisfied?, "Expecation should not be satisified"
-    refute move.executed?, "Modified move should not be executed"
-
-    assert_equal 1, move.amount, "Amount should be reduced by modifier"
-  end
-
   class MoveAcceptor < MoveArbitrator
     def initialize(**args)
       @label = args.delete(:label)

@@ -61,10 +61,8 @@ class Engine
         if all_work_items? results
           push_onto_stack(*results)
 
-        # TODO This branch needs a unit test.
         elsif work_item.complete?
           @history << work_item
-          next
 
         elsif move && permitted?(move) && work_item.accepts?(move)
 

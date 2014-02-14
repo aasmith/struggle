@@ -34,67 +34,61 @@ end
 
 class Counter
   def initialize(count, *extras)
+    @sequences = []
 
-    sum = sum_extras(unconditional(extras))
-    conditionals = conditional(extras)
+    conditionals   = extras.select &:conditional?
+    unconditionals = extras.select &:unconditional?
 
-    @possibles = { [] => bound(count + sum) }
+    @possibles = { [] => bound(count + sum(unconditionals)) }
 
     1.upto(conditionals.size) do |i|
       conditionals.combination(i).each do |combination|
-        @possibles[combination] = bound(count) + sum + sum_extras(combination)
+        @possibles[combination] = bound(count) +
+                                  sum(unconditionals) +
+                                  sum(combination)
       end
     end
-
-    @sequences = []
   end
 
   def bound(number)
     [[number, 1].max, 4].min
   end
 
-  def unconditional(extras)
-    extras.select &:unconditional?
-  end
-
-  def conditional(extras)
-    extras.select &:conditional?
-  end
-
-  def sum_extras(extras)
+  def sum(extras)
     extras.map(&:amount).reduce(:+) || 0
+  end
+
+  def all_extras_qualify?(sequence = [], extras, count)
+    sequences = @sequences + sequence
+
+    extras.all? { |e| e.qualifies?(sequences) } && sequence.size <= count
   end
 
   def accepts?(*sequence)
     return false if done?
 
-    sequences = @sequences + sequence
-
     @possibles.any? do |extras, count|
-      extras.all? { |e| e.qualifies?(sequences) } && sequence.size <= count
+      all_extras_qualify?(sequence, extras, count)
     end
   end
 
   def accept(*sequence)
-    return unless accepts?(*sequence)
-
-    sequences = @sequences + sequence
+    raise ArgumentError, "Invalid sequence" unless accepts?(*sequence)
 
     @possibles.each do |extras, count|
-      if extras.all? { |e| e.qualifies?(sequences) } && sequence.size <= count
+      if all_extras_qualify?(sequence, extras, count)
         @possibles[extras] -= sequence.size
       else
         @possibles[extras] = 0
       end
     end
 
-    @sequences = sequences
+    @sequences += sequence
   end
 
   def done?
     @possibles.all? do |extras, count|
-      count.zero? ||
-        (!extras.empty? && extras.none? { |e| e.qualifies?(@sequences) })
+      count.zero? || !all_extras_qualify?(extras, count)
     end
   end
 end

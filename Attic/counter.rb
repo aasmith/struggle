@@ -36,8 +36,8 @@ class Counter
   def initialize(count, *extras)
     @sequences = []
 
-    conditionals   = extras.select &:conditional?
-    unconditionals = extras.select &:unconditional?
+    conditionals   = extras.select(&:conditional?)
+    unconditionals = extras.select(&:unconditional?)
 
     @possibles = { [] => bound(count + sum(unconditionals)) }
 

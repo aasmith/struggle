@@ -64,7 +64,7 @@ class Counter
     extras.all? { |e| e.qualifies?(sequences) } && sequence.size <= count
   end
 
-  def accepts?(*sequence)
+  def accepts?(sequence)
     return false if done?
 
     @possibles.any? do |extras, count|
@@ -72,8 +72,8 @@ class Counter
     end
   end
 
-  def accept(*sequence)
-    raise ArgumentError, "Invalid sequence" unless accepts?(*sequence)
+  def accept(sequence)
+    raise ArgumentError, "Invalid sequence" unless accepts?(sequence)
 
     @possibles.each do |extras, count|
       if all_extras_qualify?(sequence, extras, count)
@@ -150,24 +150,24 @@ class TestCounter < Minitest::Test
   def test_basic
     c = Counter.new 3
 
-    assert c.accepts? *asia(3)
-    c.accept          *asia(3)
+    assert c.accepts? asia(3)
+    c.accept          asia(3)
     assert c.done?
   end
 
   def test_unconditional_increase
     c = Counter.new 2, ct
 
-    assert c.accepts? *asia(3)
-    c.accept          *asia(3)
+    assert c.accepts? asia(3)
+    c.accept          asia(3)
     assert c.done?
   end
 
   def test_unconditional_decrease
     c = Counter.new 2, rs
 
-    assert c.accepts? *asia
-    c.accept          *asia
+    assert c.accepts? asia
+    c.accept          asia
     assert c.done?
   end
 
@@ -175,122 +175,122 @@ class TestCounter < Minitest::Test
   def test_upper_bounds_of_mixed_conditionals
     c = Counter.new 4, cc, rs, vr
 
-    assert c.accepts? *seasia(5)
-    c.accept          *seasia(5)
+    assert c.accepts? seasia(5)
+    c.accept          seasia(5)
     assert c.done?
   end
 
   def test_upper_bounds_of_mixed_conditionals_variant
     c = Counter.new 4, rs, vr
 
-    assert c.accepts? *seasia(4)
-    c.accept          *seasia(4)
+    assert c.accepts? seasia(4)
+    c.accept          seasia(4)
     assert c.done?
   end
 
   def test_lower_bounds_of_mixed_conditionals
     c = Counter.new 1, rs, vr
 
-    assert c.accepts? *seasia
-    c.accept          *seasia
+    assert c.accepts? seasia
+    c.accept          seasia
     assert c.done?
   end
 
   def test_lower_bounds_of_unconditionals
     c = Counter.new 1, rs
 
-    assert c.accepts? *seasia
-    c.accept          *seasia
+    assert c.accepts? seasia
+    c.accept          seasia
     assert c.done?
   end
 
   def test_upper_bounds_of_unconditionals
     c = Counter.new 4, ct
 
-    assert c.accepts? *seasia(4)
-    c.accept          *seasia(4)
+    assert c.accepts? seasia(4)
+    c.accept          seasia(4)
     assert c.done?
   end
 
   def test_upper_bounds_of_unconditionals_with_conditional
     c = Counter.new 3, ct, vr
 
-    assert c.accepts? *seasia(5)
-    c.accept          *seasia(5)
+    assert c.accepts? seasia(5)
+    c.accept          seasia(5)
     assert c.done?
 
     c = Counter.new 3, ct, vr
 
-    assert c.accepts? *asia(4)
-    c.accept          *asia(4)
+    assert c.accepts? asia(4)
+    c.accept          asia(4)
     assert c.done?
   end
 
   def test_extra_when_all_in_subregion_in_multiple_moves
     c = Counter.new 3, vr
 
-    assert c.accepts? *seasia(3)
-    c.accept          *seasia(3)
+    assert c.accepts? seasia(3)
+    c.accept          seasia(3)
     refute c.done?
 
-    refute c.accepts?(Kenya), "Should reject countries outside a valid region"
+    refute c.accepts?([Kenya]), "Should reject countries outside a valid region"
 
-    assert c.accepts? *seasia
-    c.accept          *seasia
+    assert c.accepts? seasia
+    c.accept          seasia
     assert c.done?
   end
 
   def test_extra_when_all_in_subregion_in_one_move
     c = Counter.new 3, vr
 
-    assert c.accepts? *seasia(4)
-    c.accept          *seasia(4)
+    assert c.accepts? seasia(4)
+    c.accept          seasia(4)
     assert c.done?
   end
 
   def test_extra_only_triggers_when_all_moves_match
     c = Counter.new 3, vr
 
-    assert c.accepts? Burma, Burma, India
-    c.accept          Burma, Burma, India
+    assert c.accepts? [Burma, Burma, India]
+    c.accept          [Burma, Burma, India]
     assert c.done?
   end
 
   def test_extra_only_allows_extra_amount
     c = Counter.new 3, vr
 
-    refute c.accepts? *seasia(5)
+    refute c.accepts? seasia(5)
   end
 
   def test_stacking_extras_when_all_in_subregion_in_one_move
     c = Counter.new 3, vr, cc
 
-    assert c.accepts? *seasia(5)
-    c.accept          *seasia(5)
+    assert c.accepts? seasia(5)
+    c.accept          seasia(5)
     assert c.done?
   end
 
   def test_stacking_extras_when_all_in_subregion_in_multiple_moves
     c = Counter.new 3, vr, cc
 
-    assert c.accepts? *seasia(3)
-    c.accept          *seasia(3)
+    assert c.accepts? seasia(3)
+    c.accept          seasia(3)
     refute c.done?
 
-    assert c.accepts? *seasia(2)
-    c.accept          *seasia(2)
+    assert c.accepts? seasia(2)
+    c.accept          seasia(2)
     assert c.done?
   end
 
   def test_stacking_extras_when_all_in_region_in_multiple_moves
     c = Counter.new 3, vr, cc
 
-    assert c.accepts? *asia(3)
-    c.accept          *asia(3)
+    assert c.accepts? asia(3)
+    c.accept          asia(3)
     refute c.done?
 
-    assert c.accepts? *asia
-    c.accept          *asia
+    assert c.accepts? asia
+    c.accept          asia
     assert c.done?
   end
 end

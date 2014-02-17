@@ -1162,21 +1162,13 @@ Modifiers::AldrichAmesRemix = [
   )
 ]
 
+# TODO
+# Somehow flag this so it is executed whenever the china card is played for
+# operation/coup/realign
+#
+# This list should be executed before the player influences/coups/realigns
+#
 TheChinaCard = [
-  Either(
-    # TODO: should this be ExpectMove?
-    Move(
-      player: lambda { player },
-      type: [:operations],
-      ops: 4
-    ),
-    Move(
-      player: lambda { player },
-      type: [:operations],
-      countries: [Asia.countries],
-      ops: 5
-    )
-  ),
   AddModifier(Modifiers::TheChinaCard),
   ClaimChinaCard(
     player: lambda { player.opponent },
@@ -1185,15 +1177,12 @@ TheChinaCard = [
 ]
 
 Modifiers::TheChinaCard = [
-  Modifier(
-    on: Match(
-      item: TurnEnd,
-      number: 10
-    ),
-    triggers: AwardVictoryPoints(
-      player: lambda { game.china_card_holder },
-      amount: 1
-    )
+  ScoreModifier(
+    player: lambda { player },
+    type: :operation,
+    countries: [Asia],
+    amount: +1,
+    cancel: ActionRoundEnd
   )
 ]
 

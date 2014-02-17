@@ -24,14 +24,29 @@ module Instructions
         card_ref: card_ref
       )
 
-      action_instructions = send card_action
+      instructions = []
 
-      [remove_from_hand, add_to_current_cards, *action_instructions]
+      # Get instructions from card_components. These are mainly for events,
+      # although the china card is an exception to this; it has instructions
+      # for influence/coup/realign.
+      #
+      # Execute these instructions (if any) before delegating to the
+      # influence/coup/realignment/space methods below.
+
+      instructions += lookup_instructions card_ref, card_action
+      instructions += send card_action
+
+      [remove_from_hand, add_to_current_cards, *instructions]
     end
 
-    # TODO lookup event instruction list
+    # TODO Get instructions from card_components list
+    def lookup_instructions(card_ref, card_action)
+      [Noop.new]
+    end
+
+    # Nothing else to do.
     def event
-      Noop.new
+      []
     end
 
     def influence

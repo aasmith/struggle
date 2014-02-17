@@ -94,7 +94,7 @@ end
 #
 # Should be present as a permission modifier throughout the game.
 #
-class ChinaCardPermissionModifier < PermissionModifier
+class PreventChinaCardPlayForEvent < PermissionModifier
 
   needs :cards, :china_card
 

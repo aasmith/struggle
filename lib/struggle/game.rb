@@ -36,7 +36,7 @@ class Game
   def start
     @engine.add_work_item GameInstructions
 
-    @engine.add_permission_modifier ChinaCardPermissionModifier.new
+    @engine.add_permission_modifier PreventChinaCardPlayForEvent.new
     @engine.add_permission_modifier SpaceRacePermissionModifier.new
   end
 
@@ -151,7 +151,8 @@ UssrActionRound = List(
 
   Instruction(:SetPhasingPlayer, player: USSR),
   Arbitrator(:CardPlay, player: USSR),
-  Instruction(:DisposeCurrentCards)
+  Instruction(:DisposeCurrentCards),
+  ActionRoundEnd
 )
 
 UsActionRound = List(
@@ -160,7 +161,8 @@ UsActionRound = List(
 
   Instruction(:SetPhasingPlayer, player: US),
   Arbitrator(:CardPlay, player: US),
-  Instruction(:DisposeCurrentCards)
+  Instruction(:DisposeCurrentCards),
+  ActionRoundEnd
 )
 
 ActionRound = List(
@@ -171,8 +173,11 @@ ActionRound = List(
 # TODO
 HeadlinePhase = List()
 
+# Marker
+ActionRoundEnd = List()
+
 # TODO
-EndActionRounds = List()
+ActionRoundsEnd = List()
 
 EarlyPhaseTurn = List(
   I(:ImproveDefcon),
@@ -184,7 +189,7 @@ EarlyPhaseTurn = List(
   ActionRound,
   ActionRound,
   ActionRound,
-  EndActionRounds, # for certain events to trigger off of
+  ActionRoundsEnd, # for certain events to trigger off of
   I(:CheckMilitaryOps),
   I(:ResetMilitaryOps),
   I(:CheckHeldCards), # check no scoring cards
@@ -251,7 +256,12 @@ LatePhase = List(
   LatePhaseTurn
 )
 
-FinalScoring = List()
+# TODO Award the holder of The China Card at the end of Turn 10 with 1 VP.
+AwardChinaCardHolder = List()
+
+FinalScoring = List(
+  AwardChinaCardHolder
+)
 #GameEnd      = Instruction(LambdaInstruction) { puts "END!!!" }
 
 GameInstructions = List(

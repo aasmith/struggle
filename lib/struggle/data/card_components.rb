@@ -1169,11 +1169,7 @@ Modifiers::AldrichAmesRemix = [
 # This list should be executed before the player influences/coups/realigns
 #
 TheChinaCard = [
-  AddModifier(Modifiers::TheChinaCard),
-  ClaimChinaCard(
-    player: lambda { player.opponent },
-    playable: false
-  )
+  AddModifier(Modifiers::TheChinaCard)
 ]
 
 Modifiers::TheChinaCard = [

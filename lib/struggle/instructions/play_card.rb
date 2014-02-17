@@ -24,7 +24,7 @@ module Instructions
         card_ref: card_ref
       )
 
-      instructions = []
+      instructions = [remove_from_hand, add_to_current_cards]
 
       # Get instructions from card_components. These are mainly for events,
       # although the china card is an exception to this; it has instructions
@@ -35,8 +35,7 @@ module Instructions
 
       instructions += lookup_instructions card_ref, card_action
       instructions += send card_action
-
-      [remove_from_hand, add_to_current_cards, *instructions]
+      instructions
     end
 
     # TODO Get instructions from card_components list

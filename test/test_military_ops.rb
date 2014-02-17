@@ -68,8 +68,19 @@ class MilitaryOpsTest < Struggle::Test
 
     result = ops.calculate_vp(defcon)
 
-    assert result.player, "Player is not important when awarding zero points"
-    assert_equal 0, result.vp
+    assert_nil result
+  end
+
+  def test_calculate_vp_one_player_meets_milops_requirement
+    ops = MilitaryOps.new
+    ops.increment(US, 5)
+
+    defcon = FakeDefcon.new(2)
+
+    result = ops.calculate_vp(defcon)
+
+    assert_equal US, result.player
+    assert_equal 2, result.vp
   end
 
   FakeDefcon = Struct.new(:value)

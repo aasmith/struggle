@@ -16,16 +16,15 @@ class MilitaryOps
     @ops = { US => 0, USSR => 0 }
   end
 
-  def required_ops(defcon)
-    defcon.value
-  end
-
   def calculate_vp(defcon)
-    req = required_ops(defcon)
+    return if us == ussr
 
-    result = (req - us) - (req - ussr)
+    leader = us > ussr ? US : USSR
+    vp     = defcon.value > value(leader) ?
+             defcon.value - value(leader) :
+             defcon.value
 
-    VictoryPointResult.new(result > 0 ? USSR : US, result.abs)
+    VictoryPointResult.new(leader, vp)
   end
 
   def us

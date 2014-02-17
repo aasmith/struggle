@@ -54,9 +54,49 @@ The USSR player, for the final piece of their Action Round decides the operation
 
 #### Thus resolved as
 
-"Rules clarification: you may not trigger The Iron Lady, then play influence adjacent to Argentina if you did not previously have access to those countries.  This is because the influence placement rules restrict you to placing influence in countries adjacent to your existing influence at the beginning of the Action Round."
+> "Rules clarification: you may not trigger The Iron Lady, then play influence adjacent to Argentina if you did not previously have access to those countries.  This is because the influence placement rules restrict you to placing influence in countries adjacent to your existing influence at the beginning of the Action Round."
 
 [source](http://twilightstrategy.com/2012/12/03/the-iron-lady/)
+
+### Ruling #4 - Clarification of what value Latin American Death Squads affects
+
+Latin American Death Squads reduces the die roll only. Therefore, military ops is not affected.
+
+<http://boardgamegeek.com/thread/312922/latin-american-death-squads>
+<http://boardgamegeek.com/thread/502456/latin-american-death-squads-re-req-mil-ops>
+<http://boardgamegeek.com/thread/226721/latin-american-death-squads>
+
+#### Thus Resolved As
+
+> "All of the phasing player’s Coup Attempts in Central and South America, for the remainder of this turn, receive +1 to their die roll. All of the opponent’s Coup Attempts in Central and South America, for the remainder of this turn, receive -1 to their die roll."
+
+Source: [modified card description](http://twilightstrategy.com/card-list/)
+
+### UNKNOWN: Ruling #4a - Rules for reducing die rolls
+
+Given the scenario of two -1 die roll modifiers being in effect (SALT + Latin American Death Squads):
+
+Is there a lower bound that a die roll can be modified down to?
+
+What is the resolved value of a die roll of one?
+
+one? zero? or negative one (-1)?
+
+### Ruling #5 - Preventing Play of China Card if a Scoring Card Must Be Played
+
+Per Rule 9.5(2), The China Card cannot be played if it would prevent play of a Scoring Card. Given the scenario of a USSR player holding Five Year Plan and a scoring card in their last Action Round (with the intent to discard the scoring card via 5YP event), play of The China Card could be considered illegal.
+
+#### Thus Resolved As:
+
+The China Card can be played in the above scenario, as the spirit of the rules suggests The China Card cannot be used an excuse to hold a scoring card between Action Rounds. This means the rule does not need to be enforced seperately, as existing rule implementations[1] make this point moot.
+
+Source: <http://boardgamegeek.com/thread/952786/quick-q-re-china-card>
+
+[1] Rule implementations being:
+
+ * China Card exists outside of the player's hand.
+ * Checking for players holding scoring cards after the end of an Action Round.
+
 
 ## Pending Rulings
 
@@ -65,7 +105,7 @@ The USSR player, for the final piece of their Action Round decides the operation
 When in an active Bear Trap/Quagmire, the trapped player "may only play
 scoring cards". If the player has one card left, which is a scoring card, and
 has two action rounds remaining, does the player have to play the scoring card
-ASAP, or can the player withold it until the next AR?
+ASAP, or can the player withhold it until the next AR?
 
 Will assume that the player *must* play the scoring card ASAP, as a player
 cannot forgo the playing of a card per Section 5.0.

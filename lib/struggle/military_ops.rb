@@ -17,14 +17,10 @@ class MilitaryOps
   end
 
   def calculate_vp(defcon)
-    return if us == ussr
-
     leader = us > ussr ? US : USSR
-    vp     = defcon.value > value(leader) ?
-             defcon.value - value(leader) :
-             defcon.value
+        vp = [[defcon.value, value(leader)].min - value(leader.opponent), 0].max
 
-    VictoryPointResult.new(leader, vp)
+    vp.zero? ? nil : VictoryPointResult.new(leader, vp)
   end
 
   def us

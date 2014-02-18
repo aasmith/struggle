@@ -61,5 +61,9 @@ class MoveArbitrator < WorkItem
       player == move.player
   end
 
+  def incorrect_player?(move)
+    !correct_player?(move)
+  end
+
 end
 

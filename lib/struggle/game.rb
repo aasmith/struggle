@@ -36,7 +36,8 @@ class Game
   def start
     @engine.add_work_item GameInstructions
 
-    @engine.add_permission_modifier PreventChinaCardPlayForEvent.new
+    # TODO Why are these here? Shouldn't they be prevented in the
+    # card play arbitrator?
     @engine.add_permission_modifier SpaceRacePermissionModifier.new
   end
 

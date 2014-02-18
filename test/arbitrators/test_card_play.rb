@@ -32,13 +32,23 @@ class ArbitratorTests::CardPlayTest < Struggle::Test
       )
     )
 
-    # Playing the china card for event.
+    # Playing the china card for influence.
     @china_move = EmptyMove.new(
       player: USSR,
       instruction: Instructions::PlayCard.new(
         player: USSR,
         card_ref: "TheChinaCard",
         card_action: :influence
+      )
+    )
+
+    # Playing the china card for event.
+    @china_event = EmptyMove.new(
+      player: USSR,
+      instruction: Instructions::PlayCard.new(
+        player: USSR,
+        card_ref: "TheChinaCard",
+        card_action: :event
       )
     )
 
@@ -171,6 +181,10 @@ class ArbitratorTests::CardPlayTest < Struggle::Test
   def test_china_card_cannot_be_played_when_held_by_opponent
     @arb.china_card.holder = US
     refute @arb.accepts?(@china_move), "Should reject opponent-held china card"
+  end
+
+  def test_china_card_cannot_be_played_for_event
+    refute @arb.accepts?(@china_event), "Should reject china card for event"
   end
 
   def test_spacing_opponent_card_is_a_single_play

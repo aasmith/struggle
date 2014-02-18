@@ -89,25 +89,3 @@ class SpaceRacePermissionModifier < PermissionModifier
   end
 end
 
-##
-# Rejects any attempt to play the China Card as an event.
-#
-# Should be present as a permission modifier throughout the game.
-#
-class PreventChinaCardPlayForEvent < PermissionModifier
-
-  needs :cards, :china_card
-
-  def allows?(move)
-    !eventing_china_card?(move)
-  end
-
-  def eventing_china_card?(move)
-    return false unless Instructions::PlayCard === move
-
-    card = cards.find_by_ref(move.instruction.card_ref)
-
-    card.china_card? && move.instruction.card_action == :event
-  end
-end
-

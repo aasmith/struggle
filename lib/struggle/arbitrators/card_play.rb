@@ -47,7 +47,8 @@ module Arbitrators
     # by permission modifiers.
     #
     def accepts?(move)
-      return false unless correct_player?(move)
+      return false if incorrect_player?(move)
+      return false if eventing_china_card?(move)
 
       if able_to_play?
         card_play?(move) && valid_card?(move)
@@ -115,6 +116,17 @@ module Arbitrators
     #
     def second_part?
       previous_card || previous_action
+    end
+
+
+    # Rejects any attempt to play the China Card as an event.
+
+    def eventing_china_card?(move)
+      return false unless Instructions::PlayCard === move.instruction
+
+      card = cards.find_by_ref(move.instruction.card_ref)
+
+      card.china_card? && move.instruction.card_action == :event
     end
   end
 

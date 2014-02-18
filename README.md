@@ -33,6 +33,14 @@ No interactive version exists yet, an example of a game exists in ```bin/struggl
 
 ### Developers
 
+Running tests:
+
+```TESTOPTS=-p RUBYOPT=-w RAKEOPT=-q rake```
+
+Running a test:
+
+```TESTOPTS=-p RUBYOPT=-w RAKEOPT=-q rake N=test_name```
+
 After checking out the source, run:
 
 ```$ rake newb```

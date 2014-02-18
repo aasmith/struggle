@@ -35,10 +35,6 @@ class Game
 
   def start
     @engine.add_work_item GameInstructions
-
-    # TODO Why are these here? Shouldn't they be prevented in the
-    # card play arbitrator?
-    @engine.add_permission_modifier SpaceRacePermissionModifier.new
   end
 
   def accept(move)

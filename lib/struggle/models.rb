@@ -71,21 +71,3 @@ class PermissionModifier
   end
 end
 
-##
-# Updates and consults with the SpaceRace class to ensure each move is
-# made in compliance with current space race restrictions.
-#
-class SpaceRacePermissionModifier < PermissionModifier
-
-  needs :space_race
-
-  def allows?(move)
-    return true # TODO
-    # note move and see if space race will allow it.
-    #
-    # update space race component.
-    #
-    # if spacing and player has used up space race, return false.
-  end
-end
-

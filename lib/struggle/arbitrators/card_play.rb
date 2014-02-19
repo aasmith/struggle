@@ -49,9 +49,6 @@ module Arbitrators
     # If the card contains an opponent event, but is being spaced, then ensure
     # a one part move.
     #
-    # Other conditions, such as space race eligiblity are validated upstream
-    # by permission modifiers.
-    #
     def accepts?(move)
       return false if incorrect_player?(move)
       return false if eventing_china_card?(move)

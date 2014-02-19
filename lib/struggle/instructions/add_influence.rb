@@ -8,9 +8,17 @@
 #
 module Instructions
   class AddInfluence < Instruction
-    arguments :influence, :amount, :country_name
+    fancy_accessor :influence, :amount, :country_name
 
     needs :countries
+
+    def initialize(influence:, amount:, country_name:)
+      super
+
+      self.influence = influence
+      self.amount = amount
+      self.country_name = country_name
+    end
 
     def action
       countries.find(country_name).add_influence(influence, amount)

@@ -1,11 +1,18 @@
 module Arbitrators
 
   class AddInfluence < MoveArbitrator
-    arguments :player, :influence, :country_names, :total_influence
+    fancy_accessor :player, :influence, :country_names, :total_influence
 
     attr_reader :remaining_influence
 
-    def after_init
+    def initialize(player:, influence:, country_names:, total_influence:)
+      super
+
+      self.player = player
+      self.influence = influence
+      self.country_names = country_names
+      self.total_influence = total_influence
+
       @remaining_influence = total_influence
     end
 

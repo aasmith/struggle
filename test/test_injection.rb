@@ -76,11 +76,10 @@ class TestInjection < Struggle::Test
 
   class NeedyWrapper
     extend Injectible
-    extend Arguments
 
     needs :a
 
-    arguments :foo, :bar
+    fancy_accessor :foo, :bar
   end
 
 end

@@ -1,8 +1,14 @@
 module Instructions
   class DeclareWinner < Instruction
-    arguments :player
+    fancy_accessor :player
 
     needs :victory
+
+    def initialize(player:)
+      super
+
+      self.player = player
+    end
 
     def action
       victory.winner = player

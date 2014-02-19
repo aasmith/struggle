@@ -1,6 +1,6 @@
 module Arbitrators
   class AddRestrictedInfluence < MoveArbitrator
-    arguments :player, :influence, :operation_points
+    fancy_accessor :player, :influence, :operation_points
 
     needs :countries
 
@@ -24,12 +24,14 @@ module Arbitrators
 
     attr_accessor :original_countries
 
-    attr_reader :remaining_operation_points
-
     attr_reader :operation_points_to_deduct
 
-    def after_init
-      @remaining_operation_points = operation_points
+    def initialize(player:, influence:, operation_points:)
+      super
+
+      self.player = player
+      self.influence = influence
+      self.operation_points = operation_points
     end
 
     def before_execute(move)

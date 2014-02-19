@@ -4,12 +4,18 @@ module Arbitrators
 
     OPERATIONS = %i(coup realignment influence space)
 
-    arguments :player
+    fancy_accessor :player
 
     needs :deck, :china_card, :space_race, :hands, :cards
 
     # used for tracking state over two-instruction plays
     attr_accessor :previous_card, :previous_action
+
+    def initialize(player:)
+      super
+
+      self.player = player
+    end
 
     def after_execute(move)
       if noop?(move) || second_part?

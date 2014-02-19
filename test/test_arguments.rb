@@ -9,22 +9,6 @@ class ArgumentsTest < Struggle::Test
     assert_equal 2, target.b
   end
 
-  def test_too_many_arguments
-    ex = assert_raises(ArgumentError) do
-      Target.new(a: 1, b: 2, c: 3)
-    end
-
-    assert_match(/too many args/, ex.message)
-  end
-
-  def test_too_few_arguments
-    ex = assert_raises(ArgumentError) do
-      Target.new(a: 1)
-    end
-
-    assert_match(/missing args/, ex.message)
-  end
-
   def test_dynamic_arguments_evaluated_at_runtime
     dynamic = DynamicValue.new
     target  = Target.new(a: 1, b: dynamic)
@@ -38,13 +22,12 @@ class ArgumentsTest < Struggle::Test
   end
 
   class Target
-    extend Arguments
+    fancy_accessor :a, :b
 
-    def initialize(**args)
-      ArgumentProvider.new(self).provide(args)
+    def initialize(a:, b:)
+      self.a = a
+      self.b = b
     end
-
-    arguments :a, :b
   end
 
   class DynamicValue

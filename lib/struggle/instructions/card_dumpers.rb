@@ -17,9 +17,15 @@ module Instructions
   #
   card_dumpers.each do |class_name, card_pile_name|
     klass = Class.new(Instruction) do
-      arguments :card_ref
+      fancy_accessor :card_ref
 
       needs :cards, :discards, :removed, :limbo
+
+      define_method :initialize do |card_ref:|
+        super(card_ref: card_ref)
+
+        self.card_ref = card_ref
+      end
 
       define_method :action do
         card = cards.find_by_ref(card_ref)

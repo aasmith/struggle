@@ -5,11 +5,17 @@
 module Instructions
   class PlayCard < Instruction
 
-    arguments :player, :card_ref, :card_action
+    fancy_accessor :player, :card_ref, :card_action
 
     VALID_CARD_ACTIONS = %i(event influence coup realignment space)
 
-    def after_init
+    def initialize(player:, card_ref:, card_action:)
+      super
+
+      self.player = player
+      self.card_ref = card_ref
+      self.card_action = card_action
+
       unless VALID_CARD_ACTIONS.include?(card_action)
         raise "bad card_action #{card_action.inspect}"
       end

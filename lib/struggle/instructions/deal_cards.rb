@@ -4,9 +4,15 @@
 #
 module Instructions
   class DealCards < Instruction
-    arguments :target
+    fancy_accessor :target
 
     needs :deck, :hands, :discards
+
+    def initialize(target:)
+      super
+
+      self.target = target
+    end
 
     def action
       satisfied = { US => false, USSR => false }

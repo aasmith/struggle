@@ -23,11 +23,7 @@ class ExtraCount
     if unconditional?
       return true
     else
-      countries.all? do |country|
-        @conds.any? do |cond|
-          country.in? cond
-        end
-      end
+      countries.all? { |c| @conds.include?(c) }
     end
   end
 end
@@ -96,28 +92,19 @@ end
 
 require "minitest/autorun"
 
-class Country
-  def initialize(name, *regions)
-    @name = name
-    @regions = regions
-  end
-
-  def in?(region)
-    @regions.include? region
-  end
-
-  def inspect
-    "%s (%s)" % [@name, @regions.join(", ")]
-  end
-end
-
 class TestCounter < Minitest::Test
 
   attr_accessor :cc, :vr, :ct, :rs
 
-  India = Country.new("India", :asia)
-  Burma = Country.new("Burma", :asia, :seasia)
-  Kenya = Country.new("Kenya", :africa)
+  Country = Struct.new(:name)
+
+  India = Country.new(:India)
+  Burma = Country.new(:Burma)
+  Kenya = Country.new(:Kenya)
+
+  Africa = [Kenya]
+  Asia   = [India, Burma]
+  SeAsia = [Burma]
 
   def asia(num = 1)
     [India] * num
@@ -133,10 +120,10 @@ class TestCounter < Minitest::Test
 
   def setup
     # china card; +1 when all in asia
-    self.cc = ExtraCount.new(1, all: :asia)
+    self.cc = ExtraCount.new(1, all: Asia)
 
     # vietnam revolts; +1 when all in se asia
-    self.vr = ExtraCount.new(1, all: :seasia)
+    self.vr = ExtraCount.new(1, all: SeAsia)
 
     # containment/brezhnev; +1 without condition
     self.ct = ExtraCount.new(1)

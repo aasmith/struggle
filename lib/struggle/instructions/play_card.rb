@@ -7,6 +7,8 @@ module Instructions
 
     fancy_accessor :player, :card_ref, :card_action
 
+    needs :observers
+
     VALID_CARD_ACTIONS = %i(event influence coup realignment space)
 
     def initialize(player:, card_ref:, card_action:)
@@ -55,10 +57,13 @@ module Instructions
     end
 
     def influence
+      ops_modifiers = observers.ops_modifiers_for_player(player)
+      ops_counter   = OpsCounter.new(card.ops, ops_modifiers)
+
       Arbitrators::AddRestrictedInfluence.new(
         player: player,
         influence: player,
-        operation_points: ops #TODO determine card ops
+        ops_counter: ops_counter
       )
     end
 

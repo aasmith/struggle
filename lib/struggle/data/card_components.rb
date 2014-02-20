@@ -99,6 +99,9 @@ def all_influence(player)
   lambda { |c| c.influence(player) }
 end
 
+on_turn_end         = Match.new(item_class: TurnEnd)
+on_action_round_end = Match.new(item_class: ActionRoundEnd)
+
 Decolonization = [
   AddInfluence(
     player: USSR,
@@ -910,11 +913,11 @@ SaltNegotiations = [
 ]
 
 Modifiers::SaltNegotiations = [
-  ScoreModifier(
+  DieRollModifier(
     player: nil, # this affects both players!
     type: :coup,
     amount: -1,
-    cancel: TurnEnd
+    terminate: on_turn_end
   )
 ]
 
@@ -1098,30 +1101,26 @@ Modifiers::CubanMissileCrisis = [
     triggers: LoseGame(
       player: lambda { player.opponent }
     ),
-    cancel: [ # Checks event history on each 'tick' for any of these matches
-      Either(
-        Match(
-          item: RemoveInfluence,
-          player: USSR,
-          country: Cuba,
-          amount: 2
-        ),
-        Match(
-          item: RemoveInfluence,
-          player: US,
-          country: WestGermany,
-          amount: 2
-        ),
-        Match(
-          item: RemoveInfluence,
-          player: US,
-          country: Turkey,
-          amount: 2
-        ),
-        Match(
-          item: TurnEnd
-        )
-      )
+    terminate: [ # Check event history on each 'tick' for any of these matches
+      Match(
+        item: RemoveInfluence,
+        player: USSR,
+        country: Cuba,
+        amount: 2
+      ),
+      Match(
+        item: RemoveInfluence,
+        player: US,
+        country: WestGermany,
+        amount: 2
+      ),
+      Match(
+        item: RemoveInfluence,
+        player: US,
+        country: Turkey,
+        amount: 2
+      ),
+      on_turn_end
     ]
 
   )
@@ -1136,11 +1135,9 @@ Modifiers::U2Incident = [
   Modifiers(
     on: Match(item: UnIntervention, type: :event),
     triggers: AwardVictoryPoints(player: USSR, amount: 1),
-    cancel: [
-      Either(
-        Match(item: TurnEnd),
-        Match(item: UnIntervention, type: :event)
-      )
+    terminate: [
+      on_turn_end,
+      Match(item: UnIntervention, type: :event)
     ]
   )
 ]
@@ -1158,7 +1155,7 @@ Modifiers::AldrichAmesRemix = [
   Modifier(
     on: Match(), # match anything
     triggers: RevealHand(player: US),
-    cancel: Match(item: TurnEnd)
+    terminate: on_turn_end
   )
 ]
 
@@ -1173,12 +1170,11 @@ TheChinaCard = [
 ]
 
 Modifiers::TheChinaCard = [
-  ScoreModifier(
+  OpsModifier(
     player: lambda { player },
-    type: :operation,
     countries: [Asia],
     amount: +1,
-    cancel: ActionRoundEnd
+    terminate: on_action_round_end
   )
 ]
 
@@ -1262,12 +1258,10 @@ Containment = [
 ]
 
 Modifiers::Containment = [
-  ScoreModifier(
+  OpsModifier(
     player: US,
-    type: :ops, # anywhere an ops score is evaluated.
     amount: +1,
-    max: 4,
-    cancel: TurnEnd
+    terminate: on_turn_end
   )
 ]
 
@@ -1276,12 +1270,10 @@ BrezhnevDoctrine = [
 ]
 
 Modifiers::BrezhnevDoctrine = [
-  ScoreModifier(
+  OpsModifier(
     player: USSR,
-    type: :ops,
     amount: +1,
-    max: 4,
-    cancel: TurnEnd
+    terminate: on_turn_end
   )
 ]
 
@@ -1290,12 +1282,10 @@ RedScarePurge = [
 ]
 
 Modifiers::RedScarePurge = [
-  ScoreModifier(
+  OpsModifier(
     player: lambda { player },
-    type: :ops,
     amount: -1,
-    mininum: 1,
-    cancel: TurnEnd
+    terminate: on_turn_end
   )
 ]
 
@@ -1304,19 +1294,19 @@ LatinAmericanDeathSquads = [
 ]
 
 Modifiers::LatinAmericanDeathSquads = [
-  ScoreModifier(
+  DieRollModifier(
     player: lambda { player },
     type: :coup,
     countries: [CentralAmerica, SouthAmerica],
     amount: +1,
-    cancel: TurnEnd
+    terminate: on_turn_end
   ),
-  ScoreModifier(
+  DieRollModifier(
     player: lambda { player.opponent },
     type: :coup,
     countries: [CentralAmerica, SouthAmerica],
     amount: -1,
-    cancel: TurnEnd
+    terminate: on_turn_end
   )
 ]
 
@@ -1331,12 +1321,11 @@ VietnamRevolts = [
 ]
 
 Modifiers::VietnamRevolts = [
-  ScoreModifier(
+  OpsModifier(
     player: USSR,
-    type: :ops,
     countries: [SoutheastAsia],
     amount: +1,
-    cancel: TurnEnd
+    terminate: on_turn_end
   )
 ]
 
@@ -1345,11 +1334,11 @@ IranContraScandal = [
 ]
 
 Modifiers::IranContraScandal = [
-  ScoreModifier(
+  DieRollModifier(
     player: US,
     type: :realignment,
     amount: -1,
-    cancel: TurnEnd
+    terminate: on_turn_end
   )
 ]
 
@@ -1370,13 +1359,11 @@ Modifiers::FormosanResolution = [
     ),
     countries: lambda { Taiwan.controlled_by?(US) ? [Taiwan] : [] },
     battleground: true,
-    cancel: [
-      Match(
-        player: US,
-        item: ChinaCard,
-        type: :event
-      )
-    ]
+    terminate: Match(
+      player: US,
+      item: ChinaCard,
+      type: :event
+    )
   )
 ]
 
@@ -1392,7 +1379,7 @@ Modifiers::NuclearSubs = [
       countries: Countries.select(&:battleground?)
     ),
     battleground: false,
-    cancel: Match(item: TurnEnd)
+    terminate: on_turn_end
   )
 ]
 
@@ -1563,7 +1550,7 @@ Modifiers::NorthSeaOil = [
   TurnModifier(
     player: US,
     action_rounds: 8,
-    cancel: TurnEnd
+    terminate: on_turn_end
   )
 ]
 
@@ -1716,7 +1703,7 @@ Chernobyl = [
       ),
       PermissionModifier(
         on: Match(player: USSR, item: OperationalInfluence),
-        cancel: Match(item: TurnEnd),
+        terminate: on_turn_end,
         ruling: :deny
       )
     )
@@ -1777,7 +1764,7 @@ Modifiers::ShuttleDiplomacy = [
         card: ShuttleDiplomacy
       )
     ],
-    cancel: Either(
+    terminate: [
       Match(
         item: Score,
         regions: [MiddleEast, Asia]
@@ -1786,7 +1773,7 @@ Modifiers::ShuttleDiplomacy = [
         item: TurnEnd,
         number: 10
       )
-    )
+    ]
   )
 ]
 

@@ -8,11 +8,16 @@ require "struggle/stack"
 require "struggle/engine"
 require "struggle/injection"
 require "struggle/arguments"
+require "struggle/observer"
+require "struggle/observers"
 
 require "struggle/move"
 require "struggle/work_item"
 require "struggle/instruction"
 require "struggle/move_arbitrator"
+
+require "struggle/ops_counter"
+require "struggle/ops_modifier"
 
 require "struggle/instructions"
 require "struggle/arbitrators"

@@ -48,6 +48,10 @@ class Game
   def hand(player)
     hands.get(player)
   end
+
+  def observers
+    Observers.new(@engine.observers)
+  end
 end
 
 def Instruction(const, **named_args, &block)
@@ -149,7 +153,7 @@ UssrActionRound = List(
   Instruction(:SetPhasingPlayer, player: USSR),
   Arbitrator(:CardPlay, player: USSR),
   Instruction(:DisposeCurrentCards),
-  ActionRoundEnd
+  Instruction(:ActionRoundEnd)
 )
 
 UsActionRound = List(
@@ -159,7 +163,7 @@ UsActionRound = List(
   Instruction(:SetPhasingPlayer, player: US),
   Arbitrator(:CardPlay, player: US),
   Instruction(:DisposeCurrentCards),
-  ActionRoundEnd
+  Instruction(:ActionRoundEnd)
 )
 
 ActionRound = List(
@@ -170,11 +174,9 @@ ActionRound = List(
 # TODO
 HeadlinePhase = List()
 
-# Marker
-ActionRoundEnd = List()
-
-# TODO
-ActionRoundsEnd = List()
+# Markers
+ActionRoundEnd  = Class.new(Instructions::Noop)
+ActionRoundsEnd = Class.new(Instructions::Noop)
 
 EarlyPhaseTurn = List(
   I(:ImproveDefcon),

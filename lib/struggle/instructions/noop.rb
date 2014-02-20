@@ -4,7 +4,7 @@
 #
 module Instructions
   class Noop < Instruction
-    def execute
+    def action
     end
   end
 end

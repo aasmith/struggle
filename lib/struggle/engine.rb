@@ -6,6 +6,7 @@ class Engine
     @work_items = Stack.new
 
     @history = []
+    @observers = []
 
     @permission_modifiers = []
     @stack_modifiers = []
@@ -16,6 +17,16 @@ class Engine
 
   def add_work_item(*items)
     @work_items.push(*items)
+  end
+
+  ## Observers
+
+  def add_observer(observer)
+    @observers << observer
+  end
+
+  def notify_observers(work_item)
+    @observers.each { |o| o.notify(work_item) }
   end
 
   ## Modifiers
@@ -50,6 +61,8 @@ class Engine
 
       if Instruction === work_item
         results = work_item.execute
+
+        notify_observers(work_item)
 
         @history << work_item
 

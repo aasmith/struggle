@@ -1,6 +1,6 @@
 module Arbitrators
   class AddRestrictedInfluence < MoveArbitrator
-    fancy_accessor :player, :influence, :operation_points
+    fancy_accessor :player, :influence, :ops_counter
 
     needs :countries
 
@@ -26,12 +26,12 @@ module Arbitrators
 
     attr_reader :operation_points_to_deduct
 
-    def initialize(player:, influence:, operation_points:)
+    def initialize(player:, influence:, ops_counter:)
       super
 
       self.player = player
       self.influence = influence
-      self.operation_points = operation_points
+      self.ops_counter = ops_counter
     end
 
     def before_execute(move)
@@ -42,9 +42,13 @@ module Arbitrators
     end
 
     def after_execute(move)
-      @remaining_operation_points -= @operation_points_to_deduct
+      country = countries.find(move.instruction.country_name)
 
-      complete if @remaining_operation_points.zero?
+      sequence = [country] * @operation_points_to_deduct
+
+      ops_counter.accept(sequence)
+
+      complete if ops_counter.done?
     end
 
     def accepts?(move)
@@ -79,12 +83,14 @@ module Arbitrators
     end
 
     def within_spending_limit?(move)
+      amount  = move.instruction.amount
       country = countries.find(move.instruction.country_name)
 
-      price =
-        add_influence_with_price(move.instruction.amount, country)
+      price = price_of_influence(amount, country)
 
-      price <= @remaining_operation_points
+      sequence = [country] * price
+
+      ops_counter.accepts?(sequence)
     end
 
     # Adds the specified number of influence markers to the country using
@@ -113,6 +119,8 @@ module Arbitrators
     def add_influence_with_price(num_markers, country)
       add_influence_with_price!(num_markers, country.dup)
     end
+
+    alias price_of_influence add_influence_with_price
 
     # Overwrite the countries setter to store a one-time snapshot
     # of the countries. Duplicated so that changes are not written

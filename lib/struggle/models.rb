@@ -34,7 +34,25 @@ module Instructions
   end
 end
 
+class Matcher
+  attr_reader :item_class, :anything
+
+  def initialize(item_class: nil, anything: false)
+    self.item_class = item_class
+    self.anything = anything
+  end
+
+  def matches?(item)
+    anything || item_class === item
+  end
+end
+
+# alias
+Match = Matcher
+
 ### Modifiers
+
+# TODO: roll these existing modifiers into observers.
 
 ##
 # Always says no to every move.
@@ -47,6 +65,7 @@ class NegativePermissionModifier
   end
 end
 
+# Used in testing
 class StackModifier
   def initialize(*items_to_insert)
     @items_to_insert = items_to_insert

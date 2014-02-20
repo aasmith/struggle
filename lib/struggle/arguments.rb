@@ -19,7 +19,7 @@ module Arguments
   end
 
   def arguments
-    @__args || []
+    (defined?(@__args) && @__args) || []
   end
 end
 

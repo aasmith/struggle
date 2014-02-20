@@ -46,7 +46,7 @@ class AddRestrictedInfluenceTest < Struggle::Test
     arb = Arbitrators::AddRestrictedInfluence.new(
       player: USSR,
       influence: USSR,
-      operation_points: 5
+      ops_counter: SimpleOpsCounter.new(5)
     )
 
     arb.countries = @three_countries
@@ -75,7 +75,7 @@ class AddRestrictedInfluenceTest < Struggle::Test
     arb = Arbitrators::AddRestrictedInfluence.new(
       player: USSR,
       influence: USSR,
-      operation_points: 5
+      ops_counter: SimpleOpsCounter.new(5)
     )
 
     arb.countries = @five_countries
@@ -112,7 +112,7 @@ class AddRestrictedInfluenceTest < Struggle::Test
     arb = Arbitrators::AddRestrictedInfluence.new(
       player: USSR,
       influence: USSR,
-      operation_points: 5
+      ops_counter: SimpleOpsCounter.new(5)
     )
 
     arb.countries = @one_country
@@ -123,9 +123,6 @@ class AddRestrictedInfluenceTest < Struggle::Test
 
     arb.accept(add_influence_to("a"))
 
-    assert_equal 3, arb.remaining_operation_points,
-      "Should cost 2 operation points to place influence under enemy control"
-
     refute arb.complete?, "Should be remaining influence to place"
 
 
@@ -135,9 +132,6 @@ class AddRestrictedInfluenceTest < Struggle::Test
 
     arb.accept(add_influence_to("a"))
 
-    assert_equal 1, arb.remaining_operation_points,
-      "Should cost 2 operation points to place influence under enemy control"
-
     refute arb.complete?, "Should be remaining influence to place"
 
 
@@ -146,9 +140,6 @@ class AddRestrictedInfluenceTest < Struggle::Test
     assert arb.accepts?(add_influence_to("a"))
 
     arb.accept(add_influence_to("a"))
-
-    assert_equal 0, arb.remaining_operation_points,
-      "Should cost 2 operation points to place influence under enemy control"
 
     assert arb.complete?, "Should be no more influence to place"
   end
@@ -160,7 +151,7 @@ class AddRestrictedInfluenceTest < Struggle::Test
     arb = Arbitrators::AddRestrictedInfluence.new(
       player: USSR,
       influence: USSR,
-      operation_points: 5
+      ops_counter: SimpleOpsCounter.new(5)
     )
 
     arb.countries = @one_country
@@ -172,9 +163,6 @@ class AddRestrictedInfluenceTest < Struggle::Test
 
     arb.accept(add_influence_to("a", amount: 3))
 
-    assert_equal 0, arb.remaining_operation_points,
-      "Should have spent all points placing influence"
-
     assert arb.complete?, "Should be no more influence to place"
   end
 
@@ -185,7 +173,7 @@ class AddRestrictedInfluenceTest < Struggle::Test
     arb = Arbitrators::AddRestrictedInfluence.new(
       player: USSR,
       influence: USSR,
-      operation_points: 5
+      ops_counter: SimpleOpsCounter.new(5)
     )
 
     arb.countries = @one_country
@@ -217,7 +205,7 @@ class AddRestrictedInfluenceTest < Struggle::Test
     arb = Arbitrators::AddRestrictedInfluence.new(
       player: USSR,
       influence: USSR,
-      operation_points: 7
+      ops_counter: SimpleOpsCounter.new(7)
     )
 
     arb.countries = @one_country
@@ -231,9 +219,6 @@ class AddRestrictedInfluenceTest < Struggle::Test
 
     arb.accept two_markers
 
-    assert_equal 3, arb.remaining_operation_points,
-      "Should cost 2 operation points to place influence under enemy control"
-
     refute arb.complete?, "Should be remaining influence to place"
 
     ## Add 2 influence at a cost of 3 points to switch control
@@ -243,9 +228,6 @@ class AddRestrictedInfluenceTest < Struggle::Test
     assert arb.accepts?(two_markers)
 
     arb.accept two_markers
-
-    assert_equal 0, arb.remaining_operation_points,
-      "Should cost 2 operation points to place influence under enemy control"
 
     assert arb.complete?, "Should be no more influence to place"
 
@@ -257,7 +239,7 @@ class AddRestrictedInfluenceTest < Struggle::Test
     arb = Arbitrators::AddRestrictedInfluence.new(
       player: USSR,
       influence: USSR,
-      operation_points: 1
+      ops_counter: SimpleOpsCounter.new(1)
     )
 
     arb.countries = @one_country
@@ -274,7 +256,7 @@ class AddRestrictedInfluenceTest < Struggle::Test
     arb = Arbitrators::AddRestrictedInfluence.new(
       player: USSR,
       influence: USSR,
-      operation_points: 3
+      ops_counter: SimpleOpsCounter.new(3)
     )
 
     arb.countries = iv = "initial_value"
@@ -296,5 +278,26 @@ class AddRestrictedInfluenceTest < Struggle::Test
         amount: amount
       )
     )
+  end
+
+  # A counter that doesnt expect any modifers, applies no bounds,
+  # and therefore has a very simple life.
+
+  class SimpleOpsCounter
+    def initialize(amount)
+      @amount = amount
+    end
+
+    def accepts?(things)
+      @amount - things.size >= 0
+    end
+
+    def accept(things)
+      @amount -= things.size
+    end
+
+    def done?
+      @amount.zero?
+    end
   end
 end

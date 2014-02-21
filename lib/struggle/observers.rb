@@ -4,7 +4,7 @@
 
 class Observers
   def initialize(observers)
-    @observers = observers.lazy.select(&:active?)
+    @observers = observers.select(&:active?)
   end
 
   def ops_modifiers_for_player(player)

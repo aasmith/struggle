@@ -50,7 +50,7 @@ class Game
   end
 
   def observers
-    Observers.new(@engine.observers)
+    @engine.observers
   end
 end
 

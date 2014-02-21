@@ -29,6 +29,10 @@ class Engine
     @observers.each { |o| o.notify(work_item) }
   end
 
+  def observers
+    Observers.new(@observers)
+  end
+
   ## Modifiers
 
   def add_permission_modifier(mod)

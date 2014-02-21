@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w
 
 $: << "lib" << "."
 
@@ -32,32 +32,72 @@ g.accept(
 
 # skip headline for now...
 
-# play opponent card, first for the event
+# Pick an opponent card for USSR to play.
+card = g.hand(USSR).detect { |c| c.side == US }
+
+puts "USSR Playing #{card.inspect}"
+
+# play opponent card, first for event...
 g.accept(
   Move.new(
     player: USSR,
     instruction: Instructions::PlayCard.new(
       player: USSR,
-      card_ref: "Defectors",
+      card_ref: card.ref,
       card_action: :event,
     )
   )
 )
 
-# and then for influence
+# ...and then for influence
 g.accept(
   Move.new(
     player: USSR,
     instruction: Instructions::PlayCard.new(
       player: USSR,
-      card_ref: "Defectors",
+      card_ref: card.ref,
       card_action: :influence,
     )
   )
 )
 
+# add influence here
+
+g.accept(
+  Move.new(
+    player: USSR,
+    instruction: Instructions::AddInfluence.new(
+      influence: USSR,
+      country_name: "Romania",
+      amount: card.ops!
+    )
+  )
+)
+
+## US AR
+
+# US picks own card to play
+card = g.hand(US).detect { |c| c.side == US }
+
+puts "US   Playing #{card.inspect}"
+
+# play own card for coup
+g.accept(
+  Move.new(
+    player: US,
+    instruction: Instructions::PlayCard.new(
+      player: US,
+      card_ref: card.ref,
+      card_action: :coup,
+    )
+  )
+)
+
+
+
+puts "HINT: ===="
 p g.hint
 
-require 'pp'
+exit
 pp g
 

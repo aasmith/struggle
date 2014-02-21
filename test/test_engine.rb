@@ -244,6 +244,19 @@ class TestEngine < Struggle::Test
       "arbitrator should still be waiting for a move allowed by modifiers"
   end
 
+  def test_permission_modifier_skips_instruction
+    instruction = I::EmptyInstruction.new
+
+    e = Engine.new
+    e.add_permission_modifier NegativePermissionModifier.new
+
+    e.add_work_item instruction
+
+    refute e.peek, "Should be nothing left"
+
+    refute instruction.complete?, "Should never execute"
+  end
+
   # Engine stack, with one stack modifier:
   #
   # [orig-arb]

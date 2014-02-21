@@ -39,8 +39,8 @@ class Engine
     @permission_modifiers << mod
   end
 
-  def permitted?(move)
-    @permission_modifiers.all? { |mod| mod.allows? move }
+  def permitted?(item)
+    @permission_modifiers.all? { |mod| mod.allows? item }
   end
 
   def add_stack_modifier(mod)
@@ -64,13 +64,18 @@ class Engine
       injector.inject(work_item)
 
       if Instruction === work_item
-        results = work_item.execute
 
-        notify_observers(work_item)
+        if permitted?(work_item)
 
-        @history << work_item
+          results = work_item.execute
 
-        push_onto_stack(*results) if all_work_items? results
+          notify_observers(work_item)
+
+          @history << work_item
+
+          push_onto_stack(*results) if all_work_items? results
+
+        end
 
       elsif MoveArbitrator === work_item
         results = work_item.execute_stashed_moves

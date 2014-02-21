@@ -55,12 +55,12 @@ Match = Matcher
 # TODO: roll these existing modifiers into observers.
 
 ##
-# Always says no to every move.
+# Always says no to every work item.
 #
 # Used for testing.
 #
 class NegativePermissionModifier
-  def allows?(move)
+  def allows?(work_item)
     false
   end
 end
@@ -82,10 +82,18 @@ class StackModifier
 end
 
 
+# Prevents a WorkItem from being executed.
+#
+# If the WorkItem is a Move, then the move is rejected, allowing the player
+# to make an alternative move.
+#
+# If the WorkItem is an Instruction, then the instruction execution is
+# skipped.
+#
 class PermissionModifier
   extend Injectible
 
-  def allows?(move)
+  def allows?(work_item)
     raise NotImplementedError
   end
 end

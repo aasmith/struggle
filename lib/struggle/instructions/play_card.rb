@@ -7,7 +7,7 @@ module Instructions
 
     fancy_accessor :player, :card_ref, :card_action
 
-    needs :observers
+    needs :cards, :observers
 
     VALID_CARD_ACTIONS = %i(event influence coup realignment space)
 
@@ -41,8 +41,8 @@ module Instructions
       # Execute these instructions (if any) before delegating to the
       # influence/coup/realignment/space methods below.
 
-      instructions += lookup_instructions card_ref, card_action
-      instructions += send card_action
+      instructions.push(*lookup_instructions(card_ref, card_action))
+      instructions.push(*send(card_action))
       instructions
     end
 
@@ -57,8 +57,10 @@ module Instructions
     end
 
     def influence
+      card = cards.find_by_ref(card_ref)
+
       ops_modifiers = observers.ops_modifiers_for_player(player)
-      ops_counter   = OpsCounter.new(card.ops, ops_modifiers)
+      ops_counter   = OpsCounter.new(card.ops!, ops_modifiers)
 
       Arbitrators::AddRestrictedInfluence.new(
         player: player,

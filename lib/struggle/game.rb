@@ -101,6 +101,12 @@ end
 alias I Instruction
 alias L List
 
+# Markers
+module Instructions
+  ActionRoundEnd  = Class.new(Instructions::Noop)
+  ActionRoundsEnd = Class.new(Instructions::Noop)
+end
+
 StartingInfluence = List(
   I(:AddInfluence, influence: USSR, amount: 1, country_name: "Syria"),
   I(:AddInfluence, influence: USSR, amount: 1, country_name: "Iraq"),
@@ -174,10 +180,6 @@ ActionRound = List(
 # TODO
 HeadlinePhase = List()
 
-# Markers
-ActionRoundEnd  = Class.new(Instructions::Noop)
-ActionRoundsEnd = Class.new(Instructions::Noop)
-
 EarlyPhaseTurn = List(
   I(:ImproveDefcon),
   I(:DealCards, target: 8),
@@ -188,7 +190,7 @@ EarlyPhaseTurn = List(
   ActionRound,
   ActionRound,
   ActionRound,
-  ActionRoundsEnd, # for certain events to trigger off of
+  I(:ActionRoundsEnd), # for certain events to trigger off of
   I(:CheckMilitaryOps),
   I(:ResetMilitaryOps),
   I(:CheckHeldCards), # check no scoring cards
@@ -213,7 +215,7 @@ MidPhaseTurn = List(
   ActionRound,
   ActionRound,
   ActionRound,
-  EndActionRounds, # for certain events to trigger off of
+  I(:ActionRoundsEnd), # for certain events to trigger off of
   I(:CheckMilitaryOps),
   I(:ResetMilitaryOps),
   I(:CheckHeldCards), # check no scoring cards
@@ -240,7 +242,7 @@ LatePhaseTurn = List(
   ActionRound,
   ActionRound,
   ActionRound,
-  EndActionRounds, # for certain events to trigger off of
+  I(:ActionRoundsEnd), # for certain events to trigger off of
   I(:CheckMilitaryOps),
   I(:ResetMilitaryOps),
   I(:CheckHeldCards), # check no scoring cards

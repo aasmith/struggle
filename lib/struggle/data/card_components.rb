@@ -1372,13 +1372,11 @@ NuclearSubs = [
 ]
 
 Modifiers::NuclearSubs = [
-  ScoringModifier(
+  PermissionModifier(
     on: Match(
-      type: Coup,
-      player: US,
-      countries: Countries.select(&:battleground?)
-    ),
-    battleground: false,
+      item: Instructions::DegradeDefcon,
+      reason: Match(item: Instructions::Coup, player: US)),
+    ruling: :deny,
     terminate: on_turn_end
   )
 ]

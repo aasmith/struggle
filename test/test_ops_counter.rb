@@ -188,4 +188,34 @@ class OpsCounterTest < Struggle::Test
     c.accept          asia
     assert c.done?
   end
+
+  # Test value resolution
+
+  def test_value
+    c = OpsCounter.new 3
+
+    assert_equal 3, c.value(Kenya)
+  end
+
+  def test_value_conditional
+    c = OpsCounter.new 3, [cc, vr]
+
+    assert_equal 3, c.value(Kenya)
+    assert_equal 4, c.value(India)
+    assert_equal 5, c.value(Burma)
+  end
+
+  def test_value_unconditional
+    c = OpsCounter.new 3, [rs]
+
+    assert_equal 2, c.value(Burma)
+  end
+
+  def test_value_both_condition_types
+    c = OpsCounter.new 3, [rs, cc, vr]
+
+    assert_equal 2, c.value(Kenya)
+    assert_equal 3, c.value(India)
+    assert_equal 4, c.value(Burma)
+  end
 end

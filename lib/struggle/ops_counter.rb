@@ -70,6 +70,29 @@ class OpsCounter
     end
   end
 
+  # Determines how many ops points are available if all points were to
+  # be spent in the specified country. This is useful for determining
+  # ops points where points need to be known in advance, rather than
+  # tracked. (coups, space)
+  #
+  # If there are multiple possibilities, then the highest value is
+  # returned.
+  #
+  # This method only makes sense to call on a freshly initialized
+  # instance.
+
+  def value(country)
+    values = []
+
+    @possibles.each do |ops_modifiers, count|
+      if ops_modifiers.all? { |m| m.qualifies?([country]) }
+        values << count
+      end
+    end
+
+    values.max or fail "No ops value could be found for #{country.inspect}"
+  end
+
   def bound(number)
     [[number, 1].max, 4].min
   end

@@ -3,11 +3,11 @@
 
 An attempt to create a faithful clone of the board game Twilight Struggle.
 
-http://github.com/aasmith/struggle
+<http://github.com/aasmith/struggle>
 
 ### Synopsis
 
-```struggle``` aims to be a rules-enforced version of the board game Twilight Struggle. It has three logical parts:
+`struggle` aims to be a rules-enforced version of the board game Twilight Struggle. It has three logical parts:
 
  1. The representation of the game, encompassing all state needed to represent an active game, as well as a rules engine to enforce rules and inputs
  2. A CLI or other basic input/output system for playing a game locally
@@ -27,30 +27,23 @@ Ruby 2.1 or higher.
 
 Clone the project from github:
 
-```git clone git://github.com/aasmith/struggle```
+`git clone git://github.com/aasmith/struggle`
 
-No interactive version exists yet, an example of a game exists in ```bin/struggle```.
+No interactive version exists yet, an example of a game exists in `bin/struggle`.
 
 ### Developers
 
 Running tests:
 
-```TESTOPTS=-p RUBYOPT=-w RAKEOPT=-q rake```
+`TESTOPTS=-p RUBYOPT=-w RAKEOPT=-q rake`
 
 Running a test:
 
-```TESTOPTS=-p RUBYOPT=-w RAKEOPT=-q rake N=test_name```
-
-After checking out the source, run:
-
-```$ rake newb```
-
-This task will install any missing dependencies, run the tests/specs,
-and generate the RDoc.
+`TESTOPTS=-p RUBYOPT=-w RAKEOPT=-q rake N=test_name`
 
 ### License
 
-##### Copyright (c) 2014 Andrew A. Smith <andy@tinnedfruit.org>
+##### Copyright &copy; 2014 Andrew A. Smith <andy@tinnedfruit.org>
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

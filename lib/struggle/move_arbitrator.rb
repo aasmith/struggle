@@ -15,7 +15,7 @@ class MoveArbitrator < WorkItem
     results = [*move.execute]
     after_execute(move)
 
-    results.all? { |r| WorkItem === r } ? results : []
+    results
   end
 
   # Override in subclasses.
@@ -31,16 +31,16 @@ class MoveArbitrator < WorkItem
     @stashed_moves.push move
   end
 
-  def execute_stashed_moves
-    while move = @stashed_moves.pop do
-      results = *accept(move)
-      @executed_moves.push move
+  def execute_next_stashed_move
+    return unless move = @stashed_moves.pop
 
-      # There are some things to put on the engine stack, so
-      # stop executing stuff here and let the engine run the
-      # new stuff we are about to give it.
-      return results if results
-    end
+    results = *accept(move)
+    @executed_moves.push move
+
+    # There are some things to put on the engine stack, so
+    # stop executing stuff here and let the engine run the
+    # new stuff we are about to give it.
+    results
   end
 
   def correct_player?(move)

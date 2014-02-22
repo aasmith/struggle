@@ -67,7 +67,7 @@ class Engine
 
         if permitted?(work_item)
 
-          results = work_item.execute
+          results = package_results work_item.execute
 
           notify_observers(work_item)
 
@@ -78,7 +78,7 @@ class Engine
         end
 
       elsif MoveArbitrator === work_item
-        results = work_item.execute_stashed_moves
+        results = package_results work_item.execute_next_stashed_move
 
         if all_work_items? results
           push_onto_stack(*results)
@@ -102,7 +102,7 @@ class Engine
             # from the top.
             work_item.stash move
           else
-            results = work_item.accept(move)
+            results = package_results work_item.accept(move)
 
             push_onto_stack(*results) if all_work_items? results
           end
@@ -138,6 +138,11 @@ class Engine
 
   def push_onto_stack *stuff
     @work_items.push(*stuff)
+  end
+
+  # Takes a result and assures it comes back in a neatly packaged array.
+  def package_results(results)
+    [*results].flatten
   end
 
   ##

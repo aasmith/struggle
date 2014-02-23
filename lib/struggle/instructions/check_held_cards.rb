@@ -11,7 +11,10 @@ module Instructions
     end
 
     def winner(player)
-      [DeclareWinner.new(player: player), EndGame.new]
+      [
+        DeclareWinner.new(player: player, reason: "Scoring card held"),
+        EndGame.new
+      ]
     end
   end
 end

@@ -20,12 +20,6 @@ class InstructionTests::AddInfluenceTest < Struggle::Test
     assert_equal :amount, country.amount
   end
 
-  class FakeCountries < Struct.new(:country)
-    def find(x)
-      country
-    end
-  end
-
   class FakeCountry < Struct.new(:player, :amount)
     def add_influence(player, amount)
       self.player = player

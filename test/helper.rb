@@ -30,6 +30,12 @@ class EmptyMove < Move
   end
 end
 
+class FakeCountries < Struct.new(:country)
+  def find(x)
+    country
+  end
+end
+
 # No dot printing right now, thx
 #module Minitest
 #  class ProgressReporter

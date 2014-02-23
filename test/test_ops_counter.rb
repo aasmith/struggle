@@ -189,33 +189,33 @@ class OpsCounterTest < Struggle::Test
     assert c.done?
   end
 
-  # Test value resolution
+  # Test value_for_country resolution
 
-  def test_value
+  def test_value_for_country
     c = OpsCounter.new 3
 
-    assert_equal 3, c.value(Kenya)
+    assert_equal 3, c.value_for_country(Kenya)
   end
 
-  def test_value_conditional
+  def test_value_for_country_conditional
     c = OpsCounter.new 3, [cc, vr]
 
-    assert_equal 3, c.value(Kenya)
-    assert_equal 4, c.value(India)
-    assert_equal 5, c.value(Burma)
+    assert_equal 3, c.value_for_country(Kenya)
+    assert_equal 4, c.value_for_country(India)
+    assert_equal 5, c.value_for_country(Burma)
   end
 
-  def test_value_unconditional
+  def test_value_for_country_unconditional
     c = OpsCounter.new 3, [rs]
 
-    assert_equal 2, c.value(Burma)
+    assert_equal 2, c.value_for_country(Burma)
   end
 
-  def test_value_both_condition_types
+  def test_value_for_country_both_condition_types
     c = OpsCounter.new 3, [rs, cc, vr]
 
-    assert_equal 2, c.value(Kenya)
-    assert_equal 3, c.value(India)
-    assert_equal 4, c.value(Burma)
+    assert_equal 2, c.value_for_country(Kenya)
+    assert_equal 3, c.value_for_country(India)
+    assert_equal 4, c.value_for_country(Burma)
   end
 end

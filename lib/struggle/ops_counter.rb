@@ -81,7 +81,7 @@ class OpsCounter
   # This method only makes sense to call on a freshly initialized
   # instance.
 
-  def value(country)
+  def value_for_country(country)
     values = []
 
     @possibles.each do |ops_modifiers, count|

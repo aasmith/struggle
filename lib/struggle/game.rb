@@ -149,7 +149,7 @@ Setup = List(
 # These are called more than once, so make sure a list of new instances
 # are returned each time.
 
-def UssrActionRound
+def PlayerActionRound(player:)
   List(
     # TODO might need this to comply with 6.1.1 -- capturing country markers
     # that are in place at the begining of the player's AR
@@ -160,20 +160,8 @@ def UssrActionRound
     #
     # Instruction(:SnapshotCountries)
 
-    Instruction(:SetPhasingPlayer, player: USSR),
-    Arbitrator(:CardPlay, player: USSR),
-    Instruction(:DisposeCurrentCards),
-    Instruction(:ActionRoundEnd)
-  )
-end
-
-def UsActionRound
-  List(
-    # TODO see above
-    # Instruction(:SnapshotCountries)
-
-    Instruction(:SetPhasingPlayer, player: US),
-    Arbitrator(:CardPlay, player: US),
+    Instruction(:SetPhasingPlayer, player: player),
+    Arbitrator(:CardPlay, player: player),
     Instruction(:DisposeCurrentCards),
     Instruction(:ActionRoundEnd)
   )
@@ -181,8 +169,8 @@ end
 
 def ActionRound
   List(
-    UssrActionRound(),
-    UsActionRound()
+    PlayerActionRound(player: USSR),
+    PlayerActionRound(player: US)
   )
 end
 
@@ -191,17 +179,17 @@ def HeadlinePhase
   List()
 end
 
-def EarlyPhaseTurn
+def Turn(phase:)
+  cards  = { early: 8, mid: 9, late: 9 }
+  rounds = { early: 6, mid: 7, late: 7 }
+
   List(
     I(:ImproveDefcon),
-    I(:DealCards, target: 8),
+    I(:DealCards, target: cards[phase]),
     HeadlinePhase(),
-    ActionRound(),
-    ActionRound(),
-    ActionRound(),
-    ActionRound(),
-    ActionRound(),
-    ActionRound(),
+
+    *rounds[phase].times.map { ActionRound() },
+
     I(:ActionRoundsEnd), # for certain events to trigger off of
     I(:CheckMilitaryOps),
     I(:ResetMilitaryOps),
@@ -211,68 +199,23 @@ def EarlyPhaseTurn
   )
 end
 
-EarlyPhase = List(
-  EarlyPhaseTurn(),
-  EarlyPhaseTurn(),
-  EarlyPhaseTurn()
-)
-
-def MidPhaseTurn
-  List(
-    I(:ImproveDefcon),
-    I(:DealCards, target: 9),
-    HeadlinePhase(),
-    ActionRound(),
-    ActionRound(),
-    ActionRound(),
-    ActionRound(),
-    ActionRound(),
-    ActionRound(),
-    ActionRound(),
-    I(:ActionRoundsEnd), # for certain events to trigger off of
-    I(:CheckMilitaryOps),
-    I(:ResetMilitaryOps),
-    I(:CheckHeldCards), # check no scoring cards
-    I(:FlipChinaCard), # make it 'playable'
-    I(:AdvanceTurn)
-  )
+def Phase(phase)
+  # Early phase cards are dealt before the phase begins.
+  if phase == :early
+    List(
+      Turn(phase: phase),
+      Turn(phase: phase),
+      Turn(phase: phase)
+    )
+  else
+    List(
+      Instruction(:AddToDeck, phase: phase),
+      Turn(phase: phase),
+      Turn(phase: phase),
+      Turn(phase: phase)
+    )
+  end
 end
-
-MidPhase = List(
-  Instruction(:AddToDeck, phase: :mid),
-  MidPhaseTurn(),
-  MidPhaseTurn(),
-  MidPhaseTurn(),
-  MidPhaseTurn()
-)
-
-def LatePhaseTurn
-  List(
-    I(:ImproveDefcon),
-    I(:DealCards, target: 9),
-    HeadlinePhase(),
-    ActionRound(),
-    ActionRound(),
-    ActionRound(),
-    ActionRound(),
-    ActionRound(),
-    ActionRound(),
-    ActionRound(),
-    I(:ActionRoundsEnd), # for certain events to trigger off of
-    I(:CheckMilitaryOps),
-    I(:ResetMilitaryOps),
-    I(:CheckHeldCards), # check no scoring cards
-    I(:FlipChinaCard), # make it 'playable'
-    I(:AdvanceTurn)
-  )
-end
-
-LatePhase = List(
-  Instruction(:AddToDeck, phase: :late),
-  LatePhaseTurn(),
-  LatePhaseTurn(),
-  LatePhaseTurn()
-)
 
 # TODO Award the holder of The China Card at the end of Turn 10 with 1 VP.
 AwardChinaCardHolder = List()
@@ -280,13 +223,12 @@ AwardChinaCardHolder = List()
 FinalScoring = List(
   AwardChinaCardHolder
 )
-#GameEnd      = Instruction(LambdaInstruction) { puts "END!!!" }
 
 GameInstructions = List(
   Setup,
-  EarlyPhase,
-  MidPhase,
-  LatePhase,
+  Phase(:early),
+  Phase(:mid),
+  Phase(:late),
   FinalScoring, # set a winner here if applicable
   I(:EndGame)
 )

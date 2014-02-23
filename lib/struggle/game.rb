@@ -200,21 +200,13 @@ def Turn(phase:)
 end
 
 def Phase(phase)
-  # Early phase cards are dealt before the phase begins.
-  if phase == :early
-    List(
-      Turn(phase: phase),
-      Turn(phase: phase),
-      Turn(phase: phase)
-    )
-  else
-    List(
-      Instruction(:AddToDeck, phase: phase),
-      Turn(phase: phase),
-      Turn(phase: phase),
-      Turn(phase: phase)
-    )
-  end
+  List(
+    # Early phase cards are dealt before the phase begins.
+    *phase != :early ? Instruction(:AddToDeck, phase: phase) : nil,
+    Turn(phase: phase),
+    Turn(phase: phase),
+    Turn(phase: phase)
+  )
 end
 
 # TODO Award the holder of The China Card at the end of Turn 10 with 1 VP.

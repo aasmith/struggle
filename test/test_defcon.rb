@@ -90,8 +90,36 @@ class TestDefcon < Struggle::Test
     end
 
     defcon.improve(1)
-    assert_equal 3, defcon.value, "Defcon should improve without needing player"
+    assert_equal 3, defcon.value, "Improving DEFCON does not require a player"
   end
+
+  def test_restricted_regions
+    defcon = Defcon.new(1)
+
+    assert_raises ArgumentError do
+      defcon.restricted_regions
+    end
+
+    3.times do
+      defcon.improve 1
+      refute_empty defcon.restricted_regions
+    end
+
+    defcon.improve 1
+    assert_empty defcon.restricted_regions
+  end
+
+  def test_affects_country?
+    kenya = FakeCountry.new([Africa])
+    burma = FakeCountry.new([Asia, SoutheastAsia])
+
+    defcon = Defcon.new(3)
+
+    assert defcon.affects?(burma)
+    refute defcon.affects?(kenya)
+  end
+
+  FakeCountry = Struct.new(:regions)
 
 end
 

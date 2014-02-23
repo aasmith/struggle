@@ -44,6 +44,29 @@ class Defcon
     destroyed_by
   end
 
+  DEFCON_RESTRICTIONS = {
+    5 => [],
+    4 => [Europe],
+    3 => [Europe, Asia],
+    2 => [Europe, Asia, MiddleEast]
+  }
+
+  # Returns a list of regions that are defcon-restricted by
+  # the current DEFCON level.
+
+  def restricted_regions
+    DEFCON_RESTRICTIONS.fetch(value) do |key|
+      raise ArgumentError, "DEFCON is at 1, why are you asking?"
+    end
+  end
+
+  # Returns true if the given country is in the list of DEFCON
+  # restricted regions.
+
+  def affects?(country)
+    !(country.regions & restricted_regions).empty?
+  end
+
 end
 
 ImmutableDefcon = Class.new(StandardError)

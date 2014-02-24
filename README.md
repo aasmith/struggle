@@ -7,9 +7,12 @@ An attempt to create a faithful clone of the board game Twilight Struggle.
 
 ### Synopsis
 
-`struggle` aims to be a rules-enforced version of the board game Twilight Struggle. It has three logical parts:
+`struggle` aims to be a rules-enforced version of the board game
+Twilight Struggle. It has three logical parts:
 
- 1. The representation of the game, encompassing all state needed to represent an active game, as well as a rules engine to enforce rules and inputs
+ 1. The representation of the game, encompassing all state needed to
+    represent an active game, as well as a rules engine to enforce rules
+    and inputs
  2. A CLI or other basic input/output system for playing a game locally
  3. A web API and UI for allowing play over networks
 
@@ -29,7 +32,8 @@ Clone the project from github:
 
 `git clone git://github.com/aasmith/struggle`
 
-No interactive version exists yet, an example of a game exists in `bin/struggle`.
+No interactive version exists yet, an example of a game exists in
+`bin/struggle`.
 
 ### Developers
 
@@ -40,6 +44,10 @@ Running tests:
 Running a test:
 
 `TESTOPTS=-p RUBYOPT=-w RAKEOPT=-q rake N=test_name`
+
+Running the game on autopilot:
+
+`STRUGGLE_DEBUG_ENGINE=1 bin/struggle`
 
 ### License
 

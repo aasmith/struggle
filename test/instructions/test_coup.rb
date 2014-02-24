@@ -152,7 +152,6 @@ class CoupTest < Struggle::Test
 
     coup.countries = FakeCountries.new(country)
     coup.observers = Observers.new([])
-    coup.rng = Random.new
 
     @country = country
 
@@ -161,41 +160,37 @@ class CoupTest < Struggle::Test
   end
 
   def successful_coup(country = country())
-    amazing_die = FakeDieFactory.always_roll(6)
 
     country.add_influence(US,   0)
     country.add_influence(USSR, 4)
 
     coup = Instructions::Coup.new(
       player: US,
-      country_name: "Foo",
-      die_class: amazing_die
+      country_name: "Foo"
     )
 
     coup.countries = FakeCountries.new(country)
     coup.observers = Observers.new([])
-    coup.rng = Random.new
     coup.ops_value = 4
+    coup.die       = OneSidedDie.new(6)
 
     @instructions = coup.action
   end
 
   def failed_coup(country = country())
-    crap_die = FakeDieFactory.always_roll(1)
 
     country.add_influence(US,   0)
     country.add_influence(USSR, 4)
 
     coup = Instructions::Coup.new(
       player: US,
-      country_name: "Foo",
-      die_class: crap_die
+      country_name: "Foo"
     )
 
     coup.countries = FakeCountries.new(country)
     coup.observers = Observers.new([])
-    coup.rng = Random.new
     coup.ops_value = 1
+    coup.die       = OneSidedDie.new(1)
 
     @instructions = coup.action
   end
@@ -208,13 +203,13 @@ class CoupTest < Struggle::Test
     country(battleground: true)
   end
 
-  class FakeDieFactory
-    def self.always_roll(n)
-      Class.new(Die) do
-        define_method :roll do
-          n
-        end
-      end
+  class OneSidedDie
+    def initialize(n)
+      @n = n
+    end
+
+    def roll
+      @n
     end
   end
 end

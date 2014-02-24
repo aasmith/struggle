@@ -1,19 +1,16 @@
 module Instructions
   class Coup < Instruction
 
-    fancy_accessor :player, :country_name, :ops_value, :die_class
+    fancy_accessor :player, :country_name, :ops_value
 
-    needs :countries, :observers, :rng
+    needs :countries, :observers, :die
 
-    def initialize(player:, country_name:, die_class: Die)
+    def initialize(player:, country_name:)
       super
 
       self.player = player
       self.country_name = country_name
       self.ops_value = nil
-
-      # Used for testing with a rigged die
-      self.die_class = die_class
     end
 
     def action
@@ -22,7 +19,6 @@ module Instructions
       country   = countries.find(country_name)
       stability = country.stability
 
-      die  = die_class.new(rng)
       roll = die.roll
 
       mods = observers.die_roll_modifiers(

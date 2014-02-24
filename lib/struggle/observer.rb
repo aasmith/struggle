@@ -3,7 +3,7 @@
 # the upstream notifier to direct observations as needed.
 #
 # Terminators provide another way to deactivate an observer. By populating
-# +terminators+ with one or +Matcher+s, the observer will be deactivated
+# +terminators+ with one or more +Matcher+s, the observer will be deactivated
 # any time an item is observed and matched by any of the matchers.
 
 module Observer

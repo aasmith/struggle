@@ -1,19 +1,12 @@
 class Instruction < WorkItem
   def execute
-    returning action do
-      complete
-    end
+    result = action
+    complete
+    result
   end
 
   def action
     raise NotImplementedError
-  end
-
-  ##
-  # Returns +obj+ after calling +block+.
-  #
-  def returning(obj, &block)
-    obj.tap(&block)
   end
 
   def inspect

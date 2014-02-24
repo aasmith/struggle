@@ -1375,6 +1375,7 @@ Modifiers::NuclearSubs = [
   PermissionModifier(
     on: Match(
       item: Instructions::DegradeDefcon,
+      # TODO also catch free coup? (if it is a different instruction...)
       reason: Match(item: Instructions::Coup, player: US)),
     ruling: :deny,
     terminate: on_turn_end

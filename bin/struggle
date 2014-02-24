@@ -95,6 +95,16 @@ g.accept(
   )
 )
 
+g.accept(
+  Move.new(
+    player: US,
+    instruction: Instructions::Coup.new(
+      player: US,
+      country_name: "Romania"
+    )
+  )
+)
+
 
 
 puts "HINT: ===="

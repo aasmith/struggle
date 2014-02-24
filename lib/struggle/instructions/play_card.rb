@@ -57,11 +57,6 @@ module Instructions
     end
 
     def influence
-      card = cards.find_by_ref(card_ref)
-
-      ops_modifiers = observers.ops_modifiers_for_player(player)
-      ops_counter   = OpsCounter.new(card.ops!, ops_modifiers)
-
       Arbitrators::AddRestrictedInfluence.new(
         player: player,
         influence: player,
@@ -69,11 +64,14 @@ module Instructions
       )
     end
 
-    #TODO all of the below
-
     def coup
-      Arbitrators::Coup.new
+      Arbitrators::Coup.new(
+        player: player,
+        ops_counter: ops_counter
+      )
     end
+
+    #TODO all of the below
 
     def realignment
       Arbitrators::RealignmentRoll.new
@@ -82,5 +80,13 @@ module Instructions
     def space
       Arbitrators::SpaceRace.new
     end
+
+    def ops_counter
+      card = cards.find_by_ref(card_ref)
+      mods = observers.ops_modifiers_for_player(player)
+
+      OpsCounter.new(card.ops!, mods)
+    end
+
   end
 end

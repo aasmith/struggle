@@ -1,2 +1,0 @@
-A place for old experiments whose results are still needed for reference
-because they have not been fully integrated into the codebase yet.

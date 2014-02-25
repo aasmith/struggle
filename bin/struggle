@@ -40,8 +40,6 @@ g.accept(
 # Pick an opponent card for USSR to play.
 card = g.hand(USSR).detect { |c| c.side == US }
 
-puts "USSR Playing #{card.inspect}"
-
 # play opponent card, first for event...
 g.accept(
   Move.new(
@@ -83,8 +81,6 @@ g.accept(
 
 # US picks own card to play
 card = g.hand(US).detect { |c| c.side == US }
-
-puts "US   Playing #{card.inspect}"
 
 # play own card for coup
 g.accept(

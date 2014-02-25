@@ -23,6 +23,8 @@ module Arbitrators
       ops_value = ops_counter.value_for_country(country)
 
       move.instruction.ops_value = ops_value
+
+      log "%4s to coup in %s" % [player, country]
     end
 
     def after_execute(move)

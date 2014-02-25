@@ -91,5 +91,17 @@ module Instructions
       OpsCounter.new(card.ops!, mods)
     end
 
+    def to_s
+      card = cards.find_by_ref(card_ref)
+
+      opponent =
+        card.side == player.opponent && card_action == :event ?
+        "opponent " : ""
+
+      "%4s plays %s for %s%s" % [
+        player, card.inspect, opponent, card_action
+      ]
+    end
+
   end
 end

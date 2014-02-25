@@ -21,7 +21,12 @@ module Instructions
     end
 
     def action
-      countries.find(country_name).add_influence(influence, amount)
+      country = countries.find(country_name)
+      country.add_influence(influence, amount)
+
+      log "%s %4s influence added -> %s" % [
+        amount, influence, country
+      ]
     end
   end
 end

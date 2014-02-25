@@ -50,6 +50,6 @@ end
 DEBUG_ENGINE = ENV["STRUGGLE_DEBUG_ENGINE"]
 
 def log(*stuff)
-  puts(*stuff) if $logging
+  puts(*stuff.map { |line| ">> " + line }) if $logging
 end
 

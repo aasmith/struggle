@@ -34,8 +34,16 @@ module Instructions
       player_dmod_sum   = player_dmods.  map(&:amount).reduce(:+) || 0
       opponent_dmod_sum = opponent_dmods.map(&:amount).reduce(:+) || 0
 
-      player_roll   = die.roll +   player_dmod_sum +   player_bonuses
-      opponent_roll = die.roll + opponent_dmod_sum + opponent_bonuses
+      player_base   = die.roll
+      opponent_base = die.roll
+
+      player_roll   = player_base   +   player_dmod_sum +   player_bonuses
+      opponent_roll = opponent_base + opponent_dmod_sum + opponent_bonuses
+
+      roll_info_msg = "%4s rolls %s. Becomes %s after modifiers and bonuses"
+
+      log roll_info_msg % [ player,   player_base,   player_roll ]
+      log roll_info_msg % [ opponent, opponent_base, opponent_roll ]
 
       if player_roll == opponent_roll
         log "Rolls tied. No influence is removed."
@@ -53,14 +61,21 @@ module Instructions
           high_roller, difference, low_roller, country.name
         ]
 
-        if difference > country.influence(low_roller)
+        opponent_influence = country.influence(low_roller)
+
+        if opponent_influence.zero?
+          log "%s has no influence in %s." % [
+            low_roller, country.name
+          ]
+
+        elsif difference > opponent_influence
           log "%s only has %s influence in %s, removing all influence." % [
-            low_roller, country.influence(low_roller), country.name
+            low_roller, opponent_influence, country.name
           ]
 
           Instructions::RemoveInfluence.new(
                influence: low_roller,
-                  amount: country.influence(low_roller),
+                  amount: opponent_influence,
             country_name: country.name
           )
 
@@ -87,12 +102,12 @@ module Instructions
       bonus = 0
 
       if country.influence(player) > country.influence(player.opponent)
-        log "#{player} gets +1 bonus for more influence"
+        log "%4s gets +1 bonus for more influence" % player
         bonus += 1
       end
 
       if country.adjacent_superpower?(player)
-        log "#{player} gets +1 bonus for own superpower adjacency"
+        log "%4s gets +1 bonus for own superpower adjacency" % player
         bonus += 1
       end
 
@@ -100,12 +115,15 @@ module Instructions
       ncount    = neighbors.count { |n| n.controlled_by?(player) }
 
       if ncount > 0
-        log "#{player} gets +#{ncount} for control of #{ncount} neighbors"
+        log "%4s gets +%s for control of %s neighbors" % [
+          player, ncount, ncount
+        ]
+
         bonus += ncount
       end
 
       if bonus.zero?
-        log "#{player} gets no realignment bonuses."
+        log "%4s gets no realignment bonuses." % player
       end
 
       bonus

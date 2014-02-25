@@ -81,9 +81,9 @@ class Country
 
   def to_s
     swords = battleground? ? "⚔" : ""
-    adjacent = adjacent_superpower && "#{adjacent_superpower.symbol}"
+    adjacent = adjacent_superpower && adjacent_superpower.symbol
 
-    basic = "%s %s [%s%s] (US:%s, USSR:%s)" % [
+    basic = "%s %s [%s] %s (US:%s, USSR:%s)" % [
       name, adjacent, stability, swords, influence(US), influence(USSR)
     ]
 

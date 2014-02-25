@@ -17,6 +17,10 @@ module Arbitrators
       self.player = player
     end
 
+    def before_execute(move)
+      log move.instruction.to_s
+    end
+
     def after_execute(move)
       if noop?(move) || second_part?
         complete

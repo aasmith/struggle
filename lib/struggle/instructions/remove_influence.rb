@@ -20,7 +20,12 @@ module Instructions
     end
 
     def action
-      countries.find(country_name).remove_influence(influence, amount)
+      country = countries.find(country_name)
+      country.remove_influence(influence, amount)
+
+      log "%s %4s influence removed -> %s" % [
+        amount, influence, country
+      ]
     end
   end
 end

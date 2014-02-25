@@ -71,11 +71,14 @@ module Instructions
       )
     end
 
-    #TODO all of the below
-
     def realignment
-      Arbitrators::RealignmentRoll.new
+      Arbitrators::Realignment.new(
+        player: player,
+        ops_counter: ops_counter
+      )
     end
+
+    #TODO all of the below
 
     def space
       Arbitrators::SpaceRace.new

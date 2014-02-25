@@ -873,7 +873,7 @@ FiveYearPlan = [
 #
 StarWars = [
   If(
-    lambda { game.space_race(US) > game.space_race(USSR) }),
+    lambda { game.space_race(US) > game.space_race(USSR) },
     [
       PickFromDiscard(
         player: US,

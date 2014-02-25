@@ -78,9 +78,23 @@ class ArbitratorTests::CardPlayTest < Struggle::Test
       instruction: Instructions::Noop.new
     )
 
+    cards = Cards.new
+
+    # the laziest way to set move.instruction.cards on
+    # all those moves that were just created.
+    instance_variables.each do |iv|
+      target = instance_variable_get(iv)
+
+      if target.respond_to?(:instruction) &&
+         target.instruction.respond_to?(:cards=)
+
+        target.instruction.cards = cards
+      end
+    end
+
     @arb = Arbitrators::CardPlay.new(player: USSR)
 
-    @arb.cards = Cards.new
+    @arb.cards = cards
     @arb.hands = Hands.new
     @arb.china_card = ChinaCard.new
 

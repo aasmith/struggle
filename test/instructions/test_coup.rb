@@ -203,13 +203,4 @@ class CoupTest < Struggle::Test
     country(battleground: true)
   end
 
-  class OneSidedDie
-    def initialize(n)
-      @n = n
-    end
-
-    def roll
-      @n
-    end
-  end
 end

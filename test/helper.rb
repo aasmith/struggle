@@ -36,6 +36,16 @@ class FakeCountries < Struct.new(:country)
   end
 end
 
+class OneSidedDie
+  def initialize(n)
+    @n = n
+  end
+
+  def roll
+    @n
+  end
+end
+
 # No dot printing right now, thx
 #module Minitest
 #  class ProgressReporter

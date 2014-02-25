@@ -3,7 +3,7 @@ require "helper"
 # Within the scope of this test class, a 'large move' refers to a player
 # move that places more than one influence marker.
 
-class AddRestrictedInfluenceTest < Struggle::Test
+class ArbitratorTests::AddRestrictedInfluenceTest < Struggle::Test
 
   def setup
     # a -- b -- c

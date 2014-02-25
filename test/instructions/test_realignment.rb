@@ -3,7 +3,7 @@ require "helper"
 # TODO This test needs to test for the correct application of
 # die roll modifiers when present. (via Observers.new(...))
 
-class RealignmentTest < Struggle::Test
+class InstructionTests::RealignmentTest < Struggle::Test
 
   I = Instructions
 

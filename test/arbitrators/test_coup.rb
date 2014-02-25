@@ -1,6 +1,6 @@
 require "helper"
 
-class CoupTest < Struggle::Test
+class ArbitratorTests::CoupTest < Struggle::Test
 
   def setup
     @arb = Arbitrators::Coup.new(

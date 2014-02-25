@@ -49,6 +49,27 @@ class OneSidedDie
   end
 end
 
+# A counter that doesnt expect any modifers, applies no bounds,
+# and therefore has a very simple life.
+
+class SimpleOpsCounter
+  def initialize(amount)
+    @amount = amount
+  end
+
+  def accepts?(things)
+    @amount - things.size >= 0
+  end
+
+  def accept(things)
+    @amount -= things.size
+  end
+
+  def done?
+    @amount.zero?
+  end
+end
+
 # No dot printing right now, thx
 #module Minitest
 #  class ProgressReporter

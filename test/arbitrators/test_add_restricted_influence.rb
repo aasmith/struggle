@@ -280,24 +280,4 @@ class ArbitratorTests::AddRestrictedInfluenceTest < Struggle::Test
     )
   end
 
-  # A counter that doesnt expect any modifers, applies no bounds,
-  # and therefore has a very simple life.
-
-  class SimpleOpsCounter
-    def initialize(amount)
-      @amount = amount
-    end
-
-    def accepts?(things)
-      @amount - things.size >= 0
-    end
-
-    def accept(things)
-      @amount -= things.size
-    end
-
-    def done?
-      @amount.zero?
-    end
-  end
 end

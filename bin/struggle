@@ -2,6 +2,9 @@
 
 $: << "lib" << "."
 
+# HEE HEE HEE
+load 'struggle/banner.rb', true
+
 $logging = true
 
 require 'struggle'

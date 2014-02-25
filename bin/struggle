@@ -108,7 +108,32 @@ g.accept(
   )
 )
 
+# USSR realign!
+card = g.hand(USSR).detect { |c| c.side == USSR }
 
+# play own card for realign
+g.accept(
+  Move.new(
+    player: USSR,
+    instruction: Instructions::PlayCard.new(
+      player: USSR,
+      card_ref: card.ref,
+      card_action: :realignment,
+    )
+  )
+)
+
+card.ops!.times do
+  g.accept(
+    Move.new(
+      player: USSR,
+      instruction: Instructions::Realignment.new(
+        player: USSR,
+        country_name: "Italy"
+      )
+    )
+  )
+end
 
 puts "HINT: ===="
 p g.hint

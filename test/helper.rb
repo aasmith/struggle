@@ -3,6 +3,9 @@ require "minitest/mock"
 
 require "struggle"
 
+# Silence log during tests
+$logging = false
+
 class Struggle::Test < Minitest::Test
   parallelize_me!
   make_my_diffs_pretty!

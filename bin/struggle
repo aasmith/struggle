@@ -2,7 +2,7 @@
 
 $: << "lib" << "."
 
-ENABLE_LOG = true
+$logging = true
 
 require 'struggle'
 require 'struggle/game'

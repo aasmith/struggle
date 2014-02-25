@@ -49,9 +49,7 @@ end
 
 DEBUG_ENGINE = ENV["STRUGGLE_DEBUG_ENGINE"]
 
-# TODO make this into a serializing log.
-if defined?(ENABLE_LOG) && ENABLE_LOG
-  alias log puts
-else
-  def log(*); end
+def log(*stuff)
+  puts(*stuff) if $logging
 end
+

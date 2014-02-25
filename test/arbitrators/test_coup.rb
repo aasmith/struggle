@@ -48,6 +48,8 @@ class ArbitratorTests::CoupTest < Struggle::Test
     @arb.defcon    = FakeDefcon.new(prevents_everything: false)
 
     assert @arb.accepts?(@move)
+    @arb.accept @move
+    assert @arb.complete?
   end
 
   class FakeCountry

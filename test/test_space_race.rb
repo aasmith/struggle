@@ -57,4 +57,14 @@ class SpaceRaceTest < Struggle::Test
     assert_equal SpaceRace::MAX_POSITION, @race.position(US)
   end
 
+  def test_first_player_to_reach_position
+    assert_equal :first, @race.advance(US)
+  end
+
+  def test_second_player_to_reach_position
+    @race.advance(US)
+
+    assert_equal :second, @race.advance(USSR)
+  end
+
 end

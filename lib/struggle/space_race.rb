@@ -37,10 +37,30 @@ class SpaceRace
     @num_attempts.fetch superpower
   end
 
+  # Advances the superpower one place on the space race.
+  #
+  # Returns :first or :second depending on whether the superpower is
+  # first to reach the new position.
+
   def advance(superpower)
     return if position(superpower) == MAX_POSITION
 
     @positions[superpower] += 1
+
+    first_or_second(superpower)
+  end
+
+  # Is the given superpower first or second to reach their
+  # current position?
+  #
+  # This only makes sense to ask immediately after an advancement.
+
+  def first_or_second(superpower)
+    if position(superpower.opponent) < position(superpower)
+      :first
+    else
+      :second
+    end
   end
 
   def position(superpower)

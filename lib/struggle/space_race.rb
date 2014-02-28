@@ -63,9 +63,37 @@ class SpaceRace
     @positions.fetch superpower
   end
 
+  def complete?(superpower)
+    position(superpower) == MAX_POSITION
+  end
+
   def label(position)
     LABELS.fetch position
   end
+
+  # Returns an EntryRequirement for the next position on the space race
+  # for the given player.
+
+  def entry_requirement(superpower)
+    entry_requirement_for_position(position(superpower) + 1)
+  end
+
+  def entry_requirement_for_position(position)
+    ENTRY_REQUIREMENTS.fetch position
+  end
+
+  EntryRequirement = Struct.new(:min_ops, :roll_range)
+
+  ENTRY_REQUIREMENTS = {
+    1 => EntryRequirement.new(2, 1..3),
+    2 => EntryRequirement.new(2, 1..4),
+    3 => EntryRequirement.new(2, 1..3),
+    4 => EntryRequirement.new(2, 1..4),
+    5 => EntryRequirement.new(3, 1..3),
+    6 => EntryRequirement.new(3, 1..4),
+    7 => EntryRequirement.new(3, 1..3),
+    8 => EntryRequirement.new(4, 1..2),
+  }
 
 end
 

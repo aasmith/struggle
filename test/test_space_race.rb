@@ -67,4 +67,33 @@ class SpaceRaceTest < Struggle::Test
     assert_equal :second, @race.advance(USSR)
   end
 
+  def test_complete
+    7.times do |i|
+      @race.advance(USSR)
+      @race.advance(US)
+
+      refute @race.complete?(USSR)
+      refute @race.complete?(US)
+    end
+
+    @race.advance(USSR)
+
+    assert @race.complete?(USSR)
+    refute @race.complete?(US)
+  end
+
+  def test_entry_requirement_gives_requirements_for_next_position
+    @race.advance(US)
+
+    8.times do
+      behind = @race.entry_requirement(USSR)
+      ahead  = @race.entry_requirement_for_position(@race.position(US))
+
+      assert_equal ahead, behind
+
+      @race.advance(US)
+      @race.advance(USSR)
+    end
+  end
+
 end

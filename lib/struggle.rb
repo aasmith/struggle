@@ -47,6 +47,14 @@ class Struggle
   VERSION = "1.0.0"
 end
 
+COUP        = :coup
+EVENT       = :event
+INFLUENCE   = :influence
+REALIGNMENT = :realignment
+SPACE       = :space
+
+OPERATIONS = [COUP, REALIGNMENT, INFLUENCE, SPACE]
+
 DEBUG_ENGINE = ENV["STRUGGLE_DEBUG_ENGINE"]
 
 def log(*stuff)

@@ -2,8 +2,6 @@ module Arbitrators
 
   class CardPlay < MoveArbitrator
 
-    OPERATIONS = %i(coup realignment influence space)
-
     fancy_accessor :player
 
     needs :deck, :china_card, :space_race, :hands, :cards

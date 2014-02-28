@@ -21,7 +21,7 @@ class ArbitratorTests::CoupTest < Struggle::Test
     country = FakeCountry.new(ussr: 0, us: 1)
 
     @arb.countries = FakeCountries.new(country)
-    @arb.defcon    = FakeDefcon.new(prevents_everything: false)
+    @arb.defcon    = BlanketDefcon.new(prevents_everything: false)
 
     refute @arb.accepts?(@move)
   end
@@ -30,7 +30,7 @@ class ArbitratorTests::CoupTest < Struggle::Test
     country = FakeCountry.new(ussr: 1, us: 1)
 
     @arb.countries = FakeCountries.new(country)
-    @arb.defcon    = FakeDefcon.new(prevents_everything: true)
+    @arb.defcon    = BlanketDefcon.new(prevents_everything: true)
 
     refute @arb.accepts?(@move)
   end
@@ -45,7 +45,7 @@ class ArbitratorTests::CoupTest < Struggle::Test
     country = FakeCountry.new(ussr: 1, us: 1)
 
     @arb.countries = FakeCountries.new(country)
-    @arb.defcon    = FakeDefcon.new(prevents_everything: false)
+    @arb.defcon    = BlanketDefcon.new(prevents_everything: false)
 
     assert @arb.accepts?(@move)
     @arb.accept @move
@@ -65,16 +65,6 @@ class ArbitratorTests::CoupTest < Struggle::Test
   class FakeOpsCounter
     def value_for_country(*)
       rand(6) + 1
-    end
-  end
-
-  class FakeDefcon
-    def initialize(prevents_everything:)
-      @prevents_everything = prevents_everything
-    end
-
-    def affects?(*)
-      @prevents_everything
     end
   end
 end

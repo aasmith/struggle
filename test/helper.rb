@@ -70,6 +70,20 @@ class SimpleOpsCounter
   end
 end
 
+
+# A DEFCON that knows only the extremes.
+
+class BlanketDefcon
+  def initialize(prevents_everything:)
+    @prevents_everything = prevents_everything
+  end
+
+  def affects?(*)
+    @prevents_everything
+  end
+end
+
+
 # No dot printing right now, thx
 #module Minitest
 #  class ProgressReporter

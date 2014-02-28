@@ -218,4 +218,27 @@ class OpsCounterTest < Struggle::Test
     assert_equal 3, c.value_for_country(India)
     assert_equal 4, c.value_for_country(Burma)
   end
+
+  # Base value
+
+  def test_base_value_basic
+    c = OpsCounter.new 3
+
+    assert_equal 3, c.base_value
+  end
+
+  def test_base_value_applies_non_geographical_modifiers
+    c = OpsCounter.new 3, [rs]
+
+    assert_equal 2, c.base_value
+  end
+
+  def test_base_value_ignores_geography
+    c = OpsCounter.new 3, [rs, cc, vr]
+    assert_equal 2, c.base_value
+
+    c = OpsCounter.new 3, [cc, vr]
+    assert_equal 3, c.base_value
+  end
+
 end

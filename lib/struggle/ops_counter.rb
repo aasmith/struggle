@@ -73,7 +73,7 @@ class OpsCounter
   # Determines how many ops points are available if all points were to
   # be spent in the specified country. This is useful for determining
   # ops points where points need to be known in advance, rather than
-  # tracked. (coups, space)
+  # tracked. (coups)
   #
   # If there are multiple possibilities, then the highest value is
   # returned.
@@ -91,6 +91,15 @@ class OpsCounter
     end
 
     values.max or fail "No ops value could be found for #{country.inspect}"
+  end
+
+  # Returns the number of points that are available without applying
+  # any extra geographical modifiers.
+  #
+  # Useful for the space race.
+
+  def base_value
+    @possibles.fetch([])
   end
 
   def bound(number)

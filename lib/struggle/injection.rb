@@ -49,6 +49,10 @@ class Injector
     end
   end
 
+  def inspect
+    "<Injector with source %s>" % [@source]
+  end
+
   InadequateSourceError = Class.new(RuntimeError)
 end
 

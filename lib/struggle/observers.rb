@@ -17,5 +17,16 @@ class Observers
     # TODO
     []
   end
+
+  # Returns all active SpaceRaceModifiers.
+  #
+  #--
+  # The only space race modifier is probably the event
+  # on the "Animal in Space" square.
+
+  def space_race_modifiers(player: player)
+    # TODO
+    []
+  end
 end
 

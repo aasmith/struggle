@@ -15,12 +15,15 @@ require "struggle/move"
 require "struggle/work_item"
 require "struggle/instruction"
 require "struggle/move_arbitrator"
+require "struggle/guard_resolver"
+require "struggle/guard"
 
 require "struggle/ops_counter"
 require "struggle/ops_modifier"
 
 require "struggle/instructions"
 require "struggle/arbitrators"
+require "struggle/guards"
 
 # TODO delete or graduate components out of here.
 require "struggle/models"

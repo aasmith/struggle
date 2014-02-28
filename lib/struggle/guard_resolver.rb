@@ -13,7 +13,7 @@ class GuardResolver
 
     guard = Guards.const_get(action.to_s.capitalize).new(move)
 
-    injector.inject(guard)
+    @injector.inject(guard)
 
     guard
   end

@@ -68,7 +68,7 @@ class SpaceRaceTest < Struggle::Test
   end
 
   def test_complete
-    7.times do |i|
+    7.times do
       @race.advance(USSR)
       @race.advance(US)
 

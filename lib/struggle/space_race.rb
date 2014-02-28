@@ -56,11 +56,7 @@ class SpaceRace
   # This only makes sense to ask immediately after an advancement.
 
   def first_or_second(superpower)
-    if position(superpower.opponent) < position(superpower)
-      :first
-    else
-      :second
-    end
+    position(superpower.opponent) < position(superpower) ? :first : :second
   end
 
   def position(superpower)

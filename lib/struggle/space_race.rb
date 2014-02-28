@@ -75,6 +75,8 @@ class SpaceRace
   # for the given player.
 
   def entry_requirement(superpower)
+    return nil if complete? superpower
+
     entry_requirement_for_position(position(superpower) + 1)
   end
 
@@ -92,7 +94,7 @@ class SpaceRace
     5 => EntryRequirement.new(3, 1..3),
     6 => EntryRequirement.new(3, 1..4),
     7 => EntryRequirement.new(3, 1..3),
-    8 => EntryRequirement.new(4, 1..2),
+    8 => EntryRequirement.new(4, 1..2)
   }
 
 end

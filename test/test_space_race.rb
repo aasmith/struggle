@@ -96,4 +96,12 @@ class SpaceRaceTest < Struggle::Test
     end
   end
 
+  def test_entry_requirement_nil_when_complete
+    8.times { @race.advance(US) }
+
+    assert @race.complete?(US)
+
+    assert_nil @race.entry_requirement(US)
+  end
+
 end

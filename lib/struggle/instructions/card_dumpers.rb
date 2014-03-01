@@ -34,7 +34,11 @@ module Instructions
           send(pile).include?(card)
         end
 
-        send(card_pile_name) << card unless already_disposed
+        unless already_disposed
+          log "Adding card %s to the '%s' pile." % [card.name, card_pile_name]
+
+          send(card_pile_name) << card
+        end
       end
     end
 

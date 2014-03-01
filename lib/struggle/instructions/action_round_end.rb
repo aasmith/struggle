@@ -1,16 +1,16 @@
 module Instructions
   class ActionRoundEnd < Instruction
 
-    fancy_accessor :player
+    fancy_accessor :number
 
-    def initialize(player:)
+    def initialize(number:)
       super
 
-      self.player = player
+      self.number = number
     end
 
     def action
-      log "%4s Action Round has ended" % player
+      log "End of Action Round %s" % number
     end
   end
 end

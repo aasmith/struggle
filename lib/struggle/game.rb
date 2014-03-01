@@ -165,14 +165,15 @@ def PlayerActionRound(player:)
     Instruction(:SetPhasingPlayer, player: player),
     Arbitrator(:CardPlay, player: player),
     Instruction(:DisposeCurrentCards),
-    Instruction(:ActionRoundEnd, player: player)
+    Instruction(:PlayerActionRoundEnd, player: player)
   )
 end
 
-def ActionRound
+def ActionRound(number:)
   List(
     PlayerActionRound(player: USSR),
-    PlayerActionRound(player: US)
+    PlayerActionRound(player: US),
+    Instruction(:ActionRoundEnd, number: number)
   )
 end
 
@@ -190,7 +191,7 @@ def Turn(phase:)
     I(:DealCards, target: cards[phase]),
     HeadlinePhase(),
 
-    *rounds[phase].times.map { ActionRound() },
+    *rounds[phase].times.map { |n| ActionRound(number: n + 1) },
 
     I(:ActionRoundsEnd), # for certain events to trigger off of
     I(:CheckMilitaryOps),

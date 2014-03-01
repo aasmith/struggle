@@ -106,7 +106,6 @@ alias L List
 
 # Markers
 module Instructions
-  ActionRoundEnd  = Class.new(Instructions::Noop)
   ActionRoundsEnd = Class.new(Instructions::Noop)
 end
 
@@ -166,7 +165,7 @@ def PlayerActionRound(player:)
     Instruction(:SetPhasingPlayer, player: player),
     Arbitrator(:CardPlay, player: player),
     Instruction(:DisposeCurrentCards),
-    Instruction(:ActionRoundEnd)
+    Instruction(:ActionRoundEnd, player: player)
   )
 end
 

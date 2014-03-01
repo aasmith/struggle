@@ -1,5 +1,6 @@
 module Instructions; end
 
+require_relative "instructions/action_round_end"
 require_relative "instructions/add_current_card"
 require_relative "instructions/add_influence"
 require_relative "instructions/add_to_deck"

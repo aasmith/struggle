@@ -11,6 +11,8 @@ module Arguments
     # Passing +unbox: false+ to the accessor will always return +obj+.
     args.each do |arg|
       define_method(arg) do |unbox: true|
+        return nil unless instance_variable_defined?(:"@#{arg}")
+
         iv = instance_variable_get(:"@#{arg}")
 
         unbox && iv.respond_to?(:value) ? iv.value : iv

@@ -1,5 +1,6 @@
 module Instructions; end
 
+require_relative "instructions/action_round"
 require_relative "instructions/action_round_end"
 require_relative "instructions/add_current_card"
 require_relative "instructions/add_influence"
@@ -21,7 +22,9 @@ require_relative "instructions/improve_defcon"
 require_relative "instructions/increment_military_ops"
 require_relative "instructions/nesting_instruction"
 require_relative "instructions/noop"
+require_relative "instructions/optional_action_round"
 require_relative "instructions/play_card"
+require_relative "instructions/player_action_round"
 require_relative "instructions/player_action_round_end"
 require_relative "instructions/realignment"
 require_relative "instructions/remove_card_from_hand"

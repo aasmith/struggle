@@ -148,38 +148,9 @@ Setup = List(
   StartingInfluence
 )
 
-# These are called more than once, so make sure a list of new instances
-# are returned each time.
-
-def PlayerActionRound(player:)
-  List(
-    # TODO might need this to comply with 6.1.1 -- capturing country markers
-    # that are in place at the begining of the player's AR
-    #
-    # sets game.countries_snapshot = game.countries.dup
-    #
-    # the AddRestrictedInfluence arbitrator can access this var instead.
-    #
-    # Instruction(:SnapshotCountries)
-
-    Instruction(:SetPhasingPlayer, player: player),
-    Arbitrator(:CardPlay, player: player),
-    Instruction(:DisposeCurrentCards),
-    Instruction(:PlayerActionRoundEnd, player: player)
-  )
-end
-
-def ActionRound(number:)
-  List(
-    PlayerActionRound(player: USSR),
-    PlayerActionRound(player: US),
-    Instruction(:ActionRoundEnd, number: number)
-  )
-end
-
 # TODO
 def HeadlinePhase
-  List()
+  I(:Noop, label: "Headline phase is unimplemented")
 end
 
 def Turn(phase:)
@@ -191,7 +162,9 @@ def Turn(phase:)
     I(:DealCards, target: cards[phase]),
     HeadlinePhase(),
 
-    *rounds[phase].times.map { |n| ActionRound(number: n + 1) },
+    *rounds[phase].times.map { |n| I(:ActionRound, number: n + 1) },
+
+    I(:OptionalActionRound, number: rounds[phase] + 1),
 
     I(:ActionRoundsEnd), # for certain events to trigger off of
     I(:CheckMilitaryOps),
@@ -213,7 +186,8 @@ def Phase(phase)
 end
 
 # TODO Award the holder of The China Card at the end of Turn 10 with 1 VP.
-AwardChinaCardHolder = List()
+AwardChinaCardHolder =
+  I(:Noop, label: "Awarding 1 VP to holder of China Card is unimplemented")
 
 FinalScoring = List(
   AwardChinaCardHolder

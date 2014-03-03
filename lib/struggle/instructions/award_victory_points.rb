@@ -2,7 +2,7 @@ module Instructions
   class AwardVictoryPoints < Instruction
     fancy_accessor :player, :amount
 
-    needs :victory_point_track
+    needs :victory_track
 
     def initialize(player:, amount:)
       super
@@ -12,7 +12,9 @@ module Instructions
     end
 
     def action
-      victory_point_track.award(player, amount)
+      log "%4s is awarded %s Victory Points." % [player, amount]
+
+      victory_track.award(player, amount)
     end
   end
 end

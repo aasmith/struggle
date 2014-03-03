@@ -1546,9 +1546,9 @@ NorthSeaOil = [
 ]
 
 Modifiers::NorthSeaOil = [
-  TurnModifier(
+  # Give the US player an extra Action Round for just this turn.
+  OptionalActionRoundModifier(
     player: US,
-    action_rounds: 8,
     terminate: on_turn_end
   )
 ]
@@ -1775,4 +1775,61 @@ Modifiers::ShuttleDiplomacy = [
     ]
   )
 ]
+
+
+## Events from the Space Race Track
+
+TwoSpaceRacesPerTurn = [
+  AddModifier(Modifiers::TwoSpaceRacesPerTurn)
+]
+
+Modifiers::TwoSpaceRacesPerTurn = [
+  SpaceRaceAttemptModifier(
+    player: lambda { player },
+    amount: 1,
+    terminate: Match(
+      item: SpaceRaceAdvancement,
+      player: lambda { player.opponent },
+      position: 2,
+      first_or_second: :second
+    )
+  )
+]
+
+
+## TODO need to design headline round
+OpponentShowHeadlineFirst = [
+  AddModifier(Modifiers::OpponentShowHeadlineFirst)
+]
+
+
+DiscardOneHeldCard = [
+  AddModifier(Modifiers::DiscardOneHeldCard)
+]
+
+Modifiers::DiscardOneHeldCard = [
+  DiscardCardModifier(
+    player: lambda { player }
+  )
+]
+
+
+EightActionRoundsPerTurn = [
+  AddModifier(Modifiers::EightActionRoundsPerTurn)
+]
+
+# Add a modifier that grants player an extra action round. Terminates
+# once opponent reaches the same spot on the space race track.
+Modifiers::EightActionRoundsPerTurn = [
+  OptionalActionRoundModifier(
+    player: lambda { player },
+    terminate: Match(
+      item: SpaceRaceAdvancement,
+      player: lambda { player.opponent },
+      position: 8,
+      first_or_second: :second
+    )
+  )
+]
+
 

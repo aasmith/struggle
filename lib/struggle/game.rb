@@ -175,6 +175,7 @@ def Turn(phase:)
     I(:ResetMilitaryOps),
     I(:CheckHeldCards), # check no scoring cards
     I(:FlipChinaCard), # make it 'playable'
+    DiscardHeldCard, # only available with space race #6
     I(:AdvanceTurn)
   )
 end
@@ -192,6 +193,14 @@ end
 # TODO Award the holder of The China Card at the end of Turn 10 with 1 VP.
 AwardChinaCardHolder =
   I(:Noop, label: "Awarding 1 VP to holder of China Card is unimplemented")
+
+# TODO
+# Allow optional discarding of a held card by any qualifiying player
+# (space race bonus)
+#
+# Instruction that (if modifier present) returns an arbitrator that allows
+# the player to choose a card to be discarded
+DiscardHeldCard = List()
 
 FinalScoring = List(
   AwardChinaCardHolder

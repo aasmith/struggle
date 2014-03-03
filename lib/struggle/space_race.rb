@@ -79,13 +79,11 @@ class SpaceRace
   # for the given player.
 
   def entry_requirement(superpower)
-    return nil if complete? superpower
-
     entry_requirement_for_position(position(superpower) + 1)
   end
 
   def entry_requirement_for_position(position)
-    ENTRY_REQUIREMENTS.fetch position
+    ENTRY_REQUIREMENTS[position]
   end
 
   EntryRequirement = Struct.new(:min_ops, :roll_range)

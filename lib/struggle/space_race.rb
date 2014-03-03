@@ -63,6 +63,10 @@ class SpaceRace
     @positions.fetch superpower
   end
 
+  def position_name(player)
+    label(position(player))
+  end
+
   def complete?(superpower)
     position(superpower) == MAX_POSITION
   end

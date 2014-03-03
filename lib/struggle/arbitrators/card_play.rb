@@ -2,17 +2,21 @@ module Arbitrators
 
   class CardPlay < MoveArbitrator
 
-    fancy_accessor :player
+    fancy_accessor :player, :optional
 
-    needs :deck, :china_card, :space_race, :hands, :cards
+    needs :deck, :china_card, :hands, :cards, :guard_resolver
 
     # used for tracking state over two-instruction plays
     attr_accessor :previous_card, :previous_action
 
-    def initialize(player:)
+    def initialize(player:, optional: false)
       super
 
       self.player = player
+
+      # Is this an optional play? The player can pass by playing
+      # a Noop instruction.
+      self.optional = optional
     end
 
     def before_execute(move)
@@ -44,6 +48,9 @@ module Arbitrators
     # player has the card in hand (or is playable in the case of the china
     # card).
     #
+    # Asserts the particular action cannot get the game into an unplayable
+    # state. Checks the appropriate action Guard.
+    #
     # If the card contains an opponent event, then also verify that two moves
     # are played -- one for an event and one for an operation, in either order
     # and using the same card.
@@ -51,14 +58,22 @@ module Arbitrators
     # If the card contains an opponent event, but is being spaced, then ensure
     # a one part move.
     #
+    # If this CardPlay is optional, then allow the player to play as normal
+    # or accept a Noop instruction to pass.
+    #
     def accepts?(move)
       return false if incorrect_player?(move)
       return false if eventing_china_card?(move)
 
-      if able_to_play?
-        card_play?(move) && valid_card?(move)
+      if able_to_play? && !optional?
+        playing_valid_card_allowed_by_guard?(move)
+
+      elsif able_to_play? && optional?
+        playing_valid_card_allowed_by_guard?(move) or noop?(move)
+
       else
         noop?(move)
+
       end
     end
 
@@ -68,6 +83,10 @@ module Arbitrators
     #
     def able_to_play?
       second_part? || !hands.hand(player).empty?
+    end
+
+    def playing_valid_card_allowed_by_guard?(move)
+      card_play?(move) && valid_card?(move) && guard_allows?(move)
     end
 
     def noop?(move)
@@ -83,6 +102,17 @@ module Arbitrators
         same_card_as_previous?(move) && opposing_action?(move)
       else
         card_in_possession?(move)
+      end
+    end
+
+    # Delegates to the guard if the move is an operation, otherwise returns
+    # true.
+
+    def guard_allows?(move)
+      if OPERATIONS.include?(move.instruction.card_action)
+        guard_resolver.resolve(move).allows?
+      else
+        true
       end
     end
 
@@ -133,6 +163,9 @@ module Arbitrators
 
       card.china_card? && move.instruction.card_action == :event
     end
+
+    alias optional? optional
+
   end
 
 end

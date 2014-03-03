@@ -1,12 +1,13 @@
 module Instructions
   class PlayerActionRound < Instruction
 
-    fancy_accessor :player
+    fancy_accessor :player, :optional
 
-    def initialize(player:)
+    def initialize(player:, optional: false)
       super
 
       self.player = player
+      self.optional = optional
     end
 
     def action
@@ -23,7 +24,12 @@ module Instructions
       instructions = []
 
       instructions << SetPhasingPlayer.new(player: player)
-      instructions << Arbitrators::CardPlay.new(player: player)
+
+      instructions << Arbitrators::CardPlay.new(
+        player: player,
+        optional: optional
+      )
+
       instructions << DisposeCurrentCards.new
       instructions << PlayerActionRoundEnd.new(player: player)
 

@@ -90,6 +90,7 @@ class ArbitratorTests::CardPlayTest < Struggle::Test
     @arb.cards = cards
     @arb.hands = Hands.new
     @arb.china_card = ChinaCard.new
+    @arb.guard_resolver = FixedGuardResolver.new(AgreeableGuard.new)
 
     # Give the USSR two cards
     @arb.hands.add(USSR, @arb.cards.find_by_ref("SocialistGovernments"))
@@ -202,6 +203,42 @@ class ArbitratorTests::CardPlayTest < Struggle::Test
     assert @arb.complete?, "Arb should be complete after spacing a card"
   end
 
+  def test_space_denied_when_guarded
+    @arb.guard_resolver = FixedGuardResolver.new(DisagreeableGuard.new)
+    refute @arb.accepts? @space_move
+
+    @arb.guard_resolver = FixedGuardResolver.new(AgreeableGuard.new)
+    assert @arb.accepts? @space_move
+  end
+
+  def test_influence_denied_when_guarded
+    @arb.guard_resolver = FixedGuardResolver.new(DisagreeableGuard.new)
+    refute @arb.accepts? @ops_move
+
+    @arb.guard_resolver = FixedGuardResolver.new(AgreeableGuard.new)
+    assert @arb.accepts? @ops_move
+  end
+
+  def test_coup_denied_when_guarded
+    @ops_move.instruction.card_action = :coup
+
+    @arb.guard_resolver = FixedGuardResolver.new(DisagreeableGuard.new)
+    refute @arb.accepts? @ops_move
+
+    @arb.guard_resolver = FixedGuardResolver.new(AgreeableGuard.new)
+    assert @arb.accepts? @ops_move
+  end
+
+  def test_realignment_denied_when_guarded
+    @ops_move.instruction.card_action = :realignment
+
+    @arb.guard_resolver = FixedGuardResolver.new(DisagreeableGuard.new)
+    refute @arb.accepts? @ops_move
+
+    @arb.guard_resolver = FixedGuardResolver.new(AgreeableGuard.new)
+    assert @arb.accepts? @ops_move
+  end
+
   def test_card_cannot_be_played_if_not_held
     refute @arb.accepts?(@bad_card_move), "Should reject a card not in hand"
   end
@@ -241,6 +278,50 @@ class ArbitratorTests::CardPlayTest < Struggle::Test
     @arb.hands.clear(USSR)
 
     refute @arb.accepts?(@noop), "Noop must be rejected playing second part"
+  end
+
+  def test_optional_play_allows_normal_play
+    @arb.optional = true
+
+    assert @arb.accepts?(@single_move)
+  end
+
+  def test_optional_play_allows_player_to_pass
+    @arb.optional = true
+
+    assert @arb.accepts?(@noop), "Must allow player to skip optional plays"
+  end
+
+  # Always allows the move.
+
+  class AgreeableGuard
+    def initialize(*); end
+
+    def allows?
+      true
+    end
+  end
+
+  # Nope
+
+  class DisagreeableGuard
+    def initialize(*); end
+
+    def allows?
+      false
+    end
+  end
+
+  # Always returns the assigned guard.
+
+  class FixedGuardResolver
+    def initialize(guard)
+      @guard = guard
+    end
+
+    def resolve(move)
+      @guard
+    end
   end
 
 end

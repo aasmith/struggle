@@ -2,11 +2,10 @@ class Game
   attr_accessor :countries, :deck, :turn, :defcon, :china_card, :space_race,
                 :cards, :military_ops, :victory_track, :hands, :phasing_player,
                 :current_cards, :discards, :removed, :limbo, :victory, :rng,
-                :die
+                :die, :injector, :guard_resolver
 
   def initialize
-    @engine = Engine.new
-    @engine.injector = Injector.new(self)
+    self.injector = Injector.new(self)
 
     self.cards = Cards.new
     self.countries = Countries.new(COUNTRY_DATA)
@@ -34,6 +33,11 @@ class Game
     # Limbo is for cards that stay on the board but get put into the discard
     # pile once they are cancelled (i.e. Shuttle Diplomacy).
     self.limbo = Set.new
+
+    self.guard_resolver = GuardResolver.new(injector)
+
+    @engine = Engine.new
+    @engine.injector = injector
   end
 
   def start

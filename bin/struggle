@@ -131,6 +131,22 @@ card.ops!.times do
   )
 end
 
+# US to space anything
+
+card = g.hand(US).sample
+
+g.accept(
+  Move.new(
+    player: US,
+    instruction: Instructions::PlayCard.new(
+      player: US,
+      card_ref: card.ref,
+      card_action: :space,
+    )
+  )
+)
+
+
 puts "HINT: ===="
 p g.hint
 

@@ -78,22 +78,32 @@ module Instructions
       )
     end
 
-    #TODO all of the below
-
     def space
-      Arbitrators::SpaceRace.new
+      # Space race is not an arbitrator simply because there isnt anything
+      # to arbitrate. Once a player has declared they are space racing, the
+      # only thing they can do is attempt a space race, with no further
+      # parameters to be provided.
+      #
+      # The guard (Guards::Space), prevents the space race from being
+      # attempted if the player doesnt qualify.
+
+      Instructions::AttemptSpaceRace.new(
+        player: player,
+        card_ref: card_ref
+      )
+    end
+
+    def card
+      cards.find_by_ref(card_ref)
     end
 
     def ops_counter
-      card = cards.find_by_ref(card_ref)
       mods = observers.ops_modifiers_for_player(player)
 
       OpsCounter.new(card.ops!, mods)
     end
 
     def to_s
-      card = cards.find_by_ref(card_ref)
-
       opponent =
         card.side == player.opponent && card_action == :event ?
         "opponent " : ""

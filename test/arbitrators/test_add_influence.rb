@@ -9,6 +9,22 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
       country_names: [:east_germany, :west_germany],
       total_influence: 6
     )
+
+    @limit_arb = Arbitrators::AddInfluence.new(
+      player: USSR,
+      influence: USSR,
+      country_names: %i(a b c d e),
+      total_influence: 4,
+      limit_per_country: 2
+    )
+
+    @total_arb = Arbitrators::AddInfluence.new(
+      player: USSR,
+      influence: USSR,
+      country_names: %i(a b c d e),
+      total_influence: 4,
+      total_countries: 2
+    )
   end
 
   def test_accepts_move
@@ -122,4 +138,46 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
     assert @arbitrator.accepts?(move)
   end
 
+  def test_limit_per_country
+    move = EmptyMove.new(
+      player: USSR,
+      instruction: Instructions::AddInfluence.new(
+        influence: USSR,
+        country_name: :a,
+        amount: 3
+      )
+    )
+
+    refute @limit_arb.accepts?(move), "Places too much influence"
+
+    move.instruction.amount = 2
+    assert @limit_arb.accepts?(move)
+
+    @limit_arb.accept(move)
+
+    refute @limit_arb.accepts?(move), "No more influence allowed in 'a'"
+  end
+
+  def test_total_countries
+    move = EmptyMove.new(
+      player: USSR,
+      instruction: Instructions::AddInfluence.new(
+        influence: USSR,
+        country_name: :a,
+        amount: 1
+      )
+    )
+
+    assert @total_arb.accepts?(move)
+    @total_arb.accept move
+
+    move.instruction.country_name = :b
+
+    assert @total_arb.accepts?(move)
+    @total_arb.accept move
+
+    move.instruction.country_name = :c
+
+    refute @total_arb.accepts?(move), "Too many countries influenced"
+  end
 end

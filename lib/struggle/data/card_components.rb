@@ -103,7 +103,7 @@ on_turn_end         = Match.new(item_class: TurnEnd)
 on_action_round_end = Match.new(item_class: ActionRoundEnd)
 
 Decolonization = [
-  AddInfluence(
+  Arb::AddInfluence(
     player: USSR,
     influence: USSR,
     limit_per_country: 1,
@@ -165,7 +165,9 @@ EastEuropeanUnrest = [
 ]
 
 IndependentReds = [
-  AddInfluence(
+  # TODO Rethink this.
+  # Maybe Either(Instruction(countryA), Instruction(countryB), ...) ?
+  Arb::AddInfluence(
     player: US,
     influence: US,
     countries: [Yugoslavia, Romania, Bulgaria, Hungary, Czechoslovakia],
@@ -175,37 +177,37 @@ IndependentReds = [
 ]
 
 RomanianAbdication = [
-  RemoveInfluence(
+  I::RemoveInfluence(
     player: USSR,
     influence: US,
     countries: [Romania],
-    limit_per_country: all_influence(US)
+    amount: all_influence(US)
   ),
-  AddInfluence(
+  I::AddInfluence(
     player: USSR,
     influence: USSR,
     countries: [Romania],
-    limit_per_country: Romania.stability
+    amount: Romania.stability
   )
 ]
 
 Fidel = [
-  RemoveInfluence(
+  I::RemoveInfluence(
     player: USSR,
     influence: US,
     countries: [Cuba],
-    limit_per_country: all_influence(US)
+    amount: all_influence(US)
   ),
-  AddInfluence(
+  I::AddInfluence(
     player: USSR,
     influence: USSR,
     countries: [Cuba],
-    limit_per_country: Cuba.stability
+    amount: Cuba.stability
   )
 ]
 
 Comecon = [
-  AddInfluence(
+  Arb::AddInfluence(
     player: USSR,
     influence: USSR,
     countries: lambda {
@@ -217,13 +219,13 @@ Comecon = [
 ]
 
 Nasser = [
-  AddInfluence(
+  I::AddInfluence(
     player: USSR,
     influence: USSR,
     countries: [Egypt],
-    total_influence: 2
+    amount: 2
   ),
-  RemoveInfluence(
+  I::RemoveInfluence(
     player: USSR,
     influence: US,
     countries: [Egypt],
@@ -257,11 +259,23 @@ SouthAfricanUnrest = [
 ]
 
 PanamaCanalReturned = [
-  AddInfluence(
+  I::AddInfluence(
     player: US,
     influence: US,
-    countries: [Panama, CostaRica, Venezuela],
-    limit_per_country: 1
+    countries: [Panama],
+    amount: 1
+  ),
+  I::AddInfluence(
+    player: US,
+    influence: US,
+    countries: [CostaRica],
+    amount: 1
+  ),
+  I::AddInfluence(
+    player: US,
+    influence: US,
+    countries: [Venezuela],
+    amount: 1
   )
 ]
 
@@ -280,7 +294,7 @@ MuslimRevolution = [
 
 PuppetGovernments = [
   # optional
-  AddInfluence(
+  Arb::AddInfluence(
     player: US,
     influence: US,
     countries: lambda {
@@ -292,31 +306,31 @@ PuppetGovernments = [
 ]
 
 Allende = [
-  AddInfluence(
+  I::AddInfluence(
     player: USSR,
     influence: USSR,
     countries: [Chile],
-    total_influence: 2
+    amount: 2
   )
 ]
 
 SadatExpelsSoviets = [
-  RemoveInfluence(
+  I::RemoveInfluence(
     player: US,
     influence: USSR,
     countries: [Egypt],
-    limit_per_country: all_influence(USSR)
+    amount: all_influence(USSR)
   ),
-  AddInfluence(
+  I::AddInfluence(
     player: US,
     influence: US,
     countries: [Egypt],
-    total_influence: 1
+    amount: 1
   )
 ]
 
 OasFounded = [
-  AddInfluence(
+  Arb::AddInfluence(
     player: US,
     influence: US,
     countries: [CentralAmerica, SouthAmerica],
@@ -325,7 +339,7 @@ OasFounded = [
 ]
 
 LiberationTheology = [
-  AddInfluence(
+  Arb::AddInfluence(
     player: USSR,
     influence: USSR,
     countries: [CentralAmerica],
@@ -335,7 +349,7 @@ LiberationTheology = [
 ]
 
 ColonialRearGuards = [
-  AddInfluence(
+  Arb::AddInfluence(
     player: US,
     influence: US,
     countries: [Africa, SoutheastAsia],
@@ -345,16 +359,22 @@ ColonialRearGuards = [
 ]
 
 PortugueseEmpireCrumbles = [
-  AddInfluence(
+  I::AddInfluence(
     player: USSR,
     influence: USSR,
-    countries: [SeAfricanStates, Angola],
-    limit_per_country: 2,
+    countries: SeAfricanStates,
+    amount: 2,
+  ),
+  I::AddInfluence(
+    player: USSR,
+    influence: USSR,
+    countries: Angola,
+    amount: 2,
   )
 ]
 
 TheVoiceOfAmerica = [
-  RemoveInfluence(
+  Arb::RemoveInfluence(
     player: US,
     influence: USSR,
     countries: Countries.reject { |c| c.in?(Europe) },
@@ -365,22 +385,22 @@ TheVoiceOfAmerica = [
 
 Solidarity = [
   Requires(JohnPaulIiElectedPope),
-  AddInfluence(
+  I::AddInfluence(
     player: US,
     influence: US,
     countries: [Poland],
-    limit_per_country: 3
+    amount: 3
   )
 ]
 
 MarineBarracksBombing = [
-  RemoveInfluence(
+  I::RemoveInfluence(
     player: USSR,
     influence: US,
     countries: [Lebanon],
-    limit_per_country: all_influence(US)
+    amount: all_influence(US)
   ),
-  RemoveInfluence(
+  Arb::RemoveInfluence(
     player: USSR,
     influence: US,
     countries: [MiddleEast],
@@ -393,7 +413,7 @@ PershingIiDeployed = [
     player: USSR,
     amount: 1
   ),
-  RemoveInfluence(
+  Arb::RemoveInfluence(
     player: USSR,
     influence: US,
     countries: [WesternEurope],
@@ -407,32 +427,32 @@ TheIronLady = [
     player: US,
     amount: 1
   ),
-  AddInfluence(
+  I::AddInfluence(
     player: US,
     influence: USSR,
     countries: [Argentina],
-    limit_per_country: 1
+    amount: 1
   ),
-  RemoveInfluence(
+  I::RemoveInfluence(
     player: US,
     influence: USSR,
     countries: [UnitedKingdom],
-    limit_per_country: all_influence(USSR)
+    amount: all_influence(USSR)
   )
 ]
 
 IranianHostageCrisis = [
-  RemoveInfluence(
+  I::RemoveInfluence(
     player: USSR,
     influence: US,
     countries: [Iran],
-    limit_per_country: all_influence(US)
+    amount: all_influence(US)
   ),
-  AddInfluence(
+  I::AddInfluence(
     player: USSR,
     influence: USSR,
     countries: [Iran],
-    limit_per_country: 2
+    amount: 2
   )
 ]
 
@@ -441,31 +461,43 @@ CampDavidAccords = [
     player: US,
     amount: 1
   ),
-  AddInfluence(
+  I::AddInfluence(
     player: US,
     influence: US,
-    countries: [Israel, Jordan, Egypt],
-    limit_per_country: 1
+    countries: [Israel],
+    amount: 1
+  ),
+  I::AddInfluence(
+    player: US,
+    influence: US,
+    countries: [Jordan],
+    amount: 1
+  ),
+  I::AddInfluence(
+    player: US,
+    influence: US,
+    countries: [Egypt],
+    amount: 1
   )
 ]
 
 JohnPaulIiElectedPope = [
-  RemoveInfluence(
+  I::RemoveInfluence(
     player: US,
     influence: USSR,
     countries: [Poland],
-    limit_per_country: 2
+    amount: 2
   ),
-  AddInfluence(
+  I::AddInfluence(
     player: US,
     influence: US,
     countries: [Poland],
-    limit_per_country: 1
+    amount: 1
   )
 ]
 
 MarshallPlan = [
-  AddInfluence(
+  Arb::AddInfluence(
     player: US,
     influence: US,
     countries: lambda {
@@ -488,7 +520,7 @@ WarsawPactFormed = [
         )
       end
     ),
-    AddInfluence(
+    Arb::AddInfluence(
       player: USSR,
       influence: USSR,
       countries: [EasternEurope],
@@ -504,27 +536,27 @@ WillyBrandt = [
     player: USSR,
     amount: 1
   ),
-  AddInfluence(
+  I::AddInfluence(
     player: USSR,
     influence: USSR,
     countries: [WestGermany],
-    limit_per_country: 1
+    amount: 1
   )
   # NOTE: The NATO card checks for the West Germany cancellation clause.
 ]
 
 DeGaulleLeadsFrance = [
-  RemoveInfluence(
+  I::RemoveInfluence(
     player: USSR,
     influence: US,
     countries: [France],
-    limit_per_country: 2
+    amount: 2
   ),
-  AddInfluence(
+  I::AddInfluence(
     player: USSR,
     influence: USSR,
     countries: [France],
-    limit_per_country: 1
+    amount: 1
   )
   # NOTE: The NATO card checks for the France cancellation clause.
 ]
@@ -687,11 +719,11 @@ OrtegaElectedInNicaragua = [
 
 TearDownThisWall = [
   Cancels(WillyBrandt),
-  AddInfluence(
+  I::AddInfluence(
     player: US,
     influence: US,
     countries: [EastGermany],
-    limit_per_country: 3
+    amount: 3
   ),
   Either(
     FreeCoup(
@@ -707,12 +739,13 @@ TearDownThisWall = [
 ]
 
 Junta = [
-  AddInfluence(
+  Arb::AddInfluence(
     player: lambda { player },
     influence: lambda { player },
     countries: [CentralAmerica, SouthAmerica],
     limit_per_country: 2,
-    total_countries: 1
+    total_countries: 1,
+    total_influence: 2
   ),
   Either(
     FreeCoup(
@@ -958,7 +991,7 @@ UssuriRiverSkirmish = [
       player: US,
       playable: true
     ),
-    AddInfluence(
+    Arb::AddInfluence(
       player: US,
       influence: US,
       countries: [Asia],
@@ -1212,11 +1245,11 @@ Modifiers::Nato = [
 ]
 
 UsJapanMutualDefensePact = [
-  AddInfluence(
+  I::AddInfluence(
     player: US,
     influence: US,
     countries: [Japan],
-    limit_per_country: Japan.stability
+    amount: Japan.stability
   ),
   AddModifier(Modifiers::UsJapanMutualDefensePact)
 ]
@@ -1233,7 +1266,7 @@ Modifiers::UsJapanMutualDefensePact = [
 ]
 
 TheReformer = [
-  AddInfluence(
+  Arb::AddInfluence(
     player: USSR,
     influence: USSR,
     countries: [Europe],
@@ -1311,11 +1344,11 @@ Modifiers::LatinAmericanDeathSquads = [
 ]
 
 VietnamRevolts = [
-  AddInfluence(
+  I::AddInfluence(
     player: USSR,
     influence: USSR,
     countries: [Vietnam],
-    limit_per_country: 2
+    amount: 2
   ),
   AddModifier(Modifiers::VietnamRevolts)
 ]

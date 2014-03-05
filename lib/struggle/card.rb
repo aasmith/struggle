@@ -1,9 +1,9 @@
 class Card
-  attr_accessor :ref, :id, :name, :phase, :ops, :side
-  attr_accessor :remove_after_event, :discard_after_event, :always_evaluate_first
+  attr_reader :ref, :id, :name, :phase, :ops, :side
+  attr_reader :remove_after_event, :discard_after_event, :always_evaluate_first
 
   def initialize(**args)
-    args.each { |k,v| send("#{k}=", v) }
+    args.each { |k,v| instance_variable_set("@#{k}", v) }
   end
 
   def scoring?

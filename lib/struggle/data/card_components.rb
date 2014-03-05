@@ -34,67 +34,6 @@
 # remvoed from the Card class?
 #
 
-# Constant Definitions
-
-require 'pp'
-require 'set'
-
-def placeholder(names)
-  names.scan(/[A-Za-z]+/).each do |name|
-    eval("%s = '%s'" % [name, name])
-  end
-end
-
-placeholder(<<NAMES)
-USSR, US
-
-Africa, Asia, Europe, CentralAmerica, WesternEurope, EasternEurope,
-  SouthAmerica, MiddleEast, SoutheastAsia
-
-France, UnitedKingdom, Israel, Yugoslavia, Romania, Bulgaria, Hungary,
-Czechoslovakia, Cuba, Egypt, SouthAfrica, Panama, CostaRica, Venezuela,
-Sudan, Iran, Iraq, Libya, SaudiArabia, Syria, Jordan, Chile, SeAfricanStates,
-Angola, Poland, Lebanon, Argentina, WestGermany, India, Pakistan, SouthKorea,
-Nicaragua, EastGermany, Turkey, Japan, Vietnam
-
-IronLady, JohnPaulIiElectedPope, TearDownThisWall, FlowerPower,
-NorthSeaOil, UnIntervention, Defectors
-
-TurnEnd, RemoveInfluence, Coup, Realignment, Containment, Score, ChinaCard,
-SponsorOlympicGames, BoycottOlympicGames, ActionRound, WargamesInput,
-ChernobylInput, OperationalInfluence
-
-SetDefcon
-
-Early, Mid, Late
-NAMES
-
-Countries = []
-
-module Modifiers
-  def self.const_missing(n)
-  end
-end
-
-# DSL Methods
-
-$calls = Hash.new { |h,k| h[k] = Set.new }
-
-def method_missing(n, *a, &b)
-  return if [:stability, :countries, :map, :sort, :keys, :Either, :If, :name, :to_ary, :to_sym, :join].include?(n)
-
-  #$calls[n] << (a.first.keys.sort || [:__no_arg])
-  $calls[n] << a.first.map{|k,v| "%s(%s)" % [k,v.class]}
-end
-
-at_exit do
-  pp $calls
-
-  puts "","COUNTS","=====",""
-  pp $calls.keys.map { |k| [k, $calls[k].size] }.sort_by(&:last).reverse
-end
-
-
 def all_influence(player)
   lambda { |c| c.influence(player) }
 end

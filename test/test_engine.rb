@@ -47,7 +47,7 @@ class TestEngine < Struggle::Test
   end
 
   def test_instructions_execute_automatically
-    instruction = I::EmptyInstruction.new
+    instruction = EmptyInstruction.new
     arbitrator1 = MoveAcceptor.new
     arbitrator2 = MoveAcceptor.new
 
@@ -75,8 +75,8 @@ class TestEngine < Struggle::Test
   def test_nested_executables_execute_automatically
     instructions = []
 
-    instruction1 = I::LambdaInstruction.new { instructions << "ex1" }
-    instruction2 = I::LambdaInstruction.new { instructions << "ex2" }
+    instruction1 = LambdaInstruction.new { instructions << "ex1" }
+    instruction2 = LambdaInstruction.new { instructions << "ex2" }
     nested_instr = I::NestingInstruction.new(instruction1, instruction2)
 
     arbitrator = MoveAcceptor.new
@@ -103,9 +103,9 @@ class TestEngine < Struggle::Test
   def test_nested_executables_dont_need_to_return_an_array
     instructions = []
 
-    child = I::LambdaInstruction.new { instructions << "child" }
+    child = LambdaInstruction.new { instructions << "child" }
 
-    parent = I::LambdaInstruction.new do
+    parent = LambdaInstruction.new do
       instructions << "parent"
       child # return a single instruction -- not an array
     end
@@ -122,7 +122,7 @@ class TestEngine < Struggle::Test
   end
 
   def test_peek_progresses_execution
-    instruction = I::EmptyInstruction.new
+    instruction = EmptyInstruction.new
 
     e = Engine.new
     e.add_work_item instruction
@@ -137,8 +137,8 @@ class TestEngine < Struggle::Test
   def test_arbitrators_can_return_instructions
     instructions = []
 
-    instruction1 = I::LambdaInstruction.new { instructions << "ex1" }
-    instruction2 = I::LambdaInstruction.new { instructions << "ex2" }
+    instruction1 = LambdaInstruction.new { instructions << "ex1" }
+    instruction2 = LambdaInstruction.new { instructions << "ex2" }
     nested_instr = I::NestingInstruction.new(instruction1, instruction2)
 
     arbitrator = MoveAcceptor.new
@@ -188,8 +188,8 @@ class TestEngine < Struggle::Test
   def test_resumed_arbitrators_can_return_instructions
     instructions = []
 
-    instruction1 = I::LambdaInstruction.new { instructions << "ex1" }
-    instruction2 = I::LambdaInstruction.new { instructions << "ex2" }
+    instruction1 = LambdaInstruction.new { instructions << "ex1" }
+    instruction2 = LambdaInstruction.new { instructions << "ex2" }
     nested_instr = I::NestingInstruction.new(instruction1, instruction2)
 
     arbitrator = MoveAcceptor.new
@@ -198,7 +198,7 @@ class TestEngine < Struggle::Test
     move.player = USSR
     move.instruction = nested_instr
 
-    new_instruction = I::EmptyInstruction.new
+    new_instruction = EmptyInstruction.new
 
     mod = StackModifier.new(new_instruction)
 
@@ -245,7 +245,7 @@ class TestEngine < Struggle::Test
   end
 
   def test_permission_modifier_skips_instruction
-    instruction = I::EmptyInstruction.new
+    instruction = EmptyInstruction.new
 
     e = Engine.new
     e.add_permission_modifier NegativePermissionModifier.new
@@ -271,7 +271,7 @@ class TestEngine < Struggle::Test
     orig_arbitrator = MoveAcceptor.new label: :orig
     orig_move = EmptyMove.new label: :orig
 
-    new_instruction = I::EmptyInstruction.new
+    new_instruction = EmptyInstruction.new
     new_arbitrator = MoveAcceptor.new label: :new
 
     mod = StackModifier.new(new_instruction, new_arbitrator)
@@ -309,7 +309,7 @@ class TestEngine < Struggle::Test
   end
 
   def test_work_items_are_injected
-    item = I::EmptyInstruction.new
+    item = EmptyInstruction.new
 
     fake_injector = Minitest::Mock.new.expect(:inject, nil, [item])
 
@@ -349,5 +349,21 @@ class TestEngine < Struggle::Test
     end
   end
 
+  class EmptyInstruction < Instruction
+    def action
+    end
+  end
+
+  class LambdaInstruction < Instruction
+    def initialize(**_, &block)
+      super()
+
+      @block = block
+    end
+
+    def action
+      @block.call
+    end
+  end
 end
 

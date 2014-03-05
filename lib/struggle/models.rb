@@ -1,39 +1,5 @@
 ## EXAMPLE MODELS
 
-### Instructions
-
-module Instructions
-
-  # Used for testing.
-  class EmptyInstruction < Instruction
-    def action
-    end
-  end
-
-  # Used for testing.
-  class LambdaInstruction < Instruction
-    def initialize(**_, &block)
-      super()
-
-      @block = block
-    end
-
-    def action
-      @block.call
-    end
-  end
-
-  class If < Instruction
-    def initialize(cond, cond_true, cond_false)
-      super()
-    end
-
-    def action
-      NestingInstruction.new(*cond ? cond_true : cond_false)
-    end
-  end
-end
-
 class Matcher
   attr_reader :item_class, :anything
 

@@ -13,7 +13,7 @@ BANNER = <<'END'
                     /____//____/         
 END
 
-width = `tput cols`.chomp.to_i
+width = `tput cols`.to_i
 
 puts
 

@@ -63,13 +63,13 @@ class Cards
         ops: 3,
         side: US,
       ),
-       Card.new(
-         ref: "TheChinaCard",
-         id: 6,
-         name: "The China Card",
-         phase: :early,
-         ops: 4,
-         side: nil,
+      Card.new(
+        ref: "TheChinaCard",
+        id: 6,
+        name: "The China Card",
+        phase: :early,
+        ops: 4,
+        side: nil,
       ),
       Card.new(
         ref: "SocialistGovernments",

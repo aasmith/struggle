@@ -2,6 +2,8 @@ require 'delegate'
 require 'pp'
 require 'set'
 
+require "struggle/constants"
+
 require "struggle/superpowers"
 
 require "struggle/stack"
@@ -49,14 +51,6 @@ require "struggle/victory_track"
 class Struggle
   VERSION = "1.0.0"
 end
-
-COUP        = :coup
-EVENT       = :event
-INFLUENCE   = :influence
-REALIGNMENT = :realignment
-SPACE       = :space
-
-OPERATIONS = [COUP, REALIGNMENT, INFLUENCE, SPACE]
 
 DEBUG_ENGINE = ENV["STRUGGLE_DEBUG_ENGINE"]
 

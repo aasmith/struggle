@@ -4,8 +4,6 @@ require 'set'
 
 require "struggle/constants"
 
-require "struggle/superpowers"
-
 require "struggle/stack"
 require "struggle/engine"
 require "struggle/injection"
@@ -35,18 +33,19 @@ require "struggle/data/countries"
 
 require "struggle/card"
 require "struggle/cards"
+require "struggle/china_card"
 require "struggle/countries"
 require "struggle/country"
-require "struggle/china_card"
 require "struggle/deck"
 require "struggle/defcon"
 require "struggle/die"
 require "struggle/hands"
-require "struggle/victory"
 require "struggle/military_ops"
 require "struggle/phasing_player"
 require "struggle/space_race"
+require "struggle/superpowers"
 require "struggle/turn_marker"
+require "struggle/victory"
 require "struggle/victory_track"
 
 class Struggle

@@ -15,21 +15,22 @@ module Events
                   else raise ArgumentError, "Invalid action #{action.inspect}"
                   end
 
-      if namespace.constants.include? event_name
+      if namespace.constants.include? event_name.to_sym
         event_class = namespace.const_get(event_name)
         build event_class
       else
-        # TODO change this to an error for events and
-        # a warn for space/operations once events are implemented
-        Instructions::Noop.new(
-          label: "Event for #{event_name}:#{action} not found"
-        )
+        if action == EVENT
+          # Event lookup should never fail.
+          fail "Event for #{event_name}:#{action} not found"
+        else
+          warn "Event for #{event_name}:#{action} not found"
+        end
       end
     end
 
     def build(event_class)
       event_instance = event_class.new
-      injector.inject(event_instance)
+      @injector.inject(event_instance)
       event_instance
     end
 

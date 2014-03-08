@@ -7,7 +7,7 @@ module Instructions
 
     fancy_accessor :player, :card_ref, :card_action
 
-    needs :cards, :observers
+    needs :cards, :observers, :events
 
     VALID_CARD_ACTIONS = %i(event influence coup realignment space)
 
@@ -41,14 +41,9 @@ module Instructions
       # Execute these instructions (if any) before delegating to the
       # influence/coup/realignment/space methods below.
 
-      instructions.push(*lookup_instructions(card_ref, card_action))
+      instructions.push(*events.find(card_ref, card_action))
       instructions.push(*send(card_action))
       instructions
-    end
-
-    # TODO Get instructions from card_components list
-    def lookup_instructions(card_ref, card_action)
-      [Noop.new]
     end
 
     # Nothing else to do.

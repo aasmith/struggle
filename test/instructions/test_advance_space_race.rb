@@ -18,18 +18,19 @@ class InstructionTests::AdvanceSpaceRaceTest < Struggle::Test
     )
 
     @advance.space_race = @race
+
     @jump.space_race = @race
+    @jump.events = FakeEventFinder.new
   end
 
   def test_advance
     instructions = @advance.action
 
-    advertisement, event, vp_award = instructions
+    advertisement, vp_award = instructions
 
-    assert_equal 3, instructions.size
+    assert_equal 2, instructions.size
 
     assert_instance_of Instructions::SpaceRaceAdvancement, advertisement
-    assert_instance_of Instructions::Noop, event
     assert_instance_of Instructions::AwardVictoryPoints, vp_award
 
     assert_equal USSR,   advertisement.player
@@ -69,6 +70,18 @@ class InstructionTests::AdvanceSpaceRaceTest < Struggle::Test
 
     assert_equal USSR, vp_award.player
     assert_equal 2,    vp_award.amount
+
+    events = instructions.grep(Instructions::Noop)
+    event  = events.first
+
+    assert_equal 1, events.size
+    assert_equal "TwoSpaceRacesPerTurn:space", event.label
+  end
+
+  class FakeEventFinder
+    def find(name, type)
+      Instructions::Noop.new(label: [name,type].join(":"))
+    end
   end
 
 end

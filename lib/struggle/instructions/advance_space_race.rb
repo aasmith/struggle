@@ -8,7 +8,7 @@ module Instructions
 
     fancy_accessor :player, :amount
 
-    needs :space_race
+    needs :space_race, :events
 
     def initialize(player:, amount:)
       super
@@ -23,19 +23,21 @@ module Instructions
       instructions = []
 
       first_or_second = nil
+      new_position    = nil
 
       amount.times do
         first_or_second = space_race.advance(player)
 
         instructions << SpaceRaceAdvancement.new(
           player: player,
-          position: space_race.position(player),
+          position: new_position = space_race.position(player),
           first_or_second: first_or_second
         )
 
-        if first_or_second == :first
-          # TODO lookup possible event from card components
-          instructions << Noop.new(label: "Possible space race event reward")
+        event_name = EVENT_REWARDS[new_position]
+
+        if first_or_second == :first && event_name
+          instructions << events.find(event_name, :space)
         end
       end
 
@@ -65,6 +67,13 @@ module Instructions
     }
 
     VP_REWARDS.default = VpReward.new(0,0)
+
+    EVENT_REWARDS = {
+      2 => "TwoSpaceRacesPerTurn",
+      4 => "OpponentShowHeadlineFirst",
+      6 => "DiscardOneHeldCard",
+      8 => "EightActionRoundsPerTurn",
+    }
 
   end
 

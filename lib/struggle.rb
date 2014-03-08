@@ -26,6 +26,7 @@ require "struggle/ops_modifier"
 require "struggle/instructions"
 require "struggle/arbitrators"
 require "struggle/guards"
+require "struggle/events"
 
 # TODO delete or graduate components out of here.
 require "struggle/models"

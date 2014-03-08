@@ -2,7 +2,7 @@ class Game
   attr_accessor :countries, :deck, :turn, :defcon, :china_card, :space_race,
                 :cards, :military_ops, :victory_track, :hands, :phasing_player,
                 :current_cards, :discards, :removed, :limbo, :victory, :rng,
-                :die, :injector, :guard_resolver
+                :die, :injector, :guard_resolver, :events
 
   def initialize
     self.injector = Injector.new(self)
@@ -34,6 +34,7 @@ class Game
     # pile once they are cancelled (i.e. Shuttle Diplomacy).
     self.limbo = Set.new
 
+    self.events = Events::Finder.new(injector)
     self.guard_resolver = GuardResolver.new(injector)
 
     @engine = Engine.new

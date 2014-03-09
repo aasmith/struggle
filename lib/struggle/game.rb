@@ -74,38 +74,6 @@ def Arbitrator(const, **named_args, &block)
   Arbitrators.const_get(const).new(named_args, &block)
 end
 
-module ContextHelpers
-  class ContextHelper
-    extend Injectible
-
-    def value
-      raise "impl"
-    end
-  end
-
-  class EastEuropeanCountries < ContextHelper
-
-    needs :countries
-
-    def value
-      countries.
-        select { |c| c.in?(EasternEurope) }.
-        map    { |c| c.name }
-    end
-  end
-
-  class WestEuropeanCountries < ContextHelper
-
-    needs :countries
-
-    def value
-      countries.
-        select { |c| c.in?(WesternEurope) }.
-        map    { |c| c.name }
-    end
-  end
-end
-
 alias I Instruction
 alias L List
 
@@ -114,43 +82,11 @@ module Instructions
   ActionRoundsEnd = Class.new(Instructions::Noop)
 end
 
-StartingInfluence = List(
-  I(:AddInfluence, influence: USSR, amount: 1, country_name: "Syria"),
-  I(:AddInfluence, influence: USSR, amount: 1, country_name: "Iraq"),
-  I(:AddInfluence, influence: USSR, amount: 3, country_name: "North Korea"),
-  I(:AddInfluence, influence: USSR, amount: 3, country_name: "East Germany"),
-  I(:AddInfluence, influence: USSR, amount: 1, country_name: "Finland"),
-
-  I(:AddInfluence, influence: US, amount: 1, country_name: "Iran"),
-  I(:AddInfluence, influence: US, amount: 1, country_name: "Israel"),
-  I(:AddInfluence, influence: US, amount: 1, country_name: "Japan"),
-  I(:AddInfluence, influence: US, amount: 4, country_name: "Australia"),
-  I(:AddInfluence, influence: US, amount: 1, country_name: "Philippines"),
-  I(:AddInfluence, influence: US, amount: 1, country_name: "South Korea"),
-  I(:AddInfluence, influence: US, amount: 1, country_name: "Panama"),
-  I(:AddInfluence, influence: US, amount: 1, country_name: "South Africa"),
-  I(:AddInfluence, influence: US, amount: 5, country_name: "United Kingdom"),
-
-  Arbitrator(:AddInfluence,
-    player: USSR,
-    influence: USSR,
-    country_names: ContextHelpers::EastEuropeanCountries.new,
-    total_influence: 6
-  ),
-
-  Arbitrator(:AddInfluence,
-    player: US,
-    influence: US,
-    country_names: ContextHelpers::WestEuropeanCountries.new,
-    total_influence: 7
-  )
-)
-
 Setup = List(
   Instruction(:AddToDeck, phase: :early),
   Instruction(:DealCards, target: 8),
   Instruction(:ClaimChinaCard, player: USSR, playable: true),
-  StartingInfluence
+  Instruction(:StartingInfluence)
 )
 
 # TODO

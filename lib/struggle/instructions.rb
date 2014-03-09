@@ -35,6 +35,7 @@ require_relative "instructions/remove_influence"
 require_relative "instructions/reset_military_ops"
 require_relative "instructions/set_phasing_player"
 require_relative "instructions/space_race_advancement"
+require_relative "instructions/starting_influence"
 require_relative "instructions/surrender_china_card"
 
 # Generates:

@@ -20,5 +20,5 @@ puts
 BANNER.lines.each { |line| puts line.chomp.center(width) }
 
 puts
-puts "The Cold War: 1946 – 1989".center(width)
+puts "The Cold War: 1945 – 1989".center(width)
 puts

@@ -8,8 +8,32 @@ module Events
       def action
         instructions = []
 
-        instructions << Instructions::Noop.new(label: "something")
-        instructions << Instructions::Noop.new(label: "dump the card")
+        instructions << Instructions::AwardVictoryPoints.new(
+          player: US,
+          amount: 1
+        )
+
+        instructions << Instructions::AddInfluence.new(
+             influence: US,
+          country_name: "Israel",
+                amount: 1
+        )
+
+        instructions << Instructions::AddInfluence.new(
+             influence: US,
+          country_name: "Jordan",
+                amount: 1
+        )
+
+        instructions << Instructions::AddInfluence.new(
+             influence: US,
+          country_name: "Egypt",
+                amount: 1
+        )
+
+        instructions << Instructions::Remove.new(
+          card_ref: "CampDavidAccords"
+        )
 
         instructions
       end

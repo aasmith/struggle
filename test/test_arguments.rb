@@ -35,7 +35,7 @@ class ArgumentsTest < Struggle::Test
       @val = 10
     end
 
-    def value
+    def __value__
       @val += 1
     end
   end

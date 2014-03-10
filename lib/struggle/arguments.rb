@@ -5,8 +5,8 @@ module Arguments
 
     attr_writer(*args)
 
-    # Add an accessor that will delegate to +obj.value+ if +obj+ responds to
-    # +value+. Delegated results are not cached.
+    # Add an accessor that will delegate to +obj.__value__+ if +obj+
+    # responds to +__value__+. Delegated results are not cached.
     #
     # Passing +unbox: false+ to the accessor will always return +obj+.
     args.each do |arg|
@@ -15,7 +15,7 @@ module Arguments
 
         iv = instance_variable_get(:"@#{arg}")
 
-        unbox && iv.respond_to?(:value) ? iv.value : iv
+        unbox && iv.respond_to?(:__value__) ? iv.__value__ : iv
       end
     end
   end

@@ -72,7 +72,7 @@ require_relative "card_events/olympic_games"                    # TODO
 require_relative "card_events/one_small_step"                   # TODO
 require_relative "card_events/opec"                             # TODO
 require_relative "card_events/ortega_elected_in_nicaragua"      # TODO
-require_relative "card_events/panama_canal_returned"            # TODO
+require_relative "card_events/panama_canal_returned"
 require_relative "card_events/pershing_ii_deployed"             # TODO
 require_relative "card_events/portuguese_empire_crumbles"       # TODO
 require_relative "card_events/puppet_governments"               # TODO

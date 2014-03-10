@@ -8,8 +8,27 @@ module Events
       def action
         instructions = []
 
-        instructions << Instructions::Noop.new(label: "something")
-        instructions << Instructions::Noop.new(label: "dump the card")
+        instructions << Instructions::AddInfluence.new(
+             influence: US,
+          country_name: "Panama",
+                amount: 1
+        )
+
+        instructions << Instructions::AddInfluence.new(
+             influence: US,
+          country_name: "Costa Rica",
+                amount: 1
+        )
+
+        instructions << Instructions::AddInfluence.new(
+             influence: US,
+          country_name: "Venezuela",
+                amount: 1
+        )
+
+        instructions << Instructions::Remove.new(
+          card_ref: "PanamaCanalReturned"
+        )
 
         instructions
       end

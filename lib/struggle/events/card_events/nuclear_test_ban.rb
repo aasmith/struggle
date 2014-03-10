@@ -3,13 +3,23 @@ module Events
 
     class NuclearTestBan < Instruction
 
-      needs :countries
+      needs :defcon, :phasing_player
 
       def action
         instructions = []
 
-        instructions << Instructions::Noop.new(label: "something")
-        instructions << Instructions::Noop.new(label: "dump the card")
+        instructions << Instructions::AwardVictoryPoints.new(
+          player: phasing_player,
+          amount: defcon.value - 2
+        )
+
+        instructions << Instructions::ImproveDefcon.new(
+          amount: 2
+        )
+
+        instructions << Instructions::Discard.new(
+          card_ref: "NuclearTestBan"
+        )
 
         instructions
       end

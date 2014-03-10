@@ -80,7 +80,7 @@ require_relative "card_events/quagmire"                         # TODO
 require_relative "card_events/reagan_bombs_libya"               # TODO
 require_relative "card_events/red_scare_purge"                  # TODO
 require_relative "card_events/romanian_abdication"
-require_relative "card_events/sadat_expels_soviets"             # TODO
+require_relative "card_events/sadat_expels_soviets"
 require_relative "card_events/salt_negotiations"                # TODO
 require_relative "card_events/shuttle_diplomacy"                # TODO
 require_relative "card_events/socialist_governments"            # TODO

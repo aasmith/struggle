@@ -485,7 +485,6 @@ DeGaulleLeadsFrance = [
 ]
 
 AnEvilEmpire = [
-  Cancels(FlowerPower),
   AwardVictoryPoints(
     player: US,
     amount: 1
@@ -641,7 +640,6 @@ OrtegaElectedInNicaragua = [
 ]
 
 TearDownThisWall = [
-  Cancels(WillyBrandt),
   I::AddInfluence(
     player: US,
     influence: US,
@@ -1000,12 +998,13 @@ Modifiers::FlowerPower = [
   Modifier(
     on: CardPlay(
       player: US,
-      played_for: [:event, :operations], # operations: (influence,coup,realign)
+      played_for: [:event, :influence, :coup, :realignment],
       card: lambda {
         game.in_effect?(CampDavidAccords) ?
           WAR_CARDS - [ArabIsraeliWar] :
           WAR_CARDS
-      }
+      },
+      cancel: Match(AnEvilEmpire)
     ),
     actions: [
       AwardVictoryPoints(player: USSR, amount: 2)

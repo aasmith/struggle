@@ -296,6 +296,7 @@ class Cards
         phase: :early,
         ops: 1,
         side: nil,
+        prevent_in_headline: true
       ),
       Card.new(
         ref: "DeStalinization",

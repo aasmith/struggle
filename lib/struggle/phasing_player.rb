@@ -1,9 +1,11 @@
-class PhasingPlayer < SimpleDelegator
+class PhasingPlayer
 
-  alias player= __setobj__
+  fancy_accessor :player
 
   def initialize
     self.player = USSR
   end
+
+  alias __value__ player
 
 end

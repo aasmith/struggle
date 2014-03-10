@@ -5,15 +5,15 @@ class PhasingPlayerTest < Struggle::Test
   def test_new
     pp = PhasingPlayer.new
 
-    assert pp.ussr?, "Should initialize to USSR"
+    assert pp.player.ussr?, "Should initialize to USSR"
   end
 
-  def test_delegates
+  def test_switch_player
     pp = PhasingPlayer.new
-    assert pp.ussr?, "Should delegate"
 
-    pp.player = US
-    assert pp.us?, "Should delegate to updated player"
+    assert pp.player = US
+
+    assert pp.player.us?, "Should update player"
   end
 
 end

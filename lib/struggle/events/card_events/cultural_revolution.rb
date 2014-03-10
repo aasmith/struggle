@@ -3,13 +3,26 @@ module Events
 
     class CulturalRevolution < Instruction
 
-      needs :countries
+      needs :china_card
 
       def action
         instructions = []
 
-        instructions << Instructions::Noop.new(label: "something")
-        instructions << Instructions::Noop.new(label: "dump the card")
+        if china_card.holder.us?
+          instructions << Instructions::ClaimChinaCard.new(
+            player: USSR,
+            playable: true
+          )
+        else
+          instructions << Instructions::AwardVictoryPoints.new(
+            player: USSR,
+            amount: 1
+          )
+        end
+
+        instructions << Instructions::Remove.new(
+          card_ref: "CulturalRevolution"
+        )
 
         instructions
       end

@@ -3,8 +3,6 @@ module Events
 
     class PanamaCanalReturned < Instruction
 
-      needs :countries
-
       def action
         instructions = []
 

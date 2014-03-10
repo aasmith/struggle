@@ -3,8 +3,6 @@ module Events
 
     class Allende < Instruction
 
-      needs :countries
-
       def action
         instructions = []
 

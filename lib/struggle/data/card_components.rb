@@ -62,7 +62,7 @@ TrumanDoctrine = [
 ]
 
 SuezCrisis = [
-  RemoveInfluence(
+  Arb::RemoveInfluence(
     player: USSR,
     influence: US,
     countries: [France, UnitedKingdom, Israel],
@@ -73,7 +73,7 @@ SuezCrisis = [
 
 SocialistGovernments = [
   PreventedBy(IronLady),
-  RemoveInfluence(
+  Arb::RemoveInfluence(
     player: USSR,
     influence: US,
     countries: [WesternEurope],
@@ -83,22 +83,12 @@ SocialistGovernments = [
 ]
 
 EastEuropeanUnrest = [
-  # TODO Use an If here for determining early/mid/late actions
-  RemoveInfluence(
+  Arb::RemoveInfluence(
     player: US,
     influence: USSR,
     countries: [EasternEurope],
-    limit_per_country: 1,
+    limit_per_country: phase.late ? 2 : 1,
     total_countries: 3,
-    phase: [Early, Mid]
-  ),
-  RemoveInfluence(
-    player: US,
-    influence: USSR,
-    countries: [EasternEurope],
-    limit_per_country: 2,
-    total_countries: 3,
-    phase: [Late]
   )
 ]
 
@@ -1211,7 +1201,7 @@ TheReformer = [
 
 Modifiers::TheReformer = [
   PermissionModifier(
-    on: Match(item: Coup, player: USSR),
+    on: Match(item: Coup, player: USSR, countries: [Europe]),
     ruling: :deny
   )
 ]
@@ -1667,7 +1657,9 @@ Chernobyl = [
         value: r.name.to_sym
       ),
       PermissionModifier(
-        on: Match(player: USSR, item: OperationalInfluence),
+        # Chernobyl still allows placement manipulation of influence
+        # through events/coups/realigns
+        on: Match(player: USSR, item: AddRestrictedInfluence),
         terminate: on_turn_end,
         ruling: :deny
       )

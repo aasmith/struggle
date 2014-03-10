@@ -12,17 +12,19 @@ module Events
           player: USSR,
           influence: USSR,
           limit_per_country: 1,
-          countries: africa_and_seasia,
+          country_names: africa_and_seasia,
           total_influence: 4
         )
 
-        instructions << Discard.new(card_ref: "Decolonization")
+        instructions << Instructions::Discard.new(card_ref: "Decolonization")
 
         instructions
       end
 
       def africa_and_seasia
-        countries.select { |c| c.in?(Africa) || c.in?(SoutheastAsia) }
+        countries.
+          select { |c| c.in?(Africa) || c.in?(SoutheastAsia) }.
+          map    { |c| c.name }
       end
     end
 

@@ -8,7 +8,7 @@ end
 require_relative "card_events/abm_treaty"                       # TODO
 require_relative "card_events/africa_scoring"                   # TODO
 require_relative "card_events/aldrich_ames_remix"               # TODO
-require_relative "card_events/allende"                          # TODO
+require_relative "card_events/allende"
 require_relative "card_events/alliance_for_progress"            # TODO
 require_relative "card_events/an_evil_empire"                   # TODO
 require_relative "card_events/arab_israeli_war"                 # TODO

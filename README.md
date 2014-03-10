@@ -49,6 +49,17 @@ Running the game on autopilot:
 
 `STRUGGLE_DEBUG_ENGINE=1 bin/struggle`
 
+To check event implementation progress:
+
+Number of events left:
+
+`grep TODO lib/struggle/events/card_events.rb | wc -l`
+
+Events remaining:
+
+`grep require lib/struggle/events/card_events.rb | grep -v TODO | wc -l`
+
+
 ### License
 
 ##### Copyright &copy; 2014 Andrew A. Smith <andy@tinnedfruit.org>

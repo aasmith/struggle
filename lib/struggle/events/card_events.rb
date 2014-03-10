@@ -12,7 +12,7 @@ require_relative "card_events/allende"
 require_relative "card_events/alliance_for_progress"
 require_relative "card_events/an_evil_empire"
 require_relative "card_events/arab_israeli_war"                 # TODO
-require_relative "card_events/arms_race"                        # TODO
+require_relative "card_events/arms_race"
 require_relative "card_events/asia_scoring"                     # TODO
 require_relative "card_events/ask_not_what_your_country"        # TODO
 require_relative "card_events/bear_trap"                        # TODO

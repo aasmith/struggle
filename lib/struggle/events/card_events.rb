@@ -94,7 +94,7 @@ require_relative "card_events/summit"                           # TODO
 require_relative "card_events/tear_down_this_wall"              # TODO
 require_relative "card_events/terrorism"                        # TODO
 require_relative "card_events/the_china_card"                   # TODO
-require_relative "card_events/the_iron_lady"                    # TODO
+require_relative "card_events/the_iron_lady"
 require_relative "card_events/the_reformer"                     # TODO
 require_relative "card_events/the_voice_of_america"             # TODO
 require_relative "card_events/truman_doctrine"                  # TODO

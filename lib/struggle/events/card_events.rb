@@ -63,7 +63,7 @@ require_relative "card_events/missile_envy"                     # TODO
 require_relative "card_events/muslim_revolution"                # TODO
 require_relative "card_events/nasser"
 require_relative "card_events/nato"                             # TODO
-require_relative "card_events/nixon_plays_the_china_card"       # TODO
+require_relative "card_events/nixon_plays_the_china_card"
 require_relative "card_events/north_sea_oil"                    # TODO
 require_relative "card_events/nuclear_subs"                     # TODO
 require_relative "card_events/nuclear_test_ban"

@@ -3,13 +3,26 @@ module Events
 
     class NixonPlaysTheChinaCard < Instruction
 
-      needs :countries
+      needs :china_card
 
       def action
         instructions = []
 
-        instructions << Instructions::Noop.new(label: "something")
-        instructions << Instructions::Noop.new(label: "dump the card")
+        if china_card.holder.us?
+          instructions << Instructions::AwardVictoryPoints.new(
+            player: US,
+            amount: 2
+          )
+        else
+          instructions << Instructions::ClaimChinaCard.new(
+            player: US,
+            playable: false
+          )
+        end
+
+        instructions << Instructions::Remove.new(
+          card_ref: "NixonPlaysTheChinaCard"
+        )
 
         instructions
       end

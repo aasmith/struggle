@@ -52,11 +52,10 @@ Decolonization = [
 ]
 
 TrumanDoctrine = [
-  RemoveInfluence(
+  Arb::EraseInfluence(
     player: US,
     influence: USSR,
     countries: lambda { Europe.uncontrolled },
-    limit_per_country: all_influence(USSR),
     total_countries: 1
   ),
   Remove(TrumanDoctrine)
@@ -219,15 +218,14 @@ PanamaCanalReturned = [
 ]
 
 MuslimRevolution = [
-  AnyTwo(
-    [Sudan, Iran, Iraq, Egypt, Libya, SaudiArabia, Syria, Jordan].map do |c|
-      RemoveInfluence(
-        player: USSR,
-        influence: US,
-        countries: [c],
-        limit_per_country: all_influence(US)
-      )
-    end
+  # a special remove influence arbitrator:
+  # only accepts RemoveInfluence where amount is equal to influence
+  # TODO find other "remove all influence from n" (where n is a choice) cases
+  Arb::EraseInfluence(
+    player: USSR,
+    influence: US,
+    countries: [sudan...etc],
+    total_countries: 2
   )
 ]
 
@@ -449,16 +447,12 @@ MarshallPlan = [
 
 WarsawPactFormed = [
   Either(
-    AnyFour(
-      Countries.select { |c| c.in?(EasternEurope) }.map do |eeuc|
-        RemoveInfluence(
-          player: USSR,
-          influence: US,
-          countries: [eeuc],
-          limit_per_country: all_influence(US)
-        )
-      end
-    ),
+    Arb::EraseInfluence(
+      player: USSR,
+      influence: US,
+      countries: [EasternEurope],
+      total_countries: 4
+    )
     Arb::AddInfluence(
       player: USSR,
       influence: USSR,

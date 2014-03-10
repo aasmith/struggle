@@ -195,7 +195,7 @@ class Cards
         side: nil,
       ),
       Card.new(
-        ref: "NATO",
+        ref: "Nato",
         id: 21,
         name: "NATO",
         phase: :early,

@@ -36,7 +36,7 @@ require_relative "card_events/defectors"                        # TODO
 require_relative "card_events/duck_and_cover"                   # TODO
 require_relative "card_events/east_european_unrest"             # TODO
 require_relative "card_events/europe_scoring"                   # TODO
-require_relative "card_events/fidel"                            # TODO
+require_relative "card_events/fidel"
 require_relative "card_events/five_year_plan"                   # TODO
 require_relative "card_events/flower_power"                     # TODO
 require_relative "card_events/formosan_resolution"              # TODO

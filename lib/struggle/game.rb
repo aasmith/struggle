@@ -99,7 +99,7 @@ def Turn(phase:)
   rounds = { early: 6, mid: 7, late: 7 }
 
   List(
-    I(:ImproveDefcon),
+    I(:ImproveDefcon, amount: 1),
     I(:DealCards, target: cards[phase]),
     HeadlinePhase(),
 

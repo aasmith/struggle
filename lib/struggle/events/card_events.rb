@@ -33,7 +33,7 @@ require_relative "card_events/de_gaulle_leads_france"
 require_relative "card_events/de_stalinization"                 # TODO
 require_relative "card_events/decolonization"
 require_relative "card_events/defectors"                        # TODO
-require_relative "card_events/duck_and_cover"                   # TODO
+require_relative "card_events/duck_and_cover"
 require_relative "card_events/east_european_unrest"             # TODO
 require_relative "card_events/europe_scoring"                   # TODO
 require_relative "card_events/fidel"

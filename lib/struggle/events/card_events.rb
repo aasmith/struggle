@@ -77,7 +77,7 @@ require_relative "card_events/pershing_ii_deployed"             # TODO
 require_relative "card_events/portuguese_empire_crumbles"
 require_relative "card_events/puppet_governments"               # TODO
 require_relative "card_events/quagmire"                         # TODO
-require_relative "card_events/reagan_bombs_libya"               # TODO
+require_relative "card_events/reagan_bombs_libya"
 require_relative "card_events/red_scare_purge"                  # TODO
 require_relative "card_events/romanian_abdication"
 require_relative "card_events/sadat_expels_soviets"

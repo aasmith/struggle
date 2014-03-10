@@ -29,7 +29,7 @@ require_relative "card_events/comecon"
 require_relative "card_events/containment"                      # TODO
 require_relative "card_events/cuban_missile_crisis"             # TODO
 require_relative "card_events/cultural_revolution"              # TODO
-require_relative "card_events/de_gaulle_leads_france"           # TODO
+require_relative "card_events/de_gaulle_leads_france"
 require_relative "card_events/de_stalinization"                 # TODO
 require_relative "card_events/decolonization"
 require_relative "card_events/defectors"                        # TODO

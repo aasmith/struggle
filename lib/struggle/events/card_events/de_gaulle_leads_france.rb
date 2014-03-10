@@ -3,13 +3,24 @@ module Events
 
     class DeGaulleLeadsFrance < Instruction
 
-      needs :countries
-
       def action
         instructions = []
 
-        instructions << Instructions::Noop.new(label: "something")
-        instructions << Instructions::Noop.new(label: "dump the card")
+        instructions << Instructions::RemoveInfluence.new(
+             influence: US,
+          country_name: "France",
+                amount: 2
+        )
+
+        instructions << Instructions::AddInfluence.new(
+             influence: USSR,
+          country_name: "France",
+                amount: 1
+        )
+
+        instructions << Instructions::Remove.new(
+          card_ref: "DeGaulleLeadsFrance"
+        )
 
         instructions
       end

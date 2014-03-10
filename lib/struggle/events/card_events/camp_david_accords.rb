@@ -3,8 +3,6 @@ module Events
 
     class CampDavidAccords < Instruction
 
-      needs :countries
-
       def action
         instructions = []
 

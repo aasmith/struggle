@@ -1,16 +1,16 @@
 require "helper"
 
-class ArbitratorTests::AddInfluenceTest < Struggle::Test
+class ArbitratorTests::RemoveInfluenceTest < Struggle::Test
 
   def setup
-    @arbitrator = Arbitrators::AddInfluence.new(
+    @arbitrator = Arbitrators::RemoveInfluence.new(
       player: USSR,
       influence: USSR,
       country_names: [:east_germany, :west_germany],
       total_influence: 6
     )
 
-    @limit_arb = Arbitrators::AddInfluence.new(
+    @limit_arb = Arbitrators::RemoveInfluence.new(
       player: USSR,
       influence: USSR,
       country_names: %i(a b c d e),
@@ -18,7 +18,7 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
       limit_per_country: 2
     )
 
-    @total_arb = Arbitrators::AddInfluence.new(
+    @total_arb = Arbitrators::RemoveInfluence.new(
       player: USSR,
       influence: USSR,
       country_names: %i(a b c d e),
@@ -30,7 +30,7 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
   def test_accepts_move
     move = EmptyMove.new(
       player: USSR,
-      instruction: Instructions::AddInfluence.new(
+      instruction: Instructions::RemoveInfluence.new(
         influence: USSR,
         country_name: :east_germany,
         amount: 6
@@ -58,7 +58,7 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
   def test_fractional_move
     move = EmptyMove.new(
       player: USSR,
-      instruction: Instructions::AddInfluence.new(
+      instruction: Instructions::RemoveInfluence.new(
         influence: USSR,
         country_name: :east_germany,
         amount: 4
@@ -77,7 +77,7 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
   def test_invalid_country
     move = EmptyMove.new(
       player: USSR,
-      instruction: Instructions::AddInfluence.new(
+      instruction: Instructions::RemoveInfluence.new(
         influence: USSR,
         country_name: :nonexistant,
         amount: 6
@@ -93,7 +93,7 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
   def test_invalid_influence
     move = EmptyMove.new(
       player: USSR,
-      instruction: Instructions::AddInfluence.new(
+      instruction: Instructions::RemoveInfluence.new(
         influence: US,
         country_name: :east_germany,
         amount: 6
@@ -109,7 +109,7 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
   def test_invalid_amount
     move = EmptyMove.new(
       player: USSR,
-      instruction: Instructions::AddInfluence.new(
+      instruction: Instructions::RemoveInfluence.new(
         influence: USSR,
         country_name: :east_germany,
         amount: 7
@@ -125,7 +125,7 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
   def test_invalid_player
     move = EmptyMove.new(
       player: US,
-      instruction: Instructions::AddInfluence.new(
+      instruction: Instructions::RemoveInfluence.new(
         influence: USSR,
         country_name: :east_germany,
         amount: 6
@@ -141,7 +141,7 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
   def test_invalid_class
     move = EmptyMove.new(
       player: USSR,
-      instruction: Instructions::RemoveInfluence.new(
+      instruction: Instructions::AddInfluence.new(
         influence: USSR,
         country_name: :east_germany,
         amount: 6
@@ -150,7 +150,7 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
 
     refute @arbitrator.accepts?(move), "Instruction class should be invalid"
 
-    move.instruction = Instructions::AddInfluence.new(
+    move.instruction = Instructions::RemoveInfluence.new(
       influence: USSR,
       country_name: :east_germany,
       amount: 6
@@ -162,7 +162,7 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
   def test_limit_per_country
     move = EmptyMove.new(
       player: USSR,
-      instruction: Instructions::AddInfluence.new(
+      instruction: Instructions::RemoveInfluence.new(
         influence: USSR,
         country_name: :a,
         amount: 3
@@ -182,7 +182,7 @@ class ArbitratorTests::AddInfluenceTest < Struggle::Test
   def test_total_countries
     move = EmptyMove.new(
       player: USSR,
-      instruction: Instructions::AddInfluence.new(
+      instruction: Instructions::RemoveInfluence.new(
         influence: USSR,
         country_name: :a,
         amount: 1

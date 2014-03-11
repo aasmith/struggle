@@ -5,14 +5,14 @@ class ArbitratorTests::RemoveInfluenceTest < Struggle::Test
   def setup
     @arbitrator = Arbitrators::RemoveInfluence.new(
       player: USSR,
-      influence: USSR,
+      influence: US,
       country_names: [:east_germany, :west_germany],
       total_influence: 6
     )
 
     @limit_arb = Arbitrators::RemoveInfluence.new(
       player: USSR,
-      influence: USSR,
+      influence: US,
       country_names: %i(a b c d e),
       total_influence: 4,
       limit_per_country: 2
@@ -20,7 +20,7 @@ class ArbitratorTests::RemoveInfluenceTest < Struggle::Test
 
     @total_arb = Arbitrators::RemoveInfluence.new(
       player: USSR,
-      influence: USSR,
+      influence: US,
       country_names: %i(a b c d e),
       total_influence: 4,
       total_countries: 2
@@ -31,7 +31,7 @@ class ArbitratorTests::RemoveInfluenceTest < Struggle::Test
     move = EmptyMove.new(
       player: USSR,
       instruction: Instructions::RemoveInfluence.new(
-        influence: USSR,
+        influence: US,
         country_name: :east_germany,
         amount: 6
       )
@@ -59,7 +59,7 @@ class ArbitratorTests::RemoveInfluenceTest < Struggle::Test
     move = EmptyMove.new(
       player: USSR,
       instruction: Instructions::RemoveInfluence.new(
-        influence: USSR,
+        influence: US,
         country_name: :east_germany,
         amount: 4
       )
@@ -78,7 +78,7 @@ class ArbitratorTests::RemoveInfluenceTest < Struggle::Test
     move = EmptyMove.new(
       player: USSR,
       instruction: Instructions::RemoveInfluence.new(
-        influence: USSR,
+        influence: US,
         country_name: :nonexistant,
         amount: 6
       )
@@ -94,7 +94,7 @@ class ArbitratorTests::RemoveInfluenceTest < Struggle::Test
     move = EmptyMove.new(
       player: USSR,
       instruction: Instructions::RemoveInfluence.new(
-        influence: US,
+        influence: USSR,
         country_name: :east_germany,
         amount: 6
       )
@@ -102,7 +102,7 @@ class ArbitratorTests::RemoveInfluenceTest < Struggle::Test
 
     refute @arbitrator.accepts?(move), "The influence should be invalid"
 
-    move.instruction.influence = USSR
+    move.instruction.influence = US
     assert @arbitrator.accepts?(move)
   end
 
@@ -110,7 +110,7 @@ class ArbitratorTests::RemoveInfluenceTest < Struggle::Test
     move = EmptyMove.new(
       player: USSR,
       instruction: Instructions::RemoveInfluence.new(
-        influence: USSR,
+        influence: US,
         country_name: :east_germany,
         amount: 7
       )
@@ -126,7 +126,7 @@ class ArbitratorTests::RemoveInfluenceTest < Struggle::Test
     move = EmptyMove.new(
       player: US,
       instruction: Instructions::RemoveInfluence.new(
-        influence: USSR,
+        influence: US,
         country_name: :east_germany,
         amount: 6
       )
@@ -142,7 +142,7 @@ class ArbitratorTests::RemoveInfluenceTest < Struggle::Test
     move = EmptyMove.new(
       player: USSR,
       instruction: Instructions::AddInfluence.new(
-        influence: USSR,
+        influence: US,
         country_name: :east_germany,
         amount: 6
       )
@@ -151,7 +151,7 @@ class ArbitratorTests::RemoveInfluenceTest < Struggle::Test
     refute @arbitrator.accepts?(move), "Instruction class should be invalid"
 
     move.instruction = Instructions::RemoveInfluence.new(
-      influence: USSR,
+      influence: US,
       country_name: :east_germany,
       amount: 6
     )
@@ -163,7 +163,7 @@ class ArbitratorTests::RemoveInfluenceTest < Struggle::Test
     move = EmptyMove.new(
       player: USSR,
       instruction: Instructions::RemoveInfluence.new(
-        influence: USSR,
+        influence: US,
         country_name: :a,
         amount: 3
       )
@@ -183,7 +183,7 @@ class ArbitratorTests::RemoveInfluenceTest < Struggle::Test
     move = EmptyMove.new(
       player: USSR,
       instruction: Instructions::RemoveInfluence.new(
-        influence: USSR,
+        influence: US,
         country_name: :a,
         amount: 1
       )

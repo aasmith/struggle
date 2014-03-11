@@ -3,13 +3,20 @@ module Events
 
     class SuezCrisis < Instruction
 
-      needs :countries
-
       def action
         instructions = []
 
-        instructions << Instructions::Noop.new(label: "something")
-        instructions << Instructions::Noop.new(label: "dump the card")
+        instructions << Arbitrators::RemoveInfluence.new(
+          player: USSR,
+          influence: US,
+          country_names: ["France", "United Kingdom", "Israel"],
+          limit_per_country: 2,
+          total_influence: 4
+        )
+
+        instructions << Instructions::Remove.new(
+          card_ref: "SuezCrisis"
+        )
 
         instructions
       end

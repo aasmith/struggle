@@ -16,7 +16,7 @@ module Events
           total_influence: 4
         )
 
-        instructions << Instructions::Remove.new(
+        instructions << Instructions::Discard.new(
           card_ref: "ColonialRearGuards"
         )
 

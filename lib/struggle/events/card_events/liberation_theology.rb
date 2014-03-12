@@ -16,7 +16,7 @@ module Events
           total_influence: 3
         )
 
-        instructions << Instructions::Remove.new(
+        instructions << Instructions::Discard.new(
           card_ref: "LiberationTheology"
         )
 

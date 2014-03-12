@@ -67,7 +67,7 @@ require_relative "card_events/nixon_plays_the_china_card"
 require_relative "card_events/north_sea_oil"                    # TODO
 require_relative "card_events/nuclear_subs"                     # TODO
 require_relative "card_events/nuclear_test_ban"
-require_relative "card_events/oas_founded"                      # TODO
+require_relative "card_events/oas_founded"
 require_relative "card_events/olympic_games"                    # TODO
 require_relative "card_events/one_small_step"
 require_relative "card_events/opec"                             # TODO

@@ -24,7 +24,7 @@ require_relative "card_events/captured_nazi_scientist"
 require_relative "card_events/central_america_scoring"          # TODO
 require_relative "card_events/chernobyl"                        # TODO
 require_relative "card_events/cia_created"                      # TODO
-require_relative "card_events/colonial_rear_guards"             # TODO
+require_relative "card_events/colonial_rear_guards"
 require_relative "card_events/comecon"
 require_relative "card_events/containment"                      # TODO
 require_relative "card_events/cuban_missile_crisis"             # TODO

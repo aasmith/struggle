@@ -54,7 +54,7 @@ require_relative "card_events/kitchen_debates"
 require_relative "card_events/korean_war"                       # TODO
 require_relative "card_events/latin_american_death_squads"      # TODO
 require_relative "card_events/latin_american_debt_crisis"       # TODO
-require_relative "card_events/liberation_theology"              # TODO
+require_relative "card_events/liberation_theology"
 require_relative "card_events/lone_gunman"                      # TODO
 require_relative "card_events/marine_barracks_bombing"          # TODO
 require_relative "card_events/marshall_plan"                    # TODO

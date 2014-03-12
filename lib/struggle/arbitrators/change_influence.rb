@@ -56,10 +56,10 @@ module Arbitrators
     def exceeds_total_countries?(country_name)
       return false if total_countries.nil?
 
-      (countries << country_name).uniq.size > total_countries
+      (affected_countries << country_name).uniq.size > total_countries
     end
 
-    def countries
+    def affected_countries
       @country_count.keys
     end
 

@@ -28,5 +28,10 @@ class Observers
     # TODO
     []
   end
+
+  def scoring_modifiers(*conditions_todo)
+    # TODO
+    []
+  end
 end
 

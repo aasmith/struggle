@@ -17,6 +17,7 @@ require "struggle/instruction"
 require "struggle/move_arbitrator"
 require "struggle/guard_resolver"
 require "struggle/guard"
+require "struggle/scoring"
 
 require "struggle/ops_counter"
 require "struggle/ops_modifier"

@@ -11,11 +11,14 @@ class Region
     return :control    if control?(superpower)
     return :domination if domination?(superpower)
     return :presence   if presence?(superpower)
-    return nil
+    return :none
   end
 
   def control?(superpower)
-    battlegrounds.all? { |c| c.controlled_by?(superpower) } &&
+    # The use of any? forces there to be at least one battleground
+    # (as all? returns true for zero battlegrounds)
+    battlegrounds.any?   { |c| c.controlled_by?(superpower) } &&
+      battlegrounds.all? { |c| c.controlled_by?(superpower) } &&
       most_countries?(superpower)
   end
 
@@ -31,17 +34,25 @@ class Region
   end
 
   def most_countries?(superpower)
-    ours   = countries.count { |c| c.controlled_by?(superpower) }
-    theirs = countries.count { |c| c.controlled_by?(superpower.opponent) }
+    player_controlled   = controlled_countries(superpower)
+    opponent_controlled = controlled_countries(superpower.opponent)
 
-    ours > theirs
+    player_controlled.size > opponent_controlled.size
   end
 
   def most_battlegrounds?(superpower)
-    ours   = battlegrounds.count { |c| c.controlled_by?(superpower) }
-    theirs = battlegrounds.count { |c| c.controlled_by?(superpower.opponent) }
+    player_controlled   = controlled_battlegrounds(superpower)
+    opponent_controlled = controlled_battlegrounds(superpower.opponent)
 
-    ours > theirs
+    player_controlled.size > opponent_controlled.size
+  end
+
+  def controlled_countries(superpower)
+    countries.select { |c| c.controlled_by?(superpower) }
+  end
+
+  def controlled_battlegrounds(superpower)
+    battlegrounds.select { |c| c.controlled_by?(superpower) }
   end
 
   def battlegrounds
@@ -51,5 +62,37 @@ class Region
   def non_battlegrounds
     countries.reject { |c| c.battleground? }
   end
+
+  def enemy_adjacency(superpower)
+    controlled_countries(superpower).select do |country|
+      country.adjacent_superpower?(superpower.opponent)
+    end
+  end
+
+  def score(presence:, domination:, control:)
+    scores = { US => 0, USSR => 0 }
+
+    rewards = {
+      presence:   presence,
+      domination: domination,
+      control:    control,
+      none:       0
+    }
+
+    scores.each_key do |superpower|
+      scores[superpower] += rewards[level(superpower)]
+      scores[superpower] += controlled_battlegrounds(superpower).size
+      scores[superpower] += enemy_adjacency(superpower).size
+    end
+
+    winner, winner_score = scores.max_by { |player, score| score }
+    _,      loser_score  = scores.min_by { |player, score| score }
+
+    if winner_score != loser_score
+      VpReward.new(winner, winner_score - loser_score)
+    end
+  end
+
+  VpReward = Struct.new(:player, :amount)
 
 end

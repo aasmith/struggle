@@ -93,6 +93,14 @@ class Region
     end
   end
 
+  def controlled?
+    controlled_by?(USSR) || controlled_by?(US)
+  end
+
+  def controlled_by?(superpower)
+    level(superpower) == :control
+  end
+
   VpReward = Struct.new(:player, :amount)
 
 end

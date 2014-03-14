@@ -1,16 +1,4 @@
 
-# Regions
-EasternEurope = EE = "Eastern Europe"
-WesternEurope = WE = "Western Europe"
-Europe = EU = "Europe"
-Asia = AS = "Asia"
-SoutheastAsia = SE = "Southeast Asia"
-Africa = AF = "Africa"
-MiddleEast = ME = "Middle East"
-CentralAmerica = CA = "Central America"
-SouthAmerica = SA = "South America"
-
-
 # country spec
 #   Name, Stability, Battleground, Regions, Neighbors
 COUNTRY_DATA = [

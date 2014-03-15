@@ -3,13 +3,19 @@ module Events
 
     class MiddleEastScoring < Instruction
 
-      needs :countries
-
       def action
         instructions = []
 
-        instructions << Instructions::Noop.new(label: "something")
-        instructions << Instructions::Noop.new(label: "dump the card")
+        instructions << Instructions::ScoreRegion.new(
+          region_name: MiddleEastScoring,
+          presence:    3,
+          domination:  5,
+          control:     7
+        )
+
+        instructions << Instructions::Discard.new(
+          card_ref: "MiddleEastScoring"
+        )
 
         instructions
       end

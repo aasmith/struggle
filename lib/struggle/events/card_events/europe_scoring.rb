@@ -3,13 +3,19 @@ module Events
 
     class EuropeScoring < Instruction
 
-      needs :countries
-
       def action
         instructions = []
 
-        instructions << Instructions::Noop.new(label: "something")
-        instructions << Instructions::Noop.new(label: "dump the card")
+        instructions << Instructions::ScoreRegion.new(
+          region_name: Europe,
+          presence:    3,
+          domination:  7,
+          control:     nil
+        )
+
+        instructions << Instructions::Discard.new(
+          card_ref: "EuropeScoring"
+        )
 
         instructions
       end

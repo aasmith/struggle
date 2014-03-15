@@ -6,14 +6,14 @@ module Events
 end
 
 require_relative "card_events/abm_treaty"                       # TODO
-require_relative "card_events/africa_scoring"                   # TODO
+require_relative "card_events/africa_scoring"
 require_relative "card_events/aldrich_ames_remix"               # TODO
 require_relative "card_events/allende"
 require_relative "card_events/alliance_for_progress"
 require_relative "card_events/an_evil_empire"
 require_relative "card_events/arab_israeli_war"                 # TODO
 require_relative "card_events/arms_race"
-require_relative "card_events/asia_scoring"                     # TODO
+require_relative "card_events/asia_scoring"
 require_relative "card_events/ask_not_what_your_country"        # TODO
 require_relative "card_events/bear_trap"                        # TODO
 require_relative "card_events/blockade"                         # TODO
@@ -21,7 +21,7 @@ require_relative "card_events/brezhnev_doctrine"                # TODO
 require_relative "card_events/brush_war"                        # TODO
 require_relative "card_events/camp_david_accords"
 require_relative "card_events/captured_nazi_scientist"
-require_relative "card_events/central_america_scoring"          # TODO
+require_relative "card_events/central_america_scoring"
 require_relative "card_events/chernobyl"                        # TODO
 require_relative "card_events/cia_created"                      # TODO
 require_relative "card_events/colonial_rear_guards"
@@ -35,7 +35,7 @@ require_relative "card_events/decolonization"
 require_relative "card_events/defectors"                        # TODO
 require_relative "card_events/duck_and_cover"
 require_relative "card_events/east_european_unrest"
-require_relative "card_events/europe_scoring"                   # TODO
+require_relative "card_events/europe_scoring"
 require_relative "card_events/fidel"
 require_relative "card_events/five_year_plan"                   # TODO
 require_relative "card_events/flower_power"                     # TODO
@@ -58,7 +58,7 @@ require_relative "card_events/liberation_theology"
 require_relative "card_events/lone_gunman"                      # TODO
 require_relative "card_events/marine_barracks_bombing"
 require_relative "card_events/marshall_plan"
-require_relative "card_events/middle_east_scoring"              # TODO
+require_relative "card_events/middle_east_scoring"
 require_relative "card_events/missile_envy"                     # TODO
 require_relative "card_events/muslim_revolution"                # TODO
 require_relative "card_events/nasser"
@@ -86,7 +86,7 @@ require_relative "card_events/shuttle_diplomacy"                # TODO
 require_relative "card_events/socialist_governments"            # TODO
 require_relative "card_events/solidarity"                       # TODO
 require_relative "card_events/south_african_unrest"             # TODO
-require_relative "card_events/south_america_scoring"            # TODO
+require_relative "card_events/south_america_scoring"
 require_relative "card_events/southeast_asia_scoring"           # TODO
 require_relative "card_events/star_wars"                        # TODO
 require_relative "card_events/suez_crisis"

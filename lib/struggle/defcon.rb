@@ -1,29 +1,25 @@
 class Defcon
-  attr_reader :value, :destroyed_by
+
+  attr_reader :value
 
   def initialize(value = 5)
     @value = value
-    @destroyed_by = nil
   end
 
   def improve(amount = nil)
     raise ArgumentError, "Must be positive" if amount < 0
 
-    set(nil, [value + amount, 5].min)
+    set([value + amount, 5].min)
   end
 
-  def degrade(player, amount)
+  def degrade(amount)
     raise ArgumentError, "Must be positive" if amount < 0
 
-    set(player, value - amount)
+    set(value - amount)
   end
 
-  def set(player, value)
-    if player.nil? && value == 1
-      raise ArgumentError, "Player needed when setting DEFCON to WAR!"
-    end
-
-    if nuclear_war?
+  def set(value)
+    if one?
       raise ImmutableDefcon, "DEFCON can no longer be changed."
     end
 
@@ -32,16 +28,10 @@ class Defcon
     end
 
     @value = value
-
-    declare_nuclear_war(player) if value <= 1
   end
 
-  def declare_nuclear_war(player)
-    @destroyed_by = player
-  end
-
-  def nuclear_war?
-    destroyed_by
+  def one?
+    value == 1
   end
 
   DEFCON_RESTRICTIONS = {

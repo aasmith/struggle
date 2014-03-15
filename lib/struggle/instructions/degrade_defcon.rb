@@ -13,7 +13,24 @@ module Instructions
     end
 
     def action
-      defcon.degrade(phasing_player, 1)
+      defcon.degrade(player, 1)
+
+      instructions = []
+
+      if defcon.one?
+        instructions << DeclareWinner.new(
+          player: player.opponent,
+          reason: "DEFCON set to 1 by #{player}"
+        )
+
+        instructions << EndGame.new
+      end
+
+      instructions
+    end
+
+    def player
+      phasing_player.player
     end
   end
 end

@@ -12,16 +12,16 @@ class TestDefcon < Struggle::Test
 
   def test_degrade
     defcon = Defcon.new
-    defcon.degrade(USSR, 1)
+    defcon.degrade(1)
 
     assert_equal 4, defcon.value
 
     assert_raises ArgumentError, "Should not allow negative values" do
-      defcon.degrade(USSR, -1)
+      defcon.degrade(-1)
     end
 
     assert_raises InvalidDefcon, "Should not allow value outside of range" do
-      defcon.degrade(USSR, 10)
+      defcon.degrade(10)
     end
 
     assert_equal 4, defcon.value, "Should still be at previous setting"
@@ -43,31 +43,29 @@ class TestDefcon < Struggle::Test
   def test_set
     defcon = Defcon.new
 
-    defcon.set(USSR, 3)
+    defcon.set(3)
     assert_equal 3, defcon.value
 
     assert_raises InvalidDefcon, "Should not allow value outside of range" do
-      defcon.set(USSR, 6)
+      defcon.set(6)
     end
 
     assert_raises InvalidDefcon, "Should not allow value outside of range" do
-      defcon.set(USSR, 0)
+      defcon.set(0)
     end
 
     assert_equal 3, defcon.value, "Should still be at previous setting"
   end
 
-  def test_nuclear_war
+  def test_one?
     defcon = Defcon.new
-    refute defcon.nuclear_war?
+    refute defcon.one?
 
-    defcon.set(USSR, 2)
-    refute defcon.nuclear_war?
+    defcon.set(2)
+    refute defcon.one?
 
-    defcon.degrade(USSR, 1)
-    assert defcon.nuclear_war?
-
-    assert_equal USSR, defcon.destroyed_by
+    defcon.degrade(1)
+    assert defcon.one?
 
     assert_raises(ImmutableDefcon, "Setting DEFCON after war should fail") do
       defcon.improve(2)
@@ -82,17 +80,6 @@ class TestDefcon < Struggle::Test
     assert_equal 5, defcon.value
   end
 
-  def test_player_only_needed_when_going_to_nuclear_war
-    defcon = Defcon.new 2
-
-    assert_raises ArgumentError, "Should require player when going to 1" do
-      defcon.degrade(nil, 1)
-    end
-
-    defcon.improve(1)
-    assert_equal 3, defcon.value, "Improving DEFCON does not require a player"
-  end
-
   def test_restricted_regions
     defcon = Defcon.new(1)
 
@@ -100,12 +87,12 @@ class TestDefcon < Struggle::Test
       defcon.restricted_regions
     end
 
-    3.times do
-      defcon.improve 1
+    (2..4).each do |i|
+      defcon = Defcon.new(i)
       refute_empty defcon.restricted_regions
     end
 
-    defcon.improve 1
+    defcon = Defcon.new(5)
     assert_empty defcon.restricted_regions
   end
 

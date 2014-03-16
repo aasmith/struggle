@@ -54,7 +54,7 @@ class Defcon
   # restricted regions.
 
   def affects?(country)
-    !(country.regions & restricted_regions).empty?
+    (country.regions & restricted_regions).any?
   end
 
 end

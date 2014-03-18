@@ -1,5 +1,5 @@
 ## Twilight Struggle
-#### *The Cold War, 1946—1989*
+#### *The Cold War, 1945—1989*
 
 An attempt to create a faithful clone of the board game Twilight Struggle.
 

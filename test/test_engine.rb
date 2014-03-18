@@ -77,7 +77,7 @@ class TestEngine < Struggle::Test
 
     instruction1 = LambdaInstruction.new { instructions << "ex1" }
     instruction2 = LambdaInstruction.new { instructions << "ex2" }
-    nested_instr = I::NestingInstruction.new(instruction1, instruction2)
+    nested_instr = NestingInstruction.new(instruction1, instruction2)
 
     arbitrator = MoveAcceptor.new
 
@@ -139,7 +139,7 @@ class TestEngine < Struggle::Test
 
     instruction1 = LambdaInstruction.new { instructions << "ex1" }
     instruction2 = LambdaInstruction.new { instructions << "ex2" }
-    nested_instr = I::NestingInstruction.new(instruction1, instruction2)
+    nested_instr = NestingInstruction.new(instruction1, instruction2)
 
     arbitrator = MoveAcceptor.new
 
@@ -190,7 +190,7 @@ class TestEngine < Struggle::Test
 
     instruction1 = LambdaInstruction.new { instructions << "ex1" }
     instruction2 = LambdaInstruction.new { instructions << "ex2" }
-    nested_instr = I::NestingInstruction.new(instruction1, instruction2)
+    nested_instr = NestingInstruction.new(instruction1, instruction2)
 
     arbitrator = MoveAcceptor.new
 

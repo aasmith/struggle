@@ -20,6 +20,15 @@ Twilight Struggle. It has three logical parts:
 
 Current development is focused on getting the game engine to a playable state. 
 
+The game now supports all aspects of a player's move: events, influence,
+coups and realignments.
+
+Emphasis is currently on getting each event implemented. About 50% complete
+so far.
+
+Other areas that needs to implemented include the headline phase.
+Grepping the codebase for TODO also helps.
+
 Also see DESIGN.md.
 
 ### Requirements

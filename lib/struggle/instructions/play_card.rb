@@ -95,7 +95,7 @@ module Instructions
     def ops_counter
       mods = observers.ops_modifiers_for_player(player)
 
-      OpsCounter.new(card.ops!, mods)
+      card.ops_counter(mods)
     end
 
     def to_s

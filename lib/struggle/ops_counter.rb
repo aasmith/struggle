@@ -11,7 +11,7 @@
 # in those countries, then the +accept+ method should be called to update
 # the counter internal state.
 #
-# This patten should continue until +done?+ returns true.
+# This pattern should continue until +done?+ returns true.
 
 class OpsCounter
 

@@ -1,5 +1,5 @@
 class Card
-  attr_reader :ref, :id, :name, :phase, :ops, :side
+  attr_reader :ref, :id, :name, :phase, :side
   attr_reader :remove_after_event, :discard_after_event,
               :always_evaluate_first, :prevent_in_headline
 
@@ -20,17 +20,22 @@ class Card
     underline = "" # display on board until cancelled - TODO?
 
     "%3s: [%s %4s %-5s] %s%s%s%s" % [
-      id, ops, side || '-', phase.to_s.upcase, underline, name, underline, star
+      id, @ops, side || '-', phase.to_s.upcase, underline,
+      name, underline, star
     ]
   end
 
   # Make the getting of ops a special condition. Card ops should be
-  # determined using an OpsResolver (TODO)
-
-  private :ops
+  # determined / tracked using an OpsCounter.
+  #
+  # The easiest way to get one is to call Card#ops_counter.
 
   def ops!
     @ops
+  end
+
+  def ops_counter(ops_modifiers = [])
+    OpsCounter.new(@ops, ops_modifiers)
   end
 
   def china_card?

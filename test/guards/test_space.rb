@@ -66,7 +66,7 @@ module GuardTests
       end
     end
 
-    class FakeCard
+    class FakeCard < Card
       def initialize(ops)
         @ops = ops
       end

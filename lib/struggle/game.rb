@@ -42,7 +42,7 @@ class Game
   end
 
   def start
-    @engine.add_work_item GameInstructions
+    @engine.add_work_item Instructions::Game.new
   end
 
   def accept(move)
@@ -61,94 +61,4 @@ class Game
     @engine.observers
   end
 end
-
-def Instruction(const, **named_args, &block)
-  Instructions.const_get(const).new(named_args, &block)
-end
-
-def List(*args)
-  Instructions::NestingInstruction.new(*args)
-end
-
-def Arbitrator(const, **named_args, &block)
-  Arbitrators.const_get(const).new(named_args, &block)
-end
-
-alias I Instruction
-alias L List
-
-# Markers
-module Instructions
-  ActionRoundsEnd = Class.new(Instructions::Noop)
-end
-
-Setup = List(
-  Instruction(:AddToDeck, phase: :early),
-  Instruction(:DealCards, target: 8),
-  Instruction(:ClaimChinaCard, player: USSR, playable: true),
-  Instruction(:StartingInfluence)
-)
-
-# TODO
-def HeadlinePhase
-  I(:Noop, label: "Headline phase is unimplemented")
-end
-
-def Turn(phase:)
-  cards  = { early: 8, mid: 9, late: 9 }
-  rounds = { early: 6, mid: 7, late: 7 }
-
-  List(
-    I(:ImproveDefcon, amount: 1),
-    I(:DealCards, target: cards[phase]),
-    HeadlinePhase(),
-
-    *rounds[phase].times.map { |n| I(:ActionRound, number: n + 1) },
-
-    I(:OptionalActionRound, number: rounds[phase] + 1),
-
-    I(:ActionRoundsEnd), # for certain events to trigger off of
-    I(:CheckMilitaryOps),
-    I(:ResetMilitaryOps),
-    I(:CheckHeldCards), # check no scoring cards
-    I(:FlipChinaCard), # make it 'playable'
-    DiscardHeldCard, # only available with space race #6
-    I(:AdvanceTurn)
-  )
-end
-
-def Phase(phase)
-  List(
-    # Early phase cards are dealt before the phase begins.
-    *phase != :early ? Instruction(:AddToDeck, phase: phase) : nil,
-    Turn(phase: phase),
-    Turn(phase: phase),
-    Turn(phase: phase)
-  )
-end
-
-# TODO Award the holder of The China Card at the end of Turn 10 with 1 VP.
-AwardChinaCardHolder =
-  I(:Noop, label: "Awarding 1 VP to holder of China Card is unimplemented")
-
-# TODO
-# Allow optional discarding of a held card by any qualifiying player
-# (space race bonus)
-#
-# Instruction that (if modifier present) returns an arbitrator that allows
-# the player to choose a card to be discarded
-DiscardHeldCard = List()
-
-FinalScoring = List(
-  AwardChinaCardHolder
-)
-
-GameInstructions = List(
-  Setup,
-  Phase(:early),
-  Phase(:mid),
-  Phase(:late),
-  FinalScoring, # set a winner here if applicable
-  I(:EndGame)
-)
 

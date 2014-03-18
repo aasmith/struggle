@@ -12,7 +12,7 @@ module Guards
       card = cards.find_by_ref(card_ref)
       mods = observers.ops_modifiers_for_player(player)
 
-      counter = OpsCounter.new(card.ops!, mods)
+      counter = card.ops_counter(mods)
       counter.base_value
     end
 

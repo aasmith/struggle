@@ -1,3 +1,9 @@
+# This file contains a breakdown of every card event into a theoretical DSL.
+# It is used for planning implementations, and is not loaded into the game.
+# It is not executed. Therefore, syntax does not need to be 100% accurate.
+#
+fail "Don't include me"
+#
 # Notes
 # -----
 #

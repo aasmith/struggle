@@ -21,6 +21,7 @@ require "struggle/scoring"
 
 require "struggle/ops_counter"
 require "struggle/ops_modifier"
+require "struggle/war_resolver"
 
 require "struggle/instructions"
 require "struggle/arbitrators"

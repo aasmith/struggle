@@ -7,11 +7,12 @@ module Instructions
       instructions = []
 
       influences = [
-        [USSR, 2, "Syria"],
+        [USSR, 1, "Syria"],
         [USSR, 1, "Iraq"],
         [USSR, 3, "North Korea"],
         [USSR, 3, "East Germany"],
         [USSR, 1, "Finland"],
+        [US,   2, "Canada"],
         [US,   1, "Iran"],
         [US,   1, "Israel"],
         [US,   1, "Japan"],

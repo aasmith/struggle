@@ -1,9 +1,9 @@
 require "helper"
 
-class InstructionTests::WarTest < Struggle::Test
+class InstructionTests::WarOutcomeTest < Struggle::Test
 
   def test_win
-    win = Instructions::War.new(
+    win = Instructions::WarOutcome.new(
       player: USSR,
       country_name: "fake",
       victory: true,
@@ -28,7 +28,7 @@ class InstructionTests::WarTest < Struggle::Test
   end
 
   def test_loss
-    loss = Instructions::War.new(
+    loss = Instructions::WarOutcome.new(
       player: US,
       country_name: "fake",
       victory: false,

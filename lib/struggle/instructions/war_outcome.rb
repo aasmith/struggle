@@ -1,6 +1,6 @@
 module Instructions
 
-  class War < Instruction
+  class WarOutcome < Instruction
 
     fancy_accessor :player, :country_name, :victory, :military_ops, :vp_award
 

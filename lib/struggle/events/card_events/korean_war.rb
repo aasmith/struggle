@@ -14,7 +14,7 @@ module Events
 
         instructions = []
 
-        instructions << Instructions::War.new(
+        instructions << Instructions::WarOutcome.new(
           player: USSR,
           country_name: "South Korea",
           victory: victory,

@@ -3,5 +3,5 @@ rvm:
   - 2.1.2
 env:
   global:
-    - "TESTOPTS=-p RUBYOPT=-w RAKEOPT-q"
+    - "RUBYOPT=-w RAKEOPT=-q"
 

@@ -1,5 +1,12 @@
 module Instructions
 
+  # Handles the outcome of a war.
+  #
+  # * Awards military ops.
+  # * In cases of victory, influence is replaced and VPs awarded.
+  #
+  # See WarResolver#resolve_war for determining a war victory.
+  #
   class WarOutcome < Instruction
 
     fancy_accessor :player, :country_name, :victory, :military_ops, :vp_award

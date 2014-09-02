@@ -46,6 +46,8 @@ No interactive version exists yet, an example of a game exists in
 
 ### Developers
 
+[![Build Status](https://travis-ci.org/aasmith/struggle.svg?branch=master)](https://travis-ci.org/aasmith/struggle)
+
 Running tests:
 
 `TESTOPTS=-p RUBYOPT=-w RAKEOPT=-q rake`

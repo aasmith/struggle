@@ -18,3 +18,6 @@ AF = Africa         = "Africa"
 ME = MiddleEast     = "Middle East"
 CA = CentralAmerica = "Central America"
 SA = SouthAmerica   = "South America"
+
+# All regions used in normal scoring.
+REGIONS = [Europe, Asia, Africa, MiddleEast, CentralAmerica, SouthAmerica]

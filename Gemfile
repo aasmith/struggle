@@ -1,7 +1,14 @@
 # A sample Gemfile
 source "https://rubygems.org"
 
-gem "rake"
-gem "minitest"
-gem "autotest"
-gem "hoe"
+group :development do
+  gem "rake"
+  gem "hoe"
+  gem "rdoc"
+end
+
+group :test do
+  gem "minitest"
+  gem "minitest-gcstats"
+  gem "autotest"
+end

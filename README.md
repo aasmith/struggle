@@ -50,6 +50,8 @@ Running tests:
 
 `TESTOPTS=-p RUBYOPT=-w RAKEOPT=-q rake`
 
+Add `-g` to `TESTOPTS` to get GC stats.
+
 Running a test:
 
 `TESTOPTS=-p RUBYOPT=-w RAKEOPT=-q rake N=test_name`

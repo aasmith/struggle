@@ -47,7 +47,7 @@ end
 on_turn_end         = Match.new(item_class: TurnEnd)
 on_action_round_end = Match.new(item_class: ActionRoundEnd)
 
-Decolonization = [
+Done::Decolonization = [
   Arb::AddInfluence(
     player: USSR,
     influence: USSR,
@@ -67,7 +67,7 @@ TrumanDoctrine = [
   Remove(TrumanDoctrine)
 ]
 
-SuezCrisis = [
+Done::SuezCrisis = [
   Arb::RemoveInfluence(
     player: USSR,
     influence: US,
@@ -88,7 +88,7 @@ SocialistGovernments = [
   )
 ]
 
-EastEuropeanUnrest = [
+Done::EastEuropeanUnrest = [
   Arb::RemoveInfluence(
     player: US,
     influence: USSR,
@@ -110,7 +110,7 @@ IndependentReds = [
   )
 ]
 
-RomanianAbdication = [
+Done::RomanianAbdication = [
   I::RemoveInfluence(
     player: USSR,
     influence: US,
@@ -125,7 +125,7 @@ RomanianAbdication = [
   )
 ]
 
-Fidel = [
+Done::Fidel = [
   I::RemoveInfluence(
     player: USSR,
     influence: US,
@@ -140,7 +140,7 @@ Fidel = [
   )
 ]
 
-Comecon = [
+Done::Comecon = [
   Arb::AddInfluence(
     player: USSR,
     influence: USSR,
@@ -152,7 +152,7 @@ Comecon = [
   )
 ]
 
-Nasser = [
+Done::Nasser = [
   I::AddInfluence(
     player: USSR,
     influence: USSR,
@@ -185,14 +185,14 @@ SouthAfricanUnrest = [
       AddInfluence(
         player: USSR,
         influence: USSR,
-        countries: Countries.select { |c| c.neighbor?(SouthAfrica) },
+        countries: [Angola, Botswana]
         total_influence: 2
       )
     ]
   )
 ]
 
-PanamaCanalReturned = [
+Done::PanamaCanalReturned = [
   I::AddInfluence(
     player: US,
     influence: US,
@@ -238,7 +238,7 @@ PuppetGovernments = [
   )
 ]
 
-Allende = [
+Done::Allende = [
   I::AddInfluence(
     player: USSR,
     influence: USSR,
@@ -247,7 +247,7 @@ Allende = [
   )
 ]
 
-SadatExpelsSoviets = [
+Done::SadatExpelsSoviets = [
   I::RemoveInfluence(
     player: US,
     influence: USSR,
@@ -262,7 +262,7 @@ SadatExpelsSoviets = [
   )
 ]
 
-OasFounded = [
+Done::OasFounded = [
   Arb::AddInfluence(
     player: US,
     influence: US,
@@ -271,7 +271,7 @@ OasFounded = [
   )
 ]
 
-LiberationTheology = [
+Done::LiberationTheology = [
   Arb::AddInfluence(
     player: USSR,
     influence: USSR,
@@ -281,7 +281,7 @@ LiberationTheology = [
   )
 ]
 
-ColonialRearGuards = [
+Done::ColonialRearGuards = [
   Arb::AddInfluence(
     player: US,
     influence: US,
@@ -291,7 +291,7 @@ ColonialRearGuards = [
   )
 ]
 
-PortugueseEmpireCrumbles = [
+Done::PortugueseEmpireCrumbles = [
   I::AddInfluence(
     player: USSR,
     influence: USSR,
@@ -306,7 +306,7 @@ PortugueseEmpireCrumbles = [
   )
 ]
 
-TheVoiceOfAmerica = [
+Done::TheVoiceOfAmerica = [
   Arb::RemoveInfluence(
     player: US,
     influence: USSR,
@@ -326,7 +326,7 @@ Solidarity = [
   )
 ]
 
-MarineBarracksBombing = [
+Done::MarineBarracksBombing = [
   I::RemoveInfluence(
     player: USSR,
     influence: US,
@@ -341,7 +341,7 @@ MarineBarracksBombing = [
   )
 ]
 
-PershingIiDeployed = [
+Done::PershingIiDeployed = [
   AwardVictoryPoints(
     player: USSR,
     amount: 1
@@ -355,7 +355,7 @@ PershingIiDeployed = [
   )
 ]
 
-TheIronLady = [
+Done::TheIronLady = [
   AwardVictoryPoints(
     player: US,
     amount: 1
@@ -374,7 +374,7 @@ TheIronLady = [
   )
 ]
 
-IranianHostageCrisis = [
+Done::IranianHostageCrisis = [
   I::RemoveInfluence(
     player: USSR,
     influence: US,
@@ -389,7 +389,7 @@ IranianHostageCrisis = [
   )
 ]
 
-CampDavidAccords = [
+Done::CampDavidAccords = [
   AwardVictoryPoints(
     player: US,
     amount: 1
@@ -414,7 +414,7 @@ CampDavidAccords = [
   )
 ]
 
-JohnPaulIiElectedPope = [
+Done::JohnPaulIiElectedPope = [
   I::RemoveInfluence(
     player: US,
     influence: USSR,
@@ -429,7 +429,7 @@ JohnPaulIiElectedPope = [
   )
 ]
 
-MarshallPlan = [
+Done::MarshallPlan = [
   Arb::AddInfluence(
     player: US,
     influence: US,
@@ -474,7 +474,7 @@ WillyBrandt = [
   # NOTE: The NATO card checks for the West Germany cancellation clause.
 ]
 
-DeGaulleLeadsFrance = [
+Done::DeGaulleLeadsFrance = [
   I::RemoveInfluence(
     player: USSR,
     influence: US,
@@ -490,14 +490,14 @@ DeGaulleLeadsFrance = [
   # NOTE: The NATO card checks for the France cancellation clause.
 ]
 
-AnEvilEmpire = [
+Done::AnEvilEmpire = [
   AwardVictoryPoints(
     player: US,
     amount: 1
   )
 ]
 
-ReaganBombsLibya = [
+Done::ReaganBombsLibya = [
   AwardVictoryPoints(
     player: US,
     amount: lambda { |game| game.country(:libya).influence(USSR) / 2 }
@@ -516,7 +516,7 @@ Opec = [
   )
 ]
 
-AllianceForProgress = [
+Done::AllianceForProgress = [
   AwardVictoryPoints(
     player: US,
     amount: lambda do |game|
@@ -531,7 +531,7 @@ AllianceForProgress = [
 
 # Needs a Requires condition because of leading if.
 # See NOTES and section 5.2 ex4
-KitchenDebates = [
+Done::KitchenDebates = [
   AwardVictoryPoints(
     player: US,
     amount: lambda do |game|
@@ -687,7 +687,7 @@ Junta = [
   )
 ]
 
-NuclearTestBan = [
+Done::NuclearTestBan = [
   AwardVictoryPoints(
     player: lambda { player },
     amount: lambda { game.defcon - 2 }
@@ -695,7 +695,7 @@ NuclearTestBan = [
   ImproveDefcon(amount: 2)
 ]
 
-DuckAndCover = [
+Done::DuckAndCover = [
   DegradeDefcon(amount: 1),
   AwardVictoryPoints(
     player: US,
@@ -703,11 +703,11 @@ DuckAndCover = [
   )
 ]
 
-CapturedNaziScientist = [
+Done::CapturedNaziScientist = [
   AdvanceSpaceRace(amount: 1)
 ]
 
-OneSmallStep = [
+Done::OneSmallStep = [
   AdvanceSpaceRace(
     amount: lambda {
       game.space_race(player) < game.space_race(player.opponent) ? 2 : 0
@@ -726,7 +726,7 @@ HowILearnedToStopWorrying = [
   )
 ]
 
-ArmsRace = [
+Done::ArmsRace = [
   AwardVictoryPoints(
     player: lambda { player },
     amount: lambda {
@@ -827,7 +827,7 @@ FiveYearPlan = [
   )
 ]
 
-# Event only playable if the required condition is met.
+# Event only playable if the required condition is met. See 5.2 ex4
 #
 # PickFromDiscard should always show the opponent the picked card.
 #
@@ -883,7 +883,7 @@ Modifiers::SaltNegotiations = [
 
 ## Conditionals
 
-CulturalRevolution = [
+Done::CulturalRevolution = [
   If(
     lambda { game.china_card_holder.us? },
     ClaimChinaCard(
@@ -897,7 +897,7 @@ CulturalRevolution = [
   )
 ]
 
-NixonPlaysTheChinaCard = [
+Done::NixonPlaysTheChinaCard = [
   If(
     lambda { game.china_card_holder.us? },
     AwardVictoryPoints(
@@ -911,7 +911,7 @@ NixonPlaysTheChinaCard = [
   )
 ]
 
-UssuriRiverSkirmish = [
+Done::UssuriRiverSkirmish = [
   If(
     lambda { game.china_card_holder.ussr? },
     ClaimChinaCard(
@@ -1332,12 +1332,13 @@ NuclearSubs = [
   AddModifier(Modifiers::NuclearSubs)
 ]
 
+# do not degrade defcon on a US coup
 Modifiers::NuclearSubs = [
   PermissionModifier(
     on: Match(
       item: Instructions::DegradeDefcon,
       # TODO also catch free coup? (if it is a different instruction...)
-      reason: Match(item: Instructions::Coup, player: US)),
+      cause: Match(item: Instructions::Coup, player: US)),
     ruling: :deny,
     terminate: on_turn_end
   )

@@ -3,6 +3,7 @@ bin/*
 .*
 !.gitignore
 !.autotest
+!.travis.yml
 Gemfile.lock
 tags
 

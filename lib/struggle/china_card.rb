@@ -1,5 +1,5 @@
 ##
-# Respresents the current state of the china card with regard to ownership
+# Represents the current state of the china card with regard to ownership
 # and playability.
 #
 class ChinaCard

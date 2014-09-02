@@ -45,7 +45,7 @@ class Defcon
   # the current DEFCON level.
 
   def restricted_regions
-    DEFCON_RESTRICTIONS.fetch(value) do |key|
+    DEFCON_RESTRICTIONS.fetch(value) do |_key|
       raise ArgumentError, "DEFCON is at 1, why are you asking?"
     end
   end

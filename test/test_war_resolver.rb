@@ -14,21 +14,21 @@ class WarResolverTest < Struggle::Test
 
     resolver = TestableWarResolver.new(die, countries)
 
-    result = resolver.resolve_war(
+    victory = resolver.resolve_war(
       player: USSR,
       country_name: "a",
       victory_range: 4..6
     )
 
-    refute result, "Should be loss for USSR because of US neighbor control"
+    refute victory, "Should be loss for USSR because of US neighbor control"
 
-    result = resolver.resolve_war(
+    victory = resolver.resolve_war(
       player: US,
       country_name: "a",
       victory_range: 4..6
     )
 
-    assert result, "Should be victory for US because no modifiers"
+    assert victory, "Should be victory for US because no modifiers"
   end
 
   def test_counts_self
@@ -40,23 +40,23 @@ class WarResolverTest < Struggle::Test
 
     resolver = TestableWarResolver.new(die, countries)
 
-    result = resolver.resolve_war(
+    victory = resolver.resolve_war(
       player: USSR,
       country_name: "a",
       victory_range: 4..6,
       include_target: true
     )
 
-    refute result, "Should be loss for USSR because of US target control"
+    refute victory, "Should be loss for USSR because of US target control"
 
-    result = resolver.resolve_war(
+    victory = resolver.resolve_war(
       player: US,
       country_name: "a",
       victory_range: 4..6,
       include_target: true
     )
 
-    assert result, "Should be victory for US because no modifiers"
+    assert victory, "Should be victory for US because no modifiers"
   end
 
   TestableWarResolver = Struct.new(:die, :countries) do

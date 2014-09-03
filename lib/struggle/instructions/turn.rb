@@ -33,6 +33,10 @@ module Instructions
       instructions << CheckMilitaryOps.new
       instructions << ResetMilitaryOps.new
 
+      # Although not called out explicitly in Section 4.5, space race
+      # attempts are reset each turn per Section 6.4.2.
+      instructions << ResetSpaceRaceAttempts.new
+
       instructions << CheckHeldCards.new
       instructions << FlipChinaCard.new
       instructions << DiscardHeldCard.new

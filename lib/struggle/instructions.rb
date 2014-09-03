@@ -47,7 +47,9 @@ require_relative "instructions/space_race_advancement"
 require_relative "instructions/starting_influence"
 require_relative "instructions/surrender_china_card"
 require_relative "instructions/turn"
-require_relative "instructions/war_outcome"
+require_relative "instructions/war_loss"
+require_relative "instructions/war_outcome_factory"
+require_relative "instructions/war_victory"
 
 # Generates:
 #  instructions/discard

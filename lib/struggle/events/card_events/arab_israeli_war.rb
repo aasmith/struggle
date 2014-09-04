@@ -3,13 +3,33 @@ module Events
 
     class ArabIsraeliWar < Instruction
 
-      needs :countries
+      include WarResolver
+
+      needs :countries, :die
+
+      # TODO needs to check for CampDavidAccords
 
       def action
+        victory = resolve_war(
+                  player: USSR,
+            country_name: "Israel",
+           victory_range: 4..6,
+          include_target: true
+        )
+
         instructions = []
 
-        instructions << Instructions::Noop.new(label: "something")
-        instructions << Instructions::Noop.new(label: "dump the card")
+        instructions << Instructions::WarOutcomeFactory.build(
+                player: USSR,
+          country_name: "Israel",
+               victory: victory,
+          military_ops: 2,
+              vp_award: 2
+        )
+
+        instructions << Instructions::Discard.new(
+          card_ref: "ArabIsraeliWar"
+        )
 
         instructions
       end

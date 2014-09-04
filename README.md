@@ -68,7 +68,7 @@ Number of events left:
 
 `grep TODO lib/struggle/events/card_events.rb | wc -l`
 
-Events remaining:
+Number of events implemented:
 
 `grep require lib/struggle/events/card_events.rb | grep -v TODO | wc -l`
 

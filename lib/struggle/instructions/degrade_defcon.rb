@@ -13,7 +13,7 @@ module Instructions
     end
 
     def action
-      defcon.degrade(player, 1)
+      defcon.degrade(1)
 
       instructions = []
 

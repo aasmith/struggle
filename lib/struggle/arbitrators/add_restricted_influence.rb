@@ -52,10 +52,15 @@ module Arbitrators
     end
 
     def accepts?(move)
-      correct_player?(move) &&
+      add_influence?(move) &&
+        correct_player?(move) &&
         valid_country?(move) &&
         valid_influence?(move) &&
         within_spending_limit?(move)
+    end
+
+    def add_influence?(move)
+      Instructions::AddInfluence === move.instruction
     end
 
     # Is the target a country where influence can be placed in accordance

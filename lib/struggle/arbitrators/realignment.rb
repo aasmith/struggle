@@ -29,7 +29,11 @@ module Arbitrators
       # costs one point, and the arbitrator will be marked as complete
       # as soon as all points are spent.
 
-      correct_player?(move) && valid_country?(move)
+      realignment?(move) && correct_player?(move) && valid_country?(move)
+    end
+
+    def realignment?(move)
+      Instructions::Realignment === move.instruction
     end
 
     def valid_country?(move)

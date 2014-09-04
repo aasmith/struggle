@@ -32,7 +32,11 @@ module Arbitrators
     end
 
     def accepts?(move)
-      correct_player?(move) && valid_country?(move)
+      coup?(move) && correct_player?(move) && valid_country?(move)
+    end
+
+    def coup?(move)
+      Instructions::Coup === move.instruction
     end
 
     def valid_country?(move)

@@ -7,6 +7,9 @@ module Instructions
 
     # A cause (typically an instruction) must be provided for matching.
     # For an example, see Nuclear Subs card event.
+    #
+    # TODO remove cause and find a better way to screen for defcon
+    # degrades that should be ignored (probably higher up the chain)
 
     def initialize(cause:)
       self.cause = cause
@@ -19,18 +22,14 @@ module Instructions
 
       if defcon.one?
         instructions << DeclareWinner.new(
-          player: player.opponent,
-          reason: "DEFCON set to 1 by #{player}"
+          player: phasing_player.opponent,
+          reason: "DEFCON set to 1 by #{phasing_player}"
         )
 
         instructions << EndGame.new
       end
 
       instructions
-    end
-
-    def player
-      phasing_player.player
     end
   end
 end

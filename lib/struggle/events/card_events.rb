@@ -44,9 +44,9 @@ require_relative "card_events/glasnost"                         # TODO
 require_relative "card_events/grain_sales_to_soviets"           # TODO
 require_relative "card_events/how_i_learned_to_stop_worrying"   # TODO
 require_relative "card_events/independent_reds"                 # TODO
-require_relative "card_events/indo_pakistani_war"               # TODO
+require_relative "card_events/indo_pakistani_war"
 require_relative "card_events/iran_contra_scandal"              # TODO
-require_relative "card_events/iran_iraq_war"                    # TODO
+require_relative "card_events/iran_iraq_war"
 require_relative "card_events/iranian_hostage_crisis"
 require_relative "card_events/john_paul_ii_elected_pope"
 require_relative "card_events/junta"                            # TODO

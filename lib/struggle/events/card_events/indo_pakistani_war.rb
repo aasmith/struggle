@@ -3,13 +3,20 @@ module Events
 
     class IndoPakistaniWar < Instruction
 
-      needs :countries
+      needs :phasing_player
 
       def action
         instructions = []
 
-        instructions << Instructions::Noop.new(label: "something")
-        instructions << Instructions::Noop.new(label: "dump the card")
+        instructions << Arbitrators::War.new(
+                   player: phasing_player,
+            country_names: %w(India Pakistan),
+          war_instruction: Instructions::IndoPakistaniWar
+        )
+
+        instructions << Instructions::Remove.new(
+          card_ref: "IndoPakistaniWar"
+        )
 
         instructions
       end

@@ -52,6 +52,10 @@ require_relative "instructions/war_loss"
 require_relative "instructions/war_outcome_factory"
 require_relative "instructions/war_victory"
 
+require_relative "instructions/war_invasion"
+require_relative "instructions/iran_iraq_war"
+require_relative "instructions/indo_pakistani_war"
+
 # Generates:
 #  instructions/discard
 #  instructions/remove

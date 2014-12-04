@@ -1,6 +1,6 @@
 class Card
   attr_reader :ref, :id, :name, :phase, :side
-  attr_reader :remove_after_event, :discard_after_event,
+  attr_reader :remove_after_event, :display_after_event,
               :always_evaluate_first, :prevent_in_headline
 
   def initialize(**args)
@@ -17,11 +17,13 @@ class Card
 
   def inspect
     star = remove_after_event ? "*" : ""
-    underline = "" # display on board until cancelled - TODO?
+    underline = display_after_event ? "\u0332" : ""
 
-    "%3s: [%s %4s %-5s] %s%s%s%s" % [
-      id, @ops, side || '-', phase.to_s.upcase, underline,
-      name, underline, star
+    name = self.name.each_char.map { |c| "#{c}#{underline}" }.join
+
+    "%3s: [%s %4s %-5s] %s%s" % [
+      id, @ops, side || '-', phase.to_s.upcase,
+      name, star
     ]
   end
 

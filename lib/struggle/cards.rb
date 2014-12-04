@@ -158,6 +158,7 @@ class Cards
         ops: 3,
         side: USSR,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "DeGaulleLeadsFrance",
@@ -167,6 +168,7 @@ class Cards
         ops: 3,
         side: USSR,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "CapturedNaziScientist",
@@ -202,6 +204,7 @@ class Cards
         ops: 4,
         side: US,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "IndependentReds",
@@ -220,6 +223,7 @@ class Cards
         ops: 4,
         side: US,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "IndoPakistaniWar",
@@ -255,6 +259,7 @@ class Cards
         ops: 4,
         side: US,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "SuezCrisis",
@@ -323,6 +328,7 @@ class Cards
         ops: 2,
         side: US,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "Defectors",
@@ -392,6 +398,7 @@ class Cards
         ops: 3,
         side: USSR,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "SaltNegotiations",
@@ -410,6 +417,7 @@ class Cards
         ops: 3,
         side: US,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "Summit",
@@ -505,6 +513,7 @@ class Cards
         ops: 2,
         side: USSR,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "MuslimRevolution",
@@ -539,6 +548,7 @@ class Cards
         ops: 4,
         side: USSR,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "U2Incident",
@@ -591,6 +601,7 @@ class Cards
         ops: 2,
         side: US,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "PuppetGovernments",
@@ -617,6 +628,7 @@ class Cards
         ops: 2,
         side: US,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "LatinAmericanDeathSquads",
@@ -660,11 +672,7 @@ class Cards
         phase: :mid,
         ops: 3,
         side: US,
-        # once the card event has executed and has expired, place it back into
-        # the discard pile. NOTE this is different from most cards because it
-        # will be active on the board for some length of time before it appears
-        # in the discard pile.
-        discard_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "TheVoiceOfAmerica",
@@ -741,6 +749,7 @@ class Cards
         ops: 3,
         side: USSR,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "TheIronLady",
@@ -750,6 +759,7 @@ class Cards
         ops: 3,
         side: US,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "ReaganBombsLibya",
@@ -777,6 +787,7 @@ class Cards
         ops: 3,
         side: US,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "TheReformer",
@@ -786,6 +797,7 @@ class Cards
         ops: 3,
         side: USSR,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "MarineBarracksBombing",
@@ -865,6 +877,7 @@ class Cards
         ops: 3,
         side: US,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "AnEvilEmpire",
@@ -874,6 +887,7 @@ class Cards
         ops: 3,
         side: US,
         remove_after_event: true,
+        display_after_event: true
       ),
       Card.new(
         ref: "AldrichAmesRemix",

@@ -22,7 +22,7 @@ class EventsInEffect
   end
 
   def each(&block)
-    @events.each &block
+    @events.each(&block)
   end
 
 end

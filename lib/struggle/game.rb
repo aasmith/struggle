@@ -1,42 +1,43 @@
 class Game
-  attr_accessor :countries, :deck, :turn, :defcon, :china_card, :space_race,
-                :cards, :military_ops, :victory_track, :hands, :phasing_player,
-                :current_cards, :discards, :removed, :limbo, :victory, :rng,
-                :die, :injector, :guard_resolver, :events, :events_in_effect
+  attr_reader :engine,
+              :countries, :deck, :turn, :defcon, :china_card, :space_race,
+              :cards, :military_ops, :victory_track, :hands, :phasing_player,
+              :current_cards, :discards, :removed, :limbo, :victory, :rng,
+              :die, :injector, :guard_resolver, :events, :events_in_effect
 
   def initialize
-    self.injector = Injector.new(self)
+    @injector = Injector.new(self)
 
-    self.cards = Cards.new
-    self.countries = Countries.new(COUNTRY_DATA)
+    @cards = Cards.new
+    @countries = Countries.new(COUNTRY_DATA)
 
-    self.rng = Random.new
-    self.die = Die.new(rng)
-    self.deck = Deck.new
-    self.turn = TurnMarker.new
-    self.defcon = Defcon.new
-    self.victory = Victory.new
-    self.china_card = ChinaCard.new
-    self.space_race = SpaceRace.new
-    self.military_ops = MilitaryOps.new
-    self.victory_track = VictoryTrack.new
-    self.phasing_player = PhasingPlayer.new
-    self.events_in_effect = EventsInEffect.new
+    @rng = Random.new
+    @die = Die.new(rng)
+    @deck = Deck.new
+    @turn = TurnMarker.new
+    @defcon = Defcon.new
+    @victory = Victory.new
+    @china_card = ChinaCard.new
+    @space_race = SpaceRace.new
+    @military_ops = MilitaryOps.new
+    @victory_track = VictoryTrack.new
+    @phasing_player = PhasingPlayer.new
+    @events_in_effect = EventsInEffect.new
 
-    self.hands = Hands.new
+    @hands = Hands.new
 
     # Cards that are currently being played.
-    self.current_cards = Set.new
+    @current_cards = Set.new
 
-    self.discards = Set.new
-    self.removed = Set.new
+    @discards = Set.new
+    @removed = Set.new
 
     # Limbo is for cards that stay on the board but get put into the discard
     # pile once they are cancelled (i.e. Shuttle Diplomacy).
-    self.limbo = Set.new
+    @limbo = Set.new
 
-    self.events = Events::Finder.new(injector)
-    self.guard_resolver = GuardResolver.new(injector)
+    @events = Events::Finder.new(injector)
+    @guard_resolver = GuardResolver.new(injector)
 
     @engine = Engine.new
     @engine.injector = injector

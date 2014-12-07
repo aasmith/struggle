@@ -34,6 +34,11 @@ class EmptyMove < Move
   end
 end
 
+class EmptyInstruction < Instruction
+  def action
+  end
+end
+
 class FakeCountries < Struct.new(:country)
   def find(x)
     country

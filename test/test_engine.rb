@@ -349,11 +349,6 @@ class TestEngine < Struggle::Test
     end
   end
 
-  class EmptyInstruction < Instruction
-    def action
-    end
-  end
-
   class LambdaInstruction < Instruction
     def initialize(**_, &block)
       super()

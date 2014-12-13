@@ -377,5 +377,16 @@ class TestEngine < Struggle::Test
       @instructions
     end
   end
+
+  ##
+  # Always says no to every instruction or move.
+  #
+  # Used for testing.
+  #
+  class NegativePermissionModifier
+    def allows?(instruction_or_move)
+      false
+    end
+  end
 end
 

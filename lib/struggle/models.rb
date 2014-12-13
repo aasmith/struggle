@@ -20,17 +20,6 @@ Match = Matcher
 
 # TODO: roll these existing modifiers into observers.
 
-##
-# Always says no to every work item.
-#
-# Used for testing.
-#
-class NegativePermissionModifier
-  def allows?(work_item)
-    false
-  end
-end
-
 # Used in testing
 class StackModifier
   def initialize(*items_to_insert)

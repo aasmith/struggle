@@ -27,6 +27,10 @@ module Events
                 amount: uk.influence(USSR)
         )
 
+        instructions << Instructions::PlaceInEffect.new(
+          card_ref: "TheIronLady"
+        )
+
         instructions << Instructions::Remove.new(
           card_ref: "TheIronLady"
         )

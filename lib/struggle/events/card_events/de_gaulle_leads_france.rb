@@ -18,6 +18,10 @@ module Events
                 amount: 1
         )
 
+        instructions << Instructions::PlaceInEffect.new(
+          card_ref: "DeGaulleLeadsFrance"
+        )
+
         instructions << Instructions::Remove.new(
           card_ref: "DeGaulleLeadsFrance"
         )

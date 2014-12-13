@@ -29,6 +29,14 @@ module Events
                 amount: 1
         )
 
+        instructions << Instructions::PreventEvent.new(
+          card_ref: "ArabIsraeliWar"
+        )
+
+        instructions << Instructions::PlaceInEffect.new(
+          card_ref: "CampDavidAccords"
+        )
+
         instructions << Instructions::Remove.new(
           card_ref: "CampDavidAccords"
         )

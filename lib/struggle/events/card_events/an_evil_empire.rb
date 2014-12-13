@@ -11,6 +11,18 @@ module Events
           amount: 1
         )
 
+        instructions << Instructions::CancelEffect.new(
+          card_ref: "FlowerPower"
+        )
+
+        instructions << Instructions::PreventEvent.new(
+          event_name: "FlowerPower"
+        )
+
+        instructions << Instructions::PlaceInEffect.new(
+          card_ref: "AnEvilEmpire"
+        )
+
         instructions << Instructions::Remove.new(
           card_ref: "AnEvilEmpire"
         )

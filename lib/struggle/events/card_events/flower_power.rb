@@ -9,6 +9,7 @@ module Events
         instructions = []
 
         instructions << Instructions::Noop.new(label: "something")
+        instructions << Instructions::Noop.new(label: "in effect")
         instructions << Instructions::Noop.new(label: "dump the card")
 
         instructions

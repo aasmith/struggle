@@ -7,8 +7,6 @@ module Events
 
       needs :countries, :die
 
-      # TODO needs to check for CampDavidAccords
-
       def action
         victory = resolve_war(
                   player: USSR,

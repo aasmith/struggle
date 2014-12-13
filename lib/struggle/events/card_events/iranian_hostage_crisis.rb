@@ -22,6 +22,10 @@ module Events
                 amount: 2
         )
 
+        instructions << Instructions::PlaceInEffect.new(
+          card_ref: "IranianHostageCrisis"
+        )
+
         instructions << Instructions::Remove.new(
           card_ref: "IranianHostageCrisis"
         )

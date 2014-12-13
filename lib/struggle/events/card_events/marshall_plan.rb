@@ -16,6 +16,10 @@ module Events
           total_influence: 7
         )
 
+        instructions << Instructions::PlaceInEffect.new(
+          card_ref: "MarshallPlan"
+        )
+
         instructions << Instructions::Remove.new(
           card_ref: "MarshallPlan"
         )

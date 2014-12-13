@@ -34,7 +34,7 @@ class InstructionTests::RealignmentTest < Struggle::Test
     @one_country = Countries.new(one_country)
   end
 
-  def realignment(player: player, country: country, die: Die.new(Random.new))
+  def realignment(player:, country:, die: Die.new(Random.new))
     realignment = Instructions::Realignment.new(
       player: player,
       country_name: :notimportant

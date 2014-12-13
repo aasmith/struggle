@@ -24,7 +24,7 @@ class Observers
   # The only space race modifier is probably the event
   # on the "Animal in Space" square.
 
-  def space_race_modifiers(player: player)
+  def space_race_modifiers(player:)
     # TODO
     []
   end

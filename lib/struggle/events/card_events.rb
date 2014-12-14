@@ -18,7 +18,7 @@ require_relative "card_events/ask_not_what_your_country"        # TODO
 require_relative "card_events/bear_trap"                        # TODO
 require_relative "card_events/blockade"                         # TODO
 require_relative "card_events/brezhnev_doctrine"                # TODO
-require_relative "card_events/brush_war"                        # TODO
+require_relative "card_events/brush_war"
 require_relative "card_events/camp_david_accords"
 require_relative "card_events/captured_nazi_scientist"
 require_relative "card_events/central_america_scoring"

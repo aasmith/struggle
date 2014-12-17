@@ -25,7 +25,8 @@ module Instructions
 
     def action
       remove_from_hand = RemoveCardFromHand.new(
-        player: player, card_ref: card_ref
+          player: player,
+        card_ref: card_ref
       )
 
       add_to_current_cards = AddCurrentCard.new(
@@ -53,22 +54,22 @@ module Instructions
 
     def influence
       Arbitrators::AddRestrictedInfluence.new(
-        player: player,
-        influence: player,
+             player: player,
+          influence: player,
         ops_counter: ops_counter
       )
     end
 
     def coup
       Arbitrators::Coup.new(
-        player: player,
+             player: player,
         ops_counter: ops_counter
       )
     end
 
     def realignment
       Arbitrators::Realignment.new(
-        player: player,
+             player: player,
         ops_counter: ops_counter
       )
     end
@@ -83,7 +84,7 @@ module Instructions
       # attempted if the player doesnt qualify.
 
       Instructions::AttemptSpaceRace.new(
-        player: player,
+          player: player,
         card_ref: card_ref
       )
     end

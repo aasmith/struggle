@@ -5,7 +5,7 @@ module Events
 
 end
 
-require_relative "card_events/abm_treaty"                       # TODO
+require_relative "card_events/abm_treaty"
 require_relative "card_events/africa_scoring"
 require_relative "card_events/aldrich_ames_remix"               # TODO
 require_relative "card_events/allende"

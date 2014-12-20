@@ -40,7 +40,7 @@ require_relative "card_events/fidel"
 require_relative "card_events/five_year_plan"                   # TODO
 require_relative "card_events/flower_power"                     # TODO
 require_relative "card_events/formosan_resolution"              # TODO
-require_relative "card_events/glasnost"                         # TODO
+require_relative "card_events/glasnost"
 require_relative "card_events/grain_sales_to_soviets"           # TODO
 require_relative "card_events/how_i_learned_to_stop_worrying"   # TODO
 require_relative "card_events/independent_reds"                 # TODO

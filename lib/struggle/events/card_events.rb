@@ -70,7 +70,7 @@ require_relative "card_events/nuclear_test_ban"
 require_relative "card_events/oas_founded"
 require_relative "card_events/olympic_games"                    # TODO
 require_relative "card_events/one_small_step"
-require_relative "card_events/opec"                             # TODO
+require_relative "card_events/opec"
 require_relative "card_events/ortega_elected_in_nicaragua"      # TODO
 require_relative "card_events/panama_canal_returned"
 require_relative "card_events/pershing_ii_deployed"

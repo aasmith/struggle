@@ -8,8 +8,6 @@ module Events
       def action
         instructions = []
 
-        instructions << Instructions::Noop.new(label: "something")
-
         # Returns a remove or discard instruction based on whether
         # the award condition is true. See Rules 5.2 example 4.
 

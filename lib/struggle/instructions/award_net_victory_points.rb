@@ -1,4 +1,11 @@
 module Instructions
+
+  # An instruction for awarding a net gain of Victory Points.
+  #
+  # When awarding both players VP at the same time, instead of giving
+  # points to both, the points must be awarded to a single player using
+  # the net gain, per 10.2.3.
+
   class AwardNetVictoryPoints < Instruction
     fancy_accessor :players, :amounts
 
@@ -30,7 +37,7 @@ module Instructions
 
     def calcuate_net_award(players, amounts)
       player_a, player_b = players
-      value_a , value_b  = amounts
+      value_a,  value_b  = amounts
 
       player = (value_a > value_b) ? player_a : player_b
       award  = (value_a - value_b).abs

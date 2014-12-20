@@ -9,6 +9,13 @@ $logging = false
 class Struggle::Test < Minitest::Test
   parallelize_me!
   make_my_diffs_pretty!
+
+  def generate_countries(*names)
+    names.map do |name|
+      [name, 1, false, "Region", []]
+    end
+  end
+
 end
 
 module InstructionTests end

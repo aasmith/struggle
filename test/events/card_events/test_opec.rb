@@ -14,12 +14,13 @@ module CardEventTests
 
     def test_vp_award
 
-      country_list = generate_countries(
-        "Egypt", "Iran", "Libya", "Saudi Arabia",
-        "Iraq", "Gulf States", "Venezuela"
+      countries = Countries.new(
+        generate_countries(
+          "Egypt", "Iran", "Libya", "Saudi Arabia",
+          "Iraq", "Gulf States", "Venezuela"
+        )
       )
 
-      countries = Countries.new(country_list)
       countries.find("Libya").add_influence(USSR, 5)
       countries.find("Iran").add_influence(USSR, 5)
       countries.find("Iraq").add_influence(USSR, 5)

@@ -71,6 +71,12 @@ class Country
     !controlled?
   end
 
+  def controller
+    return USSR if controlled_by? USSR
+    return US   if controlled_by? US
+    return nil
+  end
+
   def player_adjacent_to_superpower?(player)
     adjacent_superpower == player
   end

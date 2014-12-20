@@ -45,5 +45,13 @@ module Instructions
       [player, award]
     end
 
+    def points_for(player)
+      # Used for testing
+
+      _, points = players.zip(amounts).assoc(player)
+
+      points
+    end
+
   end
 end

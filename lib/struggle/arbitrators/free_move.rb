@@ -1,15 +1,18 @@
 module Arbitrators
   class FreeMove < MoveArbitrator
 
-    fancy_accessor :player, :ops
+    fancy_accessor :player, :ops, :only
 
     needs :observers
 
-    def initialize(player:, ops:)
+    VALID_OPERATIONS = %i(influence realignment coup)
+
+    def initialize(player:, ops:, only: VALID_OPERATIONS)
       super
 
       self.player = player
       self.ops = ops
+      self.only = [*only]
     end
 
     def before_execute(move)
@@ -35,7 +38,8 @@ module Arbitrators
     end
 
     def free_move?(move)
-      Instructions::FreeMove === move.instruction
+      Instructions::FreeMove === move.instruction &&
+        only.include?(move.instruction.operation)
     end
 
     def noop?(move)

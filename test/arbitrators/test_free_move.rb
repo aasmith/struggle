@@ -5,7 +5,8 @@ class ArbitratorTests::FreeMoveTest < Struggle::Test
   def setup
     @arb = Arbitrators::FreeMove.new(
       player: US,
-         ops: 4
+         ops: 4,
+        only: :coup
     )
 
     @move = EmptyMove.new(
@@ -27,6 +28,12 @@ class ArbitratorTests::FreeMoveTest < Struggle::Test
 
   def test_invalid_instruction
     @move.instruction = Class.new
+
+    refute @arb.accepts?(@move)
+  end
+
+  def test_invalid_operation
+    @move.instruction.operation = :realignment
 
     refute @arb.accepts?(@move)
   end

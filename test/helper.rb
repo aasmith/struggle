@@ -15,6 +15,7 @@ module InstructionTests end
 module ArbitratorTests end
 module GuardTests end
 module ModifierTests end
+module CardEventTests end
 
 # Commonly used fake / empty test classes
 

@@ -88,6 +88,7 @@ require_relative "card_events/solidarity"                       # TODO
 require_relative "card_events/south_african_unrest"             # TODO
 require_relative "card_events/south_america_scoring"
 require_relative "card_events/southeast_asia_scoring"           # TODO
+require_relative "card_events/soviets_shoot_down_kal_007"
 require_relative "card_events/star_wars"                        # TODO
 require_relative "card_events/suez_crisis"
 require_relative "card_events/summit"                           # TODO

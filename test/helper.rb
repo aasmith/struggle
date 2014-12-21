@@ -64,6 +64,18 @@ class OneSidedDie
   end
 end
 
+class ProgrammedDie
+  def initialize(*seq)
+    @seq = seq.dup
+  end
+
+  def roll
+    @seq.shift or raise SequenceEmpty, "No more rolls left in sequence"
+  end
+
+  SequenceEmpty = Class.new(ArgumentError)
+end
+
 # A counter that doesnt expect any modifers, applies no bounds,
 # and therefore has a very simple life.
 

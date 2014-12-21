@@ -155,14 +155,4 @@ class InstructionTests::RealignmentTest < Struggle::Test
     assert_equal 0, realignment.bonuses(USSR, @five_countries.find("C"))
   end
 
-  class ProgrammedDie
-    def initialize(*seq)
-      @seq = seq.dup
-    end
-
-    def roll
-      @seq.shift
-    end
-  end
-
 end

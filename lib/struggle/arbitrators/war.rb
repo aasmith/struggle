@@ -27,6 +27,10 @@ module Arbitrators
       correct_player?(move) && war_instruction?(move) && valid_country?(move)
     end
 
+    def after_execute(move)
+      complete
+    end
+
     def war_instruction?(move)
       war_instruction === move.instruction
     end

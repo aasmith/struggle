@@ -6,6 +6,8 @@ class PhasingPlayer
     self.player = USSR
   end
 
-  alias __value__ player
+  def opponent
+    player.opponent
+  end
 
 end

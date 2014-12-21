@@ -44,7 +44,7 @@ class Injector
   def descend(target)
     if target.class.respond_to?(:arguments)
       target.class.arguments.each do |arg|
-        inject(target.send(arg, unbox: false), descend: false)
+        inject(target.send(arg), descend: false)
       end
     end
   end

@@ -23,8 +23,8 @@ module Events
       end
 
       def vp_award
-        player   = phasing_player.player
-        opponent = phasing_player.player.opponent
+        player   = phasing_player
+        opponent = phasing_player.opponent
 
         more = military_ops.value(player) >  military_ops.value(opponent)
         met  = military_ops.value(player) >= defcon.value

@@ -13,5 +13,9 @@ module Instructions
     def action
       phasing_player.player = player
     end
+
+    def needs_raw?
+      true
+    end
   end
 end

@@ -1,3 +1,4 @@
+# A pointer class for referencing the current phasing player.
 class PhasingPlayer
 
   fancy_accessor :player
@@ -6,8 +7,8 @@ class PhasingPlayer
     self.player = USSR
   end
 
-  def opponent
-    player.opponent
+  def __value__
+    player
   end
 
 end

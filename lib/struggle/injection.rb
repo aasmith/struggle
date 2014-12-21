@@ -25,7 +25,15 @@ class Injector
 
     needs(target).each do |attr|
       if @source.respond_to?(attr)
-        target.send("#{attr}=", @source.send(attr))
+        source_attr = @source.send(attr)
+
+        needs_raw = target.respond_to?(:needs_raw?) && target.needs_raw?
+
+        if source_attr.respond_to?(:__value__) && !needs_raw
+          target.send("#{attr}=", source_attr.__value__)
+        else
+          target.send("#{attr}=", source_attr)
+        end
       else
         failed << attr
       end

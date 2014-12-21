@@ -68,6 +68,36 @@ class TestInjection < Struggle::Test
     assert_equal 456, @needy.b, "Nested targets should be injected"
   end
 
+  def test_injector_unwraps_pointers
+    source = Struct.new(:a, :b).new(123, Pointer.new)
+    injector = Injector.new(source)
+
+    refute @needy.a, "Should be nil"
+    refute @needy.b, "Should be nil"
+
+    injector.inject(@needy)
+
+    assert_equal 123, @needy.a, "Injector should provide value from source"
+    assert_equal 789, @needy.b, "Injector should provide value from pointer"
+  end
+
+  def test_injector_doesnt_unwrap_pointers_when_raw_requested
+    source = Struct.new(:a, :b).new(123, p=Pointer.new)
+    injector = Injector.new(source)
+
+    def @needy.needs_raw?
+      true
+    end
+
+    refute @needy.a, "Should be nil"
+    refute @needy.b, "Should be nil"
+
+    injector.inject(@needy)
+
+    assert_equal 123, @needy.a, "Injector should provide value from source"
+    assert_equal p,   @needy.b, "Injector should provide pointer"
+  end
+
   class Needy
     extend Injectible
 
@@ -80,6 +110,12 @@ class TestInjection < Struggle::Test
     needs :a
 
     fancy_accessor :foo, :bar
+  end
+
+  class Pointer
+    def __value__
+      789
+    end
   end
 
 end

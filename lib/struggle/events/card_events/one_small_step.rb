@@ -23,8 +23,8 @@ module Events
       end
 
       def behind_on_space_race?
-        player   = phasing_player.player
-        opponent = phasing_player.player.opponent
+        player   = phasing_player
+        opponent = phasing_player.opponent
 
         space_race.position(player) < space_race.position(opponent)
       end

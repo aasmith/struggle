@@ -83,7 +83,7 @@ require_relative "card_events/romanian_abdication"
 require_relative "card_events/sadat_expels_soviets"
 require_relative "card_events/salt_negotiations"                # TODO
 require_relative "card_events/shuttle_diplomacy"                # TODO
-require_relative "card_events/socialist_governments"            # TODO
+require_relative "card_events/socialist_governments"
 require_relative "card_events/solidarity"                       # TODO
 require_relative "card_events/south_african_unrest"             # TODO
 require_relative "card_events/south_america_scoring"
@@ -103,7 +103,7 @@ require_relative "card_events/un_intervention"                  # TODO
 require_relative "card_events/us_japan_mutual_defense_pact"     # TODO
 require_relative "card_events/ussuri_river_skirmish"            # TODO
 require_relative "card_events/vietnam_revolts"                  # TODO
-require_relative "card_events/wargames"                         # TODO
+require_relative "card_events/wargames"
 require_relative "card_events/warsaw_pact_formed"               # TODO
 require_relative "card_events/we_will_bury_you"                 # TODO
 require_relative "card_events/willy_brandt"                     # TODO

@@ -12,6 +12,8 @@ module Instructions
     # degrades that should be ignored (probably higher up the chain)
 
     def initialize(cause:)
+      super
+
       self.cause = cause
     end
 

@@ -1,24 +1,20 @@
 require "helper"
 
-class ArbitratorTests::OlympicGamesTest < Struggle::Test
+class ArbitratorTests::BasicTest < Struggle::Test
 
   def setup
-    @arb = Arbitrators::OlympicGames.new(
-      player: USSR
+    @arb = Arbitrators::Basic.new(
+      player: USSR,
+      allows: [Instructions::Noop]
     )
 
     @move = EmptyMove.new(
       player: USSR,
-      instruction: Instructions::SupportOlympicGames.new
+      instruction: Instructions::Noop.new
     )
   end
 
   def test_accepts_enter
-    assert @arb.accepts?(@move)
-  end
-
-  def test_accepts_boycott
-    @move.instruction = Instructions::BoycottOlympicGames.new
     assert @arb.accepts?(@move)
   end
 
@@ -33,8 +29,10 @@ class ArbitratorTests::OlympicGamesTest < Struggle::Test
   end
 
   def test_invalid_instruction
-    @move.instruction = Instructions::Noop.new
+    @move.instruction = Instructions::Fake.new
     refute @arb.accepts?(@move)
   end
+
+  Instructions::Fake = Class.new(Instructions::Noop)
 
 end

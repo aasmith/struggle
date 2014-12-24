@@ -5,14 +5,20 @@ module Events
 
       needs :phasing_player
 
+      INPUTS = [
+        Instructions::SupportOlympicGames,
+        Instructions::BoycottOlympicGames
+      ]
+
       def action
         instructions = []
 
         # The opponent needs to decide whether to enter the olympics
         # or to boycott them.
 
-        instructions << Arbitrators::OlympicGames.new(
-          player: phasing_player.opponent
+        instructions << Arbitrators::Basic.new(
+          player: phasing_player.opponent,
+          allows: INPUTS
         )
 
         instructions << Instructions::Discard.new(

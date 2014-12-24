@@ -58,6 +58,8 @@ require_relative "instructions/turn"
 require_relative "instructions/war_loss"
 require_relative "instructions/war_outcome_factory"
 require_relative "instructions/war_victory"
+require_relative "instructions/wargames_award_vp"
+require_relative "instructions/wargames_award_vp_and_end_game"
 
 require_relative "instructions/war_invasion"
 require_relative "instructions/brush_war"

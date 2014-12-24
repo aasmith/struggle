@@ -20,10 +20,12 @@ class InstructionTests::ScoreRegionTest < Struggle::Test
       FakeCountry.new(US),
     ]
 
-    win,_ = @instruction.action
+    win, terminate = @instruction.action
 
     assert_instance_of Instructions::DeclareWinner, win
     assert_equal USSR, win.player
+
+    assert_instance_of Instructions::EndGame, terminate
   end
 
   def test_vp_award

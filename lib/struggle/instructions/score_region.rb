@@ -32,8 +32,10 @@ module Instructions
 
         instructions << Instructions::DeclareWinner.new(
           player: controller,
-          reason: "Control of Europe"
+          reason: "Control of Europe during scoring"
         )
+
+        instructions << Instructions::EndGame.new
 
         log "%s controls Europe and gets Automatic Victory" % controller
 

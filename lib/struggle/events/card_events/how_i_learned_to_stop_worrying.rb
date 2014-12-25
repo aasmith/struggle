@@ -3,13 +3,27 @@ module Events
 
     class HowILearnedToStopWorrying < Instruction
 
-      needs :countries
+      needs :phasing_player
 
       def action
         instructions = []
 
-        instructions << Instructions::Noop.new(label: "something")
-        instructions << Instructions::Noop.new(label: "dump the card")
+        instructions << Arbitrators::Basic.new(
+          player: phasing_player,
+          allows: [
+            Instructions::SetDefcon,
+            Instructions::Noop
+          ]
+        )
+
+        instructions << Instructions::IncrementMilitaryOps.new(
+          player: phasing_player,
+          amount: 5
+        )
+
+        instructions << Instructions::Remove.new(
+          card_ref: "HowILearnedToStopWorrying"
+        )
 
         instructions
       end

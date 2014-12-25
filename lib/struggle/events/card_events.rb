@@ -42,7 +42,7 @@ require_relative "card_events/flower_power"                     # TODO
 require_relative "card_events/formosan_resolution"              # TODO
 require_relative "card_events/glasnost"
 require_relative "card_events/grain_sales_to_soviets"           # TODO
-require_relative "card_events/how_i_learned_to_stop_worrying"   # TODO
+require_relative "card_events/how_i_learned_to_stop_worrying"
 require_relative "card_events/independent_reds"                 # TODO
 require_relative "card_events/indo_pakistani_war"
 require_relative "card_events/iran_contra_scandal"              # TODO

@@ -106,4 +106,4 @@ require_relative "card_events/vietnam_revolts"                  # TODO
 require_relative "card_events/wargames"
 require_relative "card_events/warsaw_pact_formed"               # TODO
 require_relative "card_events/we_will_bury_you"                 # TODO
-require_relative "card_events/willy_brandt"                     # TODO
+require_relative "card_events/willy_brandt"

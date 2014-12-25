@@ -28,7 +28,7 @@ module Instructions
       end
 
       define_method :action do
-        card = cards.find_by_ref(card_ref)
+        card = cards.find_by_ref(self.card_ref)
 
         already_disposed = %i(discards removed limbo).any? do |pile|
           send(pile).include?(card)

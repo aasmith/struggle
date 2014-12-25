@@ -77,6 +77,10 @@ class Country
     return nil
   end
 
+  def empty?
+    !presence?(US) && !presence?(USSR)
+  end
+
   def player_adjacent_to_superpower?(player)
     adjacent_superpower == player
   end

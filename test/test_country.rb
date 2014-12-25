@@ -27,6 +27,12 @@ class TestCountry < Struggle::Test
     assert_equal 0, @country.influence(USSR)
   end
 
+  def test_empty?
+    assert @country.empty?
+    @country.add_influence(US, 1)
+    refute @country.empty?
+  end
+
   def test_add_influence
     @country.add_influence(US, 3)
     @country.add_influence(USSR, 2)

@@ -21,7 +21,7 @@ class ArbitratorTests::RealignmentTest < Struggle::Test
     country = FakeCountry.new(ussr: 0, us: 1)
 
     @arb.countries = FakeCountries.new(country)
-    @arb.defcon    = FakeDefcon.new(prevents_everything: false)
+    @arb.defcon    = BlanketDefcon.new(prevents_everything: false)
 
     refute @arb.accepts?(@move)
   end
@@ -30,7 +30,7 @@ class ArbitratorTests::RealignmentTest < Struggle::Test
     country = FakeCountry.new(ussr: 1, us: 1)
 
     @arb.countries = FakeCountries.new(country)
-    @arb.defcon    = FakeDefcon.new(prevents_everything: true)
+    @arb.defcon    = BlanketDefcon.new(prevents_everything: true)
 
     refute @arb.accepts?(@move)
   end
@@ -41,11 +41,39 @@ class ArbitratorTests::RealignmentTest < Struggle::Test
     refute @arb.accepts?(@move)
   end
 
+  def test_invalid_instruction
+    @move.instruction = Instructions::Noop.new
+
+    refute @arb.accepts?(@move)
+  end
+
+  def test_invalid_country
+    @arb.countries = FakeCountries.new
+    @arb.country_names = %w(aaa bbb)
+    @move.instruction.country_name = "ccc"
+
+    refute @arb.accepts?(@move)
+  end
+
+  def test_valid_country
+    country = FakeCountry.new(ussr: 1, us: 1)
+
+    @arb.country_names = %w(aaa bbb ccc)
+    @move.instruction.country_name = "ccc"
+
+    @arb.countries = FakeCountries.new(country)
+    @arb.defcon    = BlanketDefcon.new(prevents_everything: false)
+
+    assert @arb.accepts?(@move)
+    @arb.accept @move
+    assert @arb.complete?
+  end
+
   def test_accepts_realign_with_opponent_influence_and_permissive_defcon
     country = FakeCountry.new(ussr: 1, us: 1)
 
     @arb.countries = FakeCountries.new(country)
-    @arb.defcon    = FakeDefcon.new(prevents_everything: false)
+    @arb.defcon    = BlanketDefcon.new(prevents_everything: false)
 
     assert @arb.accepts?(@move)
     @arb.accept @move
@@ -56,7 +84,7 @@ class ArbitratorTests::RealignmentTest < Struggle::Test
     country = FakeCountry.new(ussr: 4, us: 4)
 
     @arb.countries   = FakeCountries.new(country)
-    @arb.defcon      = FakeDefcon.new(prevents_everything: false)
+    @arb.defcon      = BlanketDefcon.new(prevents_everything: false)
     @arb.ops_counter = SimpleOpsCounter.new(2)
 
     assert @arb.accepts?(@move)
@@ -84,13 +112,4 @@ class ArbitratorTests::RealignmentTest < Struggle::Test
     end
   end
 
-  class FakeDefcon
-    def initialize(prevents_everything:)
-      @prevents_everything = prevents_everything
-    end
-
-    def affects?(*)
-      @prevents_everything
-    end
-  end
 end

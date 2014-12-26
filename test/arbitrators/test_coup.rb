@@ -41,6 +41,28 @@ class ArbitratorTests::CoupTest < Struggle::Test
     refute @arb.accepts?(@move)
   end
 
+  def test_invalid_country
+    @arb.countries = FakeCountries.new
+    @arb.country_names = %w(aaa bbb)
+    @move.instruction.country_name = "ccc"
+
+    refute @arb.accepts?(@move)
+  end
+
+  def test_valid_country
+    country = FakeCountry.new(ussr: 1, us: 1)
+
+    @arb.country_names = %w(aaa bbb ccc)
+    @move.instruction.country_name = "ccc"
+
+    @arb.countries = FakeCountries.new(country)
+    @arb.defcon    = BlanketDefcon.new(prevents_everything: false)
+
+    assert @arb.accepts?(@move)
+    @arb.accept @move
+    assert @arb.complete?
+  end
+
   def test_accepts_coup_with_opponent_influence_and_permissive_defcon
     country = FakeCountry.new(ussr: 1, us: 1)
 

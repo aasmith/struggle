@@ -1,15 +1,16 @@
 module Arbitrators
   class Coup < MoveArbitrator
 
-    fancy_accessor :player, :ops_counter
+    fancy_accessor :player, :ops_counter, :country_names
 
     needs :countries, :defcon
 
-    def initialize(player:, ops_counter:)
+    def initialize(player:, ops_counter:, country_names: nil)
       super
 
       self.player = player
       self.ops_counter = ops_counter
+      self.country_names = country_names
     end
 
     def before_execute(move)
@@ -40,12 +41,35 @@ module Arbitrators
     end
 
     def valid_country?(move)
-      country = countries.find(move.instruction.country_name)
+      country_name = move.instruction.country_name
+      country = countries.find(country_name)
 
+      # is the country on the list of allowed countries?
       # is the opponent in the country?
       # is the country free of DEFCON restrictions?
-      country.presence?(player.opponent) && !defcon.affects?(country)
+
+      country_whitelisted?(country_name) &&
+      country.presence?(player.opponent) &&
+      !defcon_affects?(country)
     end
 
+    def defcon_affects?(country)
+      defcon.affects?(country)
+    end
+
+    def country_whitelisted?(country_name)
+      return true if country_names.nil?
+
+      country_names.include?(country_name)
+    end
+
+  end
+
+  # A coup without DEFCON restrictions enforced, per 6.3.5.
+  class FreeCoup < Coup
+
+    def defcon_affects?(country)
+      false
+    end
   end
 end

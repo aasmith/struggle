@@ -24,9 +24,6 @@ module Instructions
 
       instructions << OptionalActionRound.new(number: num_cards + 1)
 
-      instructions << DealCards.new(target: num_cards)
-      instructions << DealCards.new(target: num_cards)
-
       # for certain events to trigger off of
       instructions << ActionRoundsEnd.new
 

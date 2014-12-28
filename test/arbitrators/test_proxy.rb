@@ -60,6 +60,14 @@ class ArbitratorTests::ProxyTest < Struggle::Test
     assert @arb.complete?
   end
 
+  def test_noop_denied_if_allow_noop_is_false
+    setup_all_to_reject
+
+    @arb.allows_noop = false
+
+    refute @arb.accepts?(@noop)
+  end
+
   def test_invalid_player_cannot_noop
     setup_all_to_reject
     @noop.player = USSR

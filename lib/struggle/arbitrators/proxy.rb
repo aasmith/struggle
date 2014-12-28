@@ -5,13 +5,15 @@
 # accepts it, then subsequent moves will be routed to that arbitrator
 # until it is complete.
 #
-# A Noop will be accepted, and will mark the arbitrator complete if no
-# other arbitrator has yet been selected.
+# If allows_noop is true (default), a Noop will be accepted, and will
+# mark the arbitrator complete if no other arbitrator has yet been selected.
 
 module Arbitrators
   class Proxy < MoveArbitrator
 
-    fancy_accessor :player, :choices
+    fancy_accessor :player, :choices, :allows_noop
+
+    alias allows_noop? allows_noop
 
     attr_reader :selected_arbitrator
     alias arbitrator_selected? selected_arbitrator
@@ -19,11 +21,12 @@ module Arbitrators
     attr_reader :nooped
     alias nooped? nooped
 
-    def initialize(player:, choices:)
+    def initialize(player:, choices:, allows_noop: true)
       super
 
       self.player = player
       self.choices = choices
+      self.allows_noop = allows_noop
     end
 
     def accepts?(move)
@@ -32,7 +35,7 @@ module Arbitrators
       if arbitrator_selected?
         selected_arbitrator.accepts?(move)
 
-      elsif !arbitrator_selected? && noop?(move) && correct_player?(move)
+      elsif !arbitrator_selected? && valid_noop?(move)
         @nooped = true
         true
 
@@ -74,6 +77,10 @@ module Arbitrators
         log "Too many accept"
 
       end
+    end
+
+    def valid_noop?(move)
+      allows_noop? && noop?(move) && correct_player?(move)
     end
 
     def noop?(move)

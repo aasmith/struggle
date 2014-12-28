@@ -71,7 +71,7 @@ require_relative "card_events/oas_founded"
 require_relative "card_events/olympic_games"
 require_relative "card_events/one_small_step"
 require_relative "card_events/opec"
-require_relative "card_events/ortega_elected_in_nicaragua"      # TODO
+require_relative "card_events/ortega_elected_in_nicaragua"
 require_relative "card_events/panama_canal_returned"
 require_relative "card_events/pershing_ii_deployed"
 require_relative "card_events/portuguese_empire_crumbles"

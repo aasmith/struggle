@@ -49,7 +49,7 @@ require_relative "card_events/iran_contra_scandal"              # TODO
 require_relative "card_events/iran_iraq_war"
 require_relative "card_events/iranian_hostage_crisis"
 require_relative "card_events/john_paul_ii_elected_pope"
-require_relative "card_events/junta"                            # TODO
+require_relative "card_events/junta"
 require_relative "card_events/kitchen_debates"
 require_relative "card_events/korean_war"
 require_relative "card_events/latin_american_death_squads"      # TODO

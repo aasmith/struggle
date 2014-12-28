@@ -22,7 +22,7 @@ module Instructions
         instructions << ActionRound.new(number: n + 1)
       end
 
-      instructions << OptionalActionRound.new(number: num_cards + 1)
+      instructions << OptionalActionRound.new(number: num_rounds + 1)
 
       # for certain events to trigger off of
       instructions << ActionRoundsEnd.new

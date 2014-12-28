@@ -92,7 +92,7 @@ require_relative "card_events/soviets_shoot_down_kal_007"
 require_relative "card_events/star_wars"                        # TODO
 require_relative "card_events/suez_crisis"
 require_relative "card_events/summit"                           # TODO
-require_relative "card_events/tear_down_this_wall"              # TODO
+require_relative "card_events/tear_down_this_wall"
 require_relative "card_events/terrorism"                        # TODO
 require_relative "card_events/the_china_card"                   # TODO
 require_relative "card_events/the_iron_lady"

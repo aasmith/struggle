@@ -81,6 +81,10 @@ class Country
     !presence?(US) && !presence?(USSR)
   end
 
+  def amount_needed_to_equal(superpower)
+    [influence(superpower) - influence(superpower.opponent), 0].max
+  end
+
   def player_adjacent_to_superpower?(player)
     adjacent_superpower == player
   end

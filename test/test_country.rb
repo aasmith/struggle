@@ -129,6 +129,19 @@ class TestCountry < Struggle::Test
       "Influence should cost 1 because the country is uncontrolled"
   end
 
+  def test_amount_needed_to_equal
+    @country.add_influence(USSR, 2)
+    @country.add_influence(US, 1)
+
+    assert_equal 0, @country.amount_needed_to_equal(US)
+    assert_equal 1, @country.amount_needed_to_equal(USSR)
+
+    @country.add_influence(US, 1)
+
+    assert_equal 0, @country.amount_needed_to_equal(US)
+    assert_equal 0, @country.amount_needed_to_equal(USSR)
+  end
+
   def test_player_adjacent_to_superpower?
     assert @country.player_adjacent_to_superpower?(USSR)
     refute @country.player_adjacent_to_superpower?(US)

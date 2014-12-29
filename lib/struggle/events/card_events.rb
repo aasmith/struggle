@@ -85,7 +85,7 @@ require_relative "card_events/salt_negotiations"                # TODO
 require_relative "card_events/shuttle_diplomacy"                # TODO
 require_relative "card_events/socialist_governments"
 require_relative "card_events/solidarity"
-require_relative "card_events/south_african_unrest"             # TODO
+require_relative "card_events/south_african_unrest"
 require_relative "card_events/south_america_scoring"
 require_relative "card_events/southeast_asia_scoring"
 require_relative "card_events/soviets_shoot_down_kal_007"

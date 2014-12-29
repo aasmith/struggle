@@ -3,8 +3,6 @@ module Events
 
     class SouthAfricanUnrest < Instruction
 
-      needs :countries
-
       def action
         instructions = []
 

@@ -13,6 +13,7 @@ class TestSuperpowers < Struggle::Test
   def test_us
     assert_equal "US", US.name
     assert_equal "US", US.to_s
+    assert_equal "US", US.inspect
 
     assert US.us?
     refute US.ussr?
@@ -25,6 +26,7 @@ class TestSuperpowers < Struggle::Test
   def test_ussr
     assert_equal "USSR", USSR.name
     assert_equal "USSR", USSR.to_s
+    assert_equal "USSR", USSR.inspect
 
     refute USSR.us?
     assert USSR.ussr?

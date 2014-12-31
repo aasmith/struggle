@@ -15,10 +15,6 @@ module Events
           card_ref: "FlowerPower"
         )
 
-        instructions << Instructions::PreventEvent.new(
-          event_name: "FlowerPower"
-        )
-
         instructions << Instructions::PlaceInEffect.new(
           card_ref: "AnEvilEmpire"
         )

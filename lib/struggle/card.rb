@@ -19,7 +19,9 @@ class Card
     star = remove_after_event ? "*" : ""
     underline = display_after_event ? "\u0332" : ""
 
-    name = self.name.each_char.map { |c| "#{c}#{underline}" }.join
+    name = self.name.each_char.
+      map { |c| c == " " ? c : "#{c}#{underline}" }.
+      join
 
     "%3s: [%s %4s %-5s] %s%s" % [
       id, @ops, side || '-', phase.to_s.upcase,

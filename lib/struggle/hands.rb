@@ -12,11 +12,25 @@ class Hands
     @hands.fetch(player).delete(card)
   end
 
+  # A duplicated and frozen hand for +player+.
+  #
+  # Modifications will raise an error.
+  #
   def get(player)
-    @hands.fetch(player).dup.freeze
+    get!(player).freeze
   end
 
-  alias hand get
+  # Returns +player+ hand with a duplicated array that is not frozen.
+  #
+  # Any changes the caller makes to the array will be not be made
+  # to the underlying hand.
+  #
+  def get!(player)
+    @hands.fetch(player).dup
+  end
+
+  alias hand  get
+  alias hand! get
 
   def clear(player)
     @hands.fetch(player).clear.dup.freeze

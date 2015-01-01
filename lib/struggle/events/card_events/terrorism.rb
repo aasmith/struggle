@@ -17,7 +17,7 @@ module Events
         # parent. Therefore, we need to remove the cards here so the same card
         # cannot be picked from the hand twice.
 
-        hand = Array.new(hands.get(opponent))
+        hand = hands.get!(opponent)
 
         log "%s %s will be chosen randomly from %s hand and discarded" % [
           qty,

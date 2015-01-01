@@ -16,8 +16,19 @@ class HandsTest < Struggle::Test
     h.add(USSR, c)
 
     assert h.get(USSR).frozen?,    "Hand should be frozen"
+    refute h.get!(USSR).frozen?,   "Hand should not be frozen when using get!"
     assert h.clear(USSR).frozen?,  "Hand should not be modifiable via clear"
     assert h.add(USSR, c).frozen?, "Hand should not be modifiable via add"
+  end
+
+  def test_any_returned_hands_are_dups
+    h = Hands.new
+    c = Object.new
+
+    h.add(USSR, c)
+
+    assert_equal h.get(USSR), h.get(USSR)
+    refute_same  h.get(USSR), h.get(USSR)
   end
 
   def test_add

@@ -49,5 +49,17 @@ class Card
   def contains_event?
     !china_card?
   end
+
+  def us?
+    side && side == US
+  end
+
+  def ussr?
+    side && side == USSR
+  end
+
+  def neutral?
+    side.nil?
+  end
 end
 

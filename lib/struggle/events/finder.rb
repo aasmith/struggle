@@ -7,11 +7,11 @@ module Events
       @injector = injector
     end
 
-    def find(event_name, action)
+    def find(event_name, action = EVENT)
       namespace = case action
                   when INFLUENCE, COUP, REALIGNMENT then OperationsEvents
-                  when SPACE then SpaceEvents
-                  when EVENT then CardEvents
+                  when SPACE                        then SpaceEvents
+                  when EVENT                        then CardEvents
                   else raise ArgumentError, "Invalid action #{action.inspect}"
                   end
 

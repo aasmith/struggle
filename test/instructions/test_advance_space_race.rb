@@ -78,10 +78,4 @@ class InstructionTests::AdvanceSpaceRaceTest < Struggle::Test
     assert_equal "TwoSpaceRacesPerTurn:space", event.label
   end
 
-  class FakeEventFinder
-    def find(name, type)
-      Instructions::Noop.new(label: [name,type].join(":"))
-    end
-  end
-
 end

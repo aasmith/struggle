@@ -37,7 +37,7 @@ require_relative "card_events/duck_and_cover"
 require_relative "card_events/east_european_unrest"
 require_relative "card_events/europe_scoring"
 require_relative "card_events/fidel"
-require_relative "card_events/five_year_plan"                   # TODO
+require_relative "card_events/five_year_plan"
 require_relative "card_events/flower_power"                     # TODO
 require_relative "card_events/formosan_resolution"              # TODO
 require_relative "card_events/glasnost"

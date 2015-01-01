@@ -110,6 +110,12 @@ class BlanketDefcon
   end
 end
 
+class FakeEventFinder
+  def find(name, type = EVENT)
+    Instructions::Noop.new(label: [name,type].join(":"))
+  end
+end
+
 
 # No dot printing right now, thx
 #module Minitest

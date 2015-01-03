@@ -20,7 +20,9 @@ task :progress do
   left = `grep TODO lib/struggle/events/card_events.rb | wc -l`
 
   puts "Event Implementation Progress:"
-  puts "Done: %s Remaining: %s" % [done.strip, left.strip]
+  puts "\tDone: %s"        % done.strip
+  puts "\tRemaining: %s"   % left.strip
+  puts "\t%.f%% Complete"  % [done.to_f / (done.to_i + left.to_i) * 100]
 end
 
 task :console do

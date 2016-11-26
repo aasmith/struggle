@@ -34,6 +34,7 @@ require "struggle/models"
 
 require "struggle/data/countries"
 
+require "struggle/action_round"
 require "struggle/card"
 require "struggle/cards"
 require "struggle/china_card"

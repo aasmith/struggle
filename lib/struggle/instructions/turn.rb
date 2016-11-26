@@ -38,6 +38,7 @@ module Instructions
       instructions << FlipChinaCard.new
       instructions << DiscardHeldCard.new
       instructions << AdvanceTurn.new
+      instructions << ResetActionRound.new
 
       instructions
     end

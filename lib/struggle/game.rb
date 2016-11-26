@@ -3,7 +3,8 @@ class Game
               :countries, :deck, :turn, :defcon, :china_card, :space_race,
               :cards, :military_ops, :victory_track, :hands, :phasing_player,
               :current_cards, :discards, :removed, :limbo, :victory, :rng,
-              :die, :injector, :guard_resolver, :events, :events_in_effect
+              :die, :injector, :guard_resolver, :events, :events_in_effect,
+              :action_round
 
   def initialize
     @injector = Injector.new(self)
@@ -20,6 +21,7 @@ class Game
     @china_card = ChinaCard.new
     @space_race = SpaceRace.new
     @military_ops = MilitaryOps.new
+    @action_round = ActionRound.new
     @victory_track = VictoryTrack.new
     @phasing_player = PhasingPlayer.new
     @events_in_effect = EventsInEffect.new

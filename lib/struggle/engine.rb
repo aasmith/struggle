@@ -62,6 +62,7 @@ class Engine
       debug_start_of_iteration(work_item, move)
 
       injector.inject(work_item)
+      injector.inject(move)
 
       if Instruction === work_item
 

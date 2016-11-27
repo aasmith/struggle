@@ -322,6 +322,20 @@ class TestEngine < Struggle::Test
     assert fake_injector.injected?(item), "Item was not passed to the injector"
   end
 
+  def test_moves_are_injected
+    item = EmptyInstruction.new
+    move = EmptyMove.new
+    fake_injector = FakeInjector.new
+
+    e = Engine.new
+    e.injector = fake_injector
+
+    e.add_work_item item
+    e.accept move
+
+    assert fake_injector.injected?(move), "Move was not passed to the injector"
+  end
+
   class MoveAcceptor < MoveArbitrator
     def initialize(**args)
       @label = args.delete(:label)

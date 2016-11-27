@@ -11,4 +11,5 @@ group :test do
   gem "minitest"
   gem "minitest-gcstats"
   gem "autotest"
+  gem "debride"
 end

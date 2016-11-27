@@ -310,8 +310,7 @@ class TestEngine < Struggle::Test
 
   def test_work_items_are_injected
     item = EmptyInstruction.new
-
-    fake_injector = Minitest::Mock.new.expect(:inject, nil, [item])
+    fake_injector = FakeInjector.new
 
     e = Engine.new
     e.injector = fake_injector
@@ -320,7 +319,7 @@ class TestEngine < Struggle::Test
 
     e.accept nil
 
-    fake_injector.verify
+    assert fake_injector.injected?(item), "Item was not passed to the injector"
   end
 
   class MoveAcceptor < MoveArbitrator

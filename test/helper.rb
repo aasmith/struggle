@@ -116,6 +116,20 @@ class FakeEventFinder
   end
 end
 
+class FakeInjector
+  def initialize
+    @injected = []
+  end
+
+  def inject(target)
+    @injected << target
+  end
+
+  def injected?(thing)
+    @injected.include? thing
+  end
+end
+
 
 # No dot printing right now, thx
 #module Minitest

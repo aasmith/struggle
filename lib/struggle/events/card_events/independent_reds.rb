@@ -30,7 +30,7 @@ module Events
         # try to solicit input from the player
 
         if choices.empty?
-          log "The US and USSR are either equal, or the USSR is not present" \
+          log "The US and USSR are either equal, or the USSR is not present " \
               "in all of the countries listed in this event."
           log "Therefore, no influence can be placed by the US for this event"
 

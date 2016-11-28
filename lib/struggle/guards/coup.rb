@@ -11,7 +11,8 @@ module Guards
       end
     end
 
-    # All countries where a coup by the player is disallowed.
+    # All countries where a coup by the player is disallowed
+    # by DEFCON, per 8.1.5.
 
     def restricted_countries
       # TODO check permission modifiers that prevent coups

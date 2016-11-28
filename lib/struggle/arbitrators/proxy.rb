@@ -13,13 +13,11 @@ module Arbitrators
 
     fancy_accessor :player, :choices, :allows_noop
 
-    alias allows_noop? allows_noop
+    attr_reader :selected_arbitrator, :nooped
 
-    attr_reader :selected_arbitrator
-    alias arbitrator_selected? selected_arbitrator
-
-    attr_reader :nooped
     alias nooped? nooped
+    alias allows_noop? allows_noop
+    alias arbitrator_selected? selected_arbitrator
 
     def initialize(player:, choices:, allows_noop: true)
       super

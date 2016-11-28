@@ -20,7 +20,7 @@ module WarResolver
     roll -= neighbors.count { |n| n.controlled_by?(opponent) }
 
     # Don't go below zero
-    roll = 0 if roll < 0
+    roll = [0, roll].max
 
     log "Roll is reduced to %s" % roll
 

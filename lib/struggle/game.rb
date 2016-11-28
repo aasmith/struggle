@@ -35,7 +35,7 @@ class Game
     @removed = Set.new
 
     # Limbo is for cards that stay on the board but get put into the discard
-    # pile once they are cancelled (i.e. Shuttle Diplomacy).
+    # pile once they are canceled (i.e. Shuttle Diplomacy).
     @limbo = Set.new
 
     @events = Events::Finder.new(injector)
@@ -65,4 +65,3 @@ class Game
     @engine.observers
   end
 end
-

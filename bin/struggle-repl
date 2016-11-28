@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+require "ripl"
+require "ripl/multi_line"
+
+Ripl.config[:irbrc] = false
+
+$: << "lib"
+require "struggle"
+require "struggle/banner"
+
+$logging = true
+
+$g = Game.new
+$g.start
+p $g.hint
+
+prompt = lambda {
+  "Turn %s, Round %s: %s >> " % [
+    $g.turn.number,
+    $g.action_round.number,
+    $g.phasing_player.player
+  ]
+}
+
+Ripl.start(
+  riplrc: false,
+  prompt: prompt,
+  multi_line_prompt: " >>> ",
+  binding: $g.instance_eval { binding }
+)
+

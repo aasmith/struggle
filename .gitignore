@@ -1,5 +1,5 @@
 bin/*
-!bin/struggle
+!bin/struggle*
 .*
 !.gitignore
 !.autotest

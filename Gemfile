@@ -13,3 +13,8 @@ group :test do
   gem "autotest"
   gem "debride"
 end
+
+group :console do
+  gem "ripl"
+  gem "ripl-multi_line"
+end

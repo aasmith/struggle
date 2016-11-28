@@ -114,6 +114,11 @@ class Engine
 
         # Not able to accept this move, put the item back and stop the loop.
         else
+          if move
+            log "The move by %s was rejected" % [move.player]
+            log move
+          end
+
           push_onto_stack work_item
           break
 

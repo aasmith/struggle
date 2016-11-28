@@ -17,5 +17,8 @@ class Move
   def executed?
     @executed
   end
-end
 
+  def to_s
+    "Move: %s, %s" % [player, instruction.inspect]
+  end
+end

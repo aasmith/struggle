@@ -8,7 +8,6 @@ load 'struggle/banner.rb', true
 $logging = true
 
 require 'struggle'
-require 'struggle/game'
 
 g = Game.new
 g.start

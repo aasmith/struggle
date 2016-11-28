@@ -54,6 +54,8 @@ require "struggle/turn_marker"
 require "struggle/victory"
 require "struggle/victory_track"
 
+require "struggle/game"
+
 class Struggle
   VERSION = "1.0.0"
 end

@@ -25,6 +25,10 @@ task :progress do
   puts "\t%.f%% Complete"  % [done.to_f / (done.to_i + left.to_i) * 100]
 end
 
+task :whatnext do
+  exec "grep TODO lib/struggle/events/card_events.rb"
+end
+
 task :console do
   # Rather than run IRB inline, shell out. This produces a cleaner backtrace
   # that excludes rake context when an error is encountered.

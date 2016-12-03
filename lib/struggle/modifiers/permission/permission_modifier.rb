@@ -2,7 +2,7 @@ module Modifiers
   module Permission
     class PermissionModifier
 
-      extend Injectible
+      extend Injectable
 
       def allows?(instruction_or_move)
         raise NotImplementedError

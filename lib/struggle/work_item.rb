@@ -1,5 +1,5 @@
 class WorkItem
-  extend Injectible
+  extend Injectable
 
   def initialize(**args)
     @complete = false

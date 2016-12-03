@@ -1,6 +1,6 @@
 class Guard
 
-  extend Injectible
+  extend Injectable
 
   attr_accessor :move
 

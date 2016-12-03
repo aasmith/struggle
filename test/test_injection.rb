@@ -40,7 +40,7 @@ class TestInjection < Struggle::Test
     end
   end
 
-  def test_injector_does_nothing_on_non_injectibles
+  def test_injector_does_nothing_on_non_injectables
     source = Struct.new(:a).new(123)
     innocent_bystander = Struct.new(:a).new
 
@@ -99,13 +99,13 @@ class TestInjection < Struggle::Test
   end
 
   class Needy
-    extend Injectible
+    extend Injectable
 
     needs :a, :b
   end
 
   class NeedyWrapper
-    extend Injectible
+    extend Injectable
 
     needs :a
 

@@ -46,7 +46,7 @@ end
 # skipped.
 #
 class PermissionModifier
-  extend Injectible
+  extend Injectable
 
   def allows?(work_item)
     raise NotImplementedError

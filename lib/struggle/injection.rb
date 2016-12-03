@@ -1,4 +1,4 @@
-module Injectible
+module Injectable
   def needs(*attrs)
     @needs ||= []
     @needs.push(*attrs)

@@ -40,7 +40,10 @@ class Engine
   end
 
   def permitted?(item)
-    @permission_modifiers.all? { |mod| mod.allows? item }
+    @permission_modifiers.all? do |mod|
+      injector.inject mod
+      mod.allows? item
+    end
   end
 
   def add_stack_modifier(mod)

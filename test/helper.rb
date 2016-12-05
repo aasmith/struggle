@@ -6,7 +6,35 @@ require "struggle"
 # Silence log during tests
 $logging = false
 
+module Assertions
+  def assert_instruction(thing)
+    assert_kind_of Instruction, thing
+  end
+
+  def assert_permission_added(permission_name, instruction)
+    assert_instruction instruction
+    assert_instance_of Instructions::AddPermissionModifier, instruction
+    assert_equal permission_name, instruction.modifier_name
+  end
+
+  def assert_placed_in_effect(card_ref, instruction)
+    assert_instruction instruction
+    assert_instance_of Instructions::PlaceInEffect, instruction
+    assert_equal card_ref, instruction.card_ref
+  end
+
+  def assert_removed_from_play(card_ref, instruction)
+    assert_instruction instruction
+    assert_instance_of Instructions::Remove, instruction
+    assert_equal card_ref, instruction.card_ref
+  end
+
+end
+
 class Struggle::Test < Minitest::Test
+
+  include Assertions
+
   parallelize_me!
   make_my_diffs_pretty!
 

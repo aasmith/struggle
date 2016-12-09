@@ -3,7 +3,7 @@ source "https://rubygems.org"
 
 group :development do
   gem "rake"
-  gem "hoe"
+  gem "hoe", ">= 3.1.0"
   gem "rdoc"
 end
 

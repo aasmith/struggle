@@ -3,7 +3,9 @@ class Countries
   include Enumerable
 
   def initialize(data)
-    @countries = data.map { |row| Country.new(*row) }
+    @countries = data.map do |row|
+      Country === row ? row : Country.new(*row)
+    end
   end
 
   def initialize_copy(orig)

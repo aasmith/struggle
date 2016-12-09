@@ -37,10 +37,6 @@ module Events
 
         end
 
-        # TODO Regarding canceling NATO effect for West Germany:
-        # The nato modifier should check for this event being in effect.
-        # NATO modifier will enforce the clause regarding coup/realign/brush.
-
         instructions
       end
 

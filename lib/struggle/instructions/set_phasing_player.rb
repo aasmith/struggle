@@ -11,6 +11,8 @@ module Instructions
     end
 
     def action
+      log "%4s is now the phasing player" % player
+
       phasing_player.player = player
     end
 

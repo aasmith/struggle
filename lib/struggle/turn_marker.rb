@@ -1,7 +1,11 @@
 class TurnMarker
 
-  def initialize(turn = 1)
-    @turn = turn
+  def initialize
+    @turn = nil
+  end
+
+  def start
+    @turn = 1
   end
 
   def advance

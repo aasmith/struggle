@@ -13,6 +13,8 @@ module Instructions
 
       instructions << StartingInfluence.new
 
+      instructions << InitializeMarkers.new
+
       instructions << AddPermissionModifier.new(modifier_name: "NatoPreventer")
 
       instructions

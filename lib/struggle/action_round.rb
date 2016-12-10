@@ -4,7 +4,7 @@
 
 class ActionRound
   def initialize
-    reset
+    @round = nil
   end
 
   def advance
@@ -14,6 +14,8 @@ class ActionRound
   def reset
     @round = 1
   end
+
+  alias start reset
 
   def number
     @round

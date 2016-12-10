@@ -35,4 +35,8 @@ task :console do
   exec "irb -Ilib -rstruggle -EUTF-8"
 end
 
+task :ctags do
+  sh "ctags --extra=+f -R *"
+end
+
 # vim: syntax=ruby

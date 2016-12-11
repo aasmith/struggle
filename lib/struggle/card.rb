@@ -1,7 +1,7 @@
 class Card
   attr_reader :ref, :id, :name, :phase, :side
   attr_reader :remove_after_event, :display_after_event,
-              :always_evaluate_first, :prevent_in_headline
+              :always_evaluate_first
 
   def initialize(**args)
     args.each { |k,v| instance_variable_set("@#{k}", v) }

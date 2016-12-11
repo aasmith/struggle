@@ -300,8 +300,7 @@ class Cards
         name: "UN Intervention",
         phase: :early,
         ops: 1,
-        side: nil,
-        prevent_in_headline: true
+        side: nil
       ),
       Card.new(
         ref: "DeStalinization",

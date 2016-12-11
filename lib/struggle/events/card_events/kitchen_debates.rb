@@ -12,7 +12,7 @@ module Events
         # the award condition is true. See Rules 5.2 example 4.
 
         if us_controls_more_battlegrounds?
-          instructions << AwardVictoryPoints.new(
+          instructions << Instructions::AwardVictoryPoints.new(
             player: US,
             amount: 2
           )

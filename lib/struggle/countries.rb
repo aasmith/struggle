@@ -4,7 +4,7 @@ class Countries
 
   def initialize(data)
     @countries = data.map do |row|
-      Country === row ? row : Country.new(*row)
+      Array === row ? Country.new(*row) : row
     end
   end
 

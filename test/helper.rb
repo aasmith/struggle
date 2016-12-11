@@ -29,6 +29,22 @@ module Assertions
     assert_equal card_ref, instruction.card_ref
   end
 
+  def assert_discard(card_ref, instruction)
+    assert_kind_of Instructions::Discard, instruction
+    assert_equal card_ref, instruction.card_ref
+  end
+
+  def assert_remove(card_ref, instruction)
+    assert_kind_of Instructions::Remove, instruction
+    assert_equal card_ref, instruction.card_ref
+  end
+
+  def assert_award_vp(amount, player, instruction)
+    assert_kind_of Instructions::AwardVictoryPoints, instruction
+    assert_equal amount, instruction.amount
+    assert_equal player, instruction.player
+  end
+
 end
 
 class Struggle::Test < Minitest::Test

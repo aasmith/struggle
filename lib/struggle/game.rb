@@ -65,4 +65,17 @@ class Game
   def observers
     @engine.observers
   end
+
+  def timeline
+    case
+    when turn.number.nil? && action_round.number.nil?
+      :setup
+    when headline_phase.active?
+      :headline
+    when turn.number
+      :turn
+    else
+      :unknown
+    end
+  end
 end

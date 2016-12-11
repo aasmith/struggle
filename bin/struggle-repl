@@ -16,11 +16,16 @@ $g.start
 p $g.hint
 
 prompt = lambda {
-  "Turn %s, Round %s: %s >> " % [
-    $g.turn.number,
-    $g.action_round.number,
-    $g.phasing_player.player
-  ]
+  timeline = case $g.timeline
+  when :setup
+    "Setup"
+  when :headline
+    "Turn %s, Headline" % [$g.turn.number]
+  when :turn
+    "Turn %s, Round %s" % [$g.turn.number, $g.action_round.number]
+  end
+
+  "%s: %s >> " % [timeline, $g.phasing_player.player]
 }
 
 Ripl.start(
@@ -29,4 +34,3 @@ Ripl.start(
   multi_line_prompt: " >>> ",
   binding: $g.instance_eval { binding }
 )
-

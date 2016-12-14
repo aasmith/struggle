@@ -12,6 +12,11 @@ module Events
           card_ref: "WillyBrandt"
         )
 
+        instructions << Instructions::PreventPlayOfEvent.new(
+          card_ref: "WillyBrandt",
+            reason: "Tear Down This Wall is in effect."
+        )
+
         instructions << Instructions::PlaceInEffect.new(
           card_ref: "TearDownThisWall"
         )

@@ -15,6 +15,11 @@ module Events
           card_ref: "FlowerPower"
         )
 
+        instructions << Instructions::PreventPlayOfEvent.new(
+          card_ref: "FlowerPower",
+            reason: "An Evil Empire is in effect."
+        )
+
         instructions << Instructions::PlaceInEffect.new(
           card_ref: "AnEvilEmpire"
         )

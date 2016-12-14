@@ -2,6 +2,8 @@ class Engine
 
   attr_accessor :injector
 
+  attr_reader :permission_modifiers
+
   def initialize
     @work_items = Stack.new
 
@@ -37,6 +39,10 @@ class Engine
 
   def add_permission_modifier(mod)
     @permission_modifiers << mod
+  end
+
+  def remove_permission_modifier(mod)
+    @permission_modifiers.delete mod
   end
 
   def permitted?(item)

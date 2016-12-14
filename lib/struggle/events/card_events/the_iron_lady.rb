@@ -27,6 +27,11 @@ module Events
                 amount: uk.influence(USSR)
         )
 
+        instructions << Instructions::PreventPlayOfEvent.new(
+          card_ref: "SocialistGovernments",
+            reason: "The Iron Lady is in effect."
+        )
+
         instructions << Instructions::PlaceInEffect.new(
           card_ref: "TheIronLady"
         )

@@ -33,6 +33,11 @@ module Events
           card_ref: "CampDavidAccords"
         )
 
+        instructions << Instructions::PreventPlayOfEvent.new(
+          card_ref: "ArabIsraeliWar",
+            reason: "Camp David Accords is in effect."
+        )
+
         instructions << Instructions::Remove.new(
           card_ref: "CampDavidAccords"
         )

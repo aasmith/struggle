@@ -22,6 +22,10 @@ module Events
           card_ref: "JohnPaulIiElectedPope"
         )
 
+        instructions << Instructions::AllowPlayOfEvent.new(
+          card_ref: "Solidarity"
+        )
+
         instructions << Instructions::Remove.new(
           card_ref: "JohnPaulIiElectedPope"
         )

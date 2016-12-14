@@ -15,7 +15,15 @@ module Instructions
 
       instructions << InitializeMarkers.new
 
-      instructions << AddPermissionModifier.new(modifier_name: "NatoPreventer")
+      instructions << PreventPlayOfEvent.new(
+        card_ref: "Nato",
+          reason: "Marshall Plan or Warsaw Pact must be played for event first."
+      )
+
+      instructions << PreventPlayOfEvent.new(
+        card_ref: "Solidarity",
+          reason: "John Paul II Elected Pope must be played for event first."
+      )
 
       instructions
     end

@@ -21,9 +21,9 @@ module Events
           )
 
         else
-          instructions << Instructions::Discard.new(
-            card_ref: "Solidarity"
-          )
+
+          log "John Paul II Elected Pope is not in effect, event will not occur."
+
         end
 
         instructions

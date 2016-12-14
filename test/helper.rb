@@ -6,6 +6,9 @@ require "struggle"
 # Silence log during tests
 $logging = false
 
+# Generate this immutable instance once and keep it around for all tests.
+TEST_CARDS = Cards.new.freeze
+
 module Assertions
   def assert_instruction(thing)
     assert_kind_of Instruction, thing

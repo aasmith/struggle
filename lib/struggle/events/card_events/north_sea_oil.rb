@@ -8,6 +8,8 @@ module Events
       def action
         instructions = []
 
+        # TODO: prevent play of OPEC
+
         instructions << Instructions::Noop.new(label: "something")
         instructions << Instructions::Noop.new(label: "dump the card")
 

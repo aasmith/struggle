@@ -20,6 +20,10 @@ module Events
           card_ref: "MarshallPlan"
         )
 
+        instructions << Instructions::AllowPlayOfEvent.new(
+          card_ref: "Nato"
+        )
+
         instructions << Instructions::Remove.new(
           card_ref: "MarshallPlan"
         )

@@ -10,9 +10,8 @@ module Events
 
         if events_in_effect.include?("TearDownThisWall")
 
-          instructions << Instructions::Discard.new(
-            card_ref: "WillyBrandt"
-          )
+          log "Tear Down This Wall is in effect."
+          log "Willy Brandt event will not be triggered."
 
         else
 

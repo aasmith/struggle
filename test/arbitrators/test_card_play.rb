@@ -78,7 +78,7 @@ class ArbitratorTests::CardPlayTest < Struggle::Test
       instruction: Instructions::Noop.new
     )
 
-    cards = Cards.new
+    cards = TEST_CARDS
 
     [@event_move, @ops_move, @single_move, @china_move, @china_event,
      @space_move, @bad_card_move].each do |m|

@@ -3,7 +3,7 @@ require "helper"
 class InstructionTests::DealCardsTest < Struggle::Test
 
   def test_deal
-    cards = Cards.new.select { |c| c.early? }
+    cards = TEST_CARDS.select { |c| c.early? }
 
     deck = Deck.new
     deck.add cards

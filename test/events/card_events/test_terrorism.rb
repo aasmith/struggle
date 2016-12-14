@@ -3,15 +3,13 @@ require "helper"
 module CardEventTests
   class TerrorismTest < Struggle::Test
 
-    @@cards = Cards.new
-
     def setup
       @hands = Hands.new
-      @hands.add(US, @@cards.find_by_ref("Nato"))
-      @hands.add(US, @@cards.find_by_ref("AnEvilEmpire"))
+      @hands.add(US, TEST_CARDS.find_by_ref("Nato"))
+      @hands.add(US, TEST_CARDS.find_by_ref("AnEvilEmpire"))
 
-      @hands.add(USSR, @@cards.find_by_ref("Fidel"))
-      @hands.add(USSR, @@cards.find_by_ref("Blockade"))
+      @hands.add(USSR, TEST_CARDS.find_by_ref("Fidel"))
+      @hands.add(USSR, TEST_CARDS.find_by_ref("Blockade"))
 
       @event = Events::CardEvents::Terrorism.new
       @event.events_in_effect = EventsInEffect.new(["IranianHostageCrisis"])
@@ -91,7 +89,7 @@ module CardEventTests
       @event.phasing_player = USSR
 
       # Make hand small
-      @hands.remove(US, @@cards.find_by_ref("AnEvilEmpire"))
+      @hands.remove(US, TEST_CARDS.find_by_ref("AnEvilEmpire"))
 
       instructions = @event.action
 

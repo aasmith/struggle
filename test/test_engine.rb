@@ -336,6 +336,24 @@ class TestEngine < Struggle::Test
     assert fake_injector.injected?(move), "Move was not passed to the injector"
   end
 
+  def test_permission_modifiers_can_be_added_and_removed
+    e = Engine.new
+    p = NegativePermissionModifier.new
+
+    assert_empty e.permission_modifiers,
+      "There should be no permission modifiers installed in a new Engine"
+
+    e.add_permission_modifier p
+
+    assert_includes e.permission_modifiers, p,
+      "There should be one permission modifier installed after addition"
+
+    e.remove_permission_modifier p
+
+    assert_empty e.permission_modifiers,
+      "There should be no permission modifiers installed after removal"
+  end
+
   class MoveAcceptor < MoveArbitrator
     def initialize(**args)
       @label = args.delete(:label)

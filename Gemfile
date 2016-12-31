@@ -10,6 +10,8 @@ end
 group :test do
   gem "minitest"
   gem "minitest-gcstats"
+  gem "minitest-profile"
+  gem "minitest-proveit"
   gem "autotest"
   gem "debride"
 end

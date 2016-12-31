@@ -1,5 +1,5 @@
 require "minitest/autorun"
-require "minitest/mock"
+require "minitest/proveit"
 
 require "struggle"
 
@@ -56,6 +56,7 @@ class Struggle::Test < Minitest::Test
 
   parallelize_me!
   make_my_diffs_pretty!
+  prove_it!
 
   def generate_countries(*names)
     names.map do |name|

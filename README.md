@@ -53,6 +53,7 @@ Running tests:
 `TESTOPTS=-p RUBYOPT=-w RAKEOPT=-q rake`
 
 Add `-g` to `TESTOPTS` to get GC stats.
+Add `--profile` to `TESTOPTS` to show slowest tests.
 
 Running a test:
 

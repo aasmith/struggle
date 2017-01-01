@@ -3,6 +3,8 @@ class Card
   attr_reader :remove_after_event, :display_after_event,
               :always_evaluate_first
 
+  alias always_evaluate_first? always_evaluate_first
+
   def initialize(**args)
     args.each { |k,v| instance_variable_set("@#{k}", v) }
   end
@@ -36,6 +38,12 @@ class Card
 
   def ops!
     @ops
+  end
+
+  # Only use this during the headline phase. A negative value is returned as
+  # the ranking order is lowest value first.
+  def headline_value
+    -ops!
   end
 
   def ops_counter(ops_modifiers = [])
